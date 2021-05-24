@@ -48,6 +48,7 @@ sp-version = { default-features = false, version = '3.0.0', git = 'https://githu
 
 # local dependencies
 pallet-template = { default-features = false, version = '3.0.0', path = '../pallets/template' }
+node-primitives = { default-features = false, version = '3.0.0', path = '../primitives' }
 
 [features]
 default = ['std']
