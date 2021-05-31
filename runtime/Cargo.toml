@@ -4,7 +4,7 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus-runtime'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '1.0.0'
+version = '1.0.0-1'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -73,7 +73,7 @@ sp-consensus-babe = { default-features = false, version = '0.9.0', git = 'https:
 # local dependencies
 pallet-template = { default-features = false, version = '3.0.0', path = '../pallets/template' }
 bholdus-primitives = { default-features = false, version = '1.0.0', path = '../primitives' }
-pallet-bholdus-private-sales = { default-features = false, version = '1.0.0', path = '../pallets/bholdus-private-sales' }
+pallet-bholdus-private-sales = { default-features = false, version = '1.0.0-1', path = '../pallets/bholdus-private-sales' }
 
 [features]
 default = ['std']

@@ -507,7 +507,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-runtime"
-version = "1.0.0"
+version = "1.0.0-1"
 dependencies = [
  "bholdus-primitives",
  "frame-benchmarking",
@@ -4071,7 +4071,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-bholdus-private-sales"
-version = "1.0.0"
+version = "1.0.0-1"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
