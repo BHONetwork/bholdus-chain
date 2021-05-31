@@ -22,6 +22,11 @@ const DEFAULT_PROTOCOL_ID: &str = "bho";
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
+// Token Decimals
+const TOKEN_DECIMALS: u32 = 10;
+// Token Symbol
+const TOKEN_SYMBOL: &str = "BHO";
+
 /// Generate a crypto pair from seed.
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
     TPublic::Pair::from_string(&format!("//{}", seed), None)
@@ -36,8 +41,8 @@ pub fn get_properties() -> Properties {
         "ss58Format".into(),
         bholdus_runtime::SS58Prefix::get().into(),
     );
-    properties.insert("tokenDecimals".into(), 18.into());
-    properties.insert("tokenSymbol".into(), "BHO".into());
+    properties.insert("tokenDecimals".into(), TOKEN_DECIMALS.into());
+    properties.insert("tokenSymbol".into(), TOKEN_SYMBOL.into());
 
     properties
 }
@@ -233,7 +238,7 @@ fn testnet_genesis(
 
     let num_endowed_accounts = endowed_accounts.len();
 
-    const ENDOWMENT: Balance = 10_000_000;
+    const ENDOWMENT: Balance = 10_000_000_000 * 10_u128.pow(TOKEN_DECIMALS);
     const STASH: Balance = ENDOWMENT / 1000;
 
     GenesisConfig {
