@@ -1,12 +1,12 @@
 [package]
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-description = 'FRAME pallet template for defining custom runtime logic.'
+authors = ['Bholdus <https://github.com/bholdus>']
+description = 'Private sale pallet'
 edition = '2018'
-homepage = 'https://substrate.dev'
-license = 'Unlicense'
+homepage = 'https://bholdus.com'
 name = 'pallet-bholdus-private-sales'
+license = "Apache-2.0"
 readme = 'README.md'
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+repository = 'https://github.com/bholdus/bholdus-chain'
 version = '1.0.0'
 
 [package.metadata.docs.rs]

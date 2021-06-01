@@ -456,7 +456,7 @@ dependencies = [
  "pallet-im-online",
  "pallet-mmr-rpc",
  "pallet-transaction-payment-rpc",
- "rand 0.7.3",
+ "rand 0.8.3",
  "sc-authority-discovery",
  "sc-basic-authorship",
  "sc-chain-spec",
