@@ -1,0 +1,23 @@
+[package]
+authors = ["Hawking Technologies <dung.lam@hawking.network>"]
+edition = "2018"
+homepage = "https://substrate.dev"
+license = "Apache-2.0"
+name = "bholdus-primitives"
+repository = "https://github.com/hawkingnetwork/substrate-node-template/"
+version = "1.0.0"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+sp-core = { default-features = false, version = "3.0.0", git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+sp-runtime = { default-features = false, version = "3.0.0", git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+
+[dev-dependencies]
+pretty_assertions = "0.6.1"
+sp-serializer = { version = "3.0.0", git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+
+[features]
+default = ["std"]
+std = ["sp-core/std", "sp-runtime/std"]
