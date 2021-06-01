@@ -23,7 +23,7 @@ const DEFAULT_PROTOCOL_ID: &str = "bho";
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
 // Token Decimals
-const TOKEN_DECIMALS: u32 = 10;
+const TOKEN_DECIMALS: u32 = 18;
 // Token Symbol
 const TOKEN_SYMBOL: &str = "BHO";
 
