@@ -1,10 +1,10 @@
 [package]
-authors = ["Hawking Technologies <dung.lam@hawking.network>"]
+authors = ["Bholdus <dung.lam@hawking.network>"]
 edition = "2018"
-homepage = "https://substrate.dev"
+homepage = "https://bholdus.com"
 license = "Apache-2.0"
 name = "bholdus-primitives"
-repository = "https://github.com/hawkingnetwork/substrate-node-template/"
+repository = "https://github.com/bholdus/bholdus-chain/"
 version = "1.0.0"
 
 [package.metadata.docs.rs]
