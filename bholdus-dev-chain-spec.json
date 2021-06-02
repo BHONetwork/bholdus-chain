@@ -1,7 +1,7 @@
 {
-  "name": "Bholdus-Development",
-  "id": "dev",
-  "chainType": "Development",
+  "name": "Bholdus-Local Testnet",
+  "id": "local_testnet",
+  "chainType": "Local",
   "bootNodes": [
     "/dns/bholdus-chain.dev.hawking.technology/tcp/30333/p2p/12D3KooWMnPDgBTddaZ5nfuTWWekJ2mZbeSmxCqHeb4VfNwoudbT"
   ],
@@ -31,12 +31,12 @@
       "palletBalances": {
         "balances": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            1000000000000000000000
-          ],
-          [
             "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
             10000000000000000000000000000
+          ],
+          [
+            "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
+            10000000000000000000000000
           ]
         ]
       },
@@ -69,6 +69,16 @@
               "im_online": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
               "authority_discovery": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
             }
+          ],
+          [
+            "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
+            "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
+            {
+              "grandpa": "5GoNkf6WdbxCFnPdAnYYQyCjAKPJgLNxXwPjwTh6DGg6gN3E",
+              "babe": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+              "im_online": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+              "authority_discovery": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
+            }
           ]
         ]
       },
@@ -80,10 +90,11 @@
       },
       "palletStaking": {
         "historyDepth": 84,
-        "validatorCount": 2,
-        "minimumValidatorCount": 1,
+        "validatorCount": 4,
+        "minimumValidatorCount": 2,
         "invulnerables": [
-          "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY"
+          "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
+          "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc"
         ],
         "forceEra": "NotForcing",
         "slashRewardFraction": 100000000,
@@ -92,7 +103,13 @@
           [
             "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
             "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            10000000000000000000000,
+            1000000000000000000000,
+            "Validator"
+          ],
+          [
+            "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
+            "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+            1000000000000000000000,
             "Validator"
           ]
         ]

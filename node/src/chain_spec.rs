@@ -143,7 +143,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 
     Ok(ChainSpec::from_genesis(
         // Name
-        "Local Testnet",
+        "Bholdus-Local Testnet",
         // ID
         "local_testnet",
         ChainType::Local,
@@ -161,22 +161,28 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     (
-                        get_account_id_from_seed::<sr25519::Public>("Alice"),
+                        get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                         10_000_000_000 * BHO,
                     ),
                     (
-                        get_account_id_from_seed::<sr25519::Public>("Bob"),
+                        get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                         10_000_000 * BHO,
                     ),
                 ],
-                10_000 * BHO,
+                1000 * BHO,
                 true,
             )
         },
         // Bootnodes
         vec![],
         // Telemetry
-        None,
+        Some(
+            TelemetryEndpoints::new(vec![(
+                String::from("wss://telemetry.polkadot.io/submit/"),
+                0,
+            )])
+            .unwrap(),
+        ),
         // Protocol ID
         Some(DEFAULT_PROTOCOL_ID),
         // Properties
