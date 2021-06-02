@@ -2,8 +2,8 @@ use bholdus_primitives::{AccountId, Balance, Signature};
 use bholdus_runtime::{
     opaque::SessionKeys, AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig,
     CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-    StakerStatus, StakingConfig, SudoConfig, SystemConfig, BABE_GENESIS_EPOCH_CONFIG,
-    MAX_NOMINATIONS, WASM_BINARY,
+    StakerStatus, StakingConfig, SudoConfig, SystemConfig, BABE_GENESIS_EPOCH_CONFIG, BHO,
+    MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
@@ -21,11 +21,6 @@ use sp_runtime::{
 const DEFAULT_PROTOCOL_ID: &str = "bho";
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
-
-// Token Decimals
-const TOKEN_DECIMALS: u32 = 18;
-// Token Symbol
-const TOKEN_SYMBOL: &str = "BHO";
 
 /// Generate a crypto pair from seed.
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -110,12 +105,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
                 // Sudo account
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
                 // Pre-funded accounts
-                vec![
-                    get_account_id_from_seed::<sr25519::Public>("Alice"),
-                    get_account_id_from_seed::<sr25519::Public>("Bob"),
-                    get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-                ],
+                vec![get_account_id_from_seed::<sr25519::Public>("Alice")],
                 true,
             )
         },
@@ -205,19 +195,6 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
 ) -> GenesisConfig {
-    let mut endowed_accounts = endowed_accounts;
-
-    // endow all authorities and nominators.
-    initial_authorities
-        .iter()
-        .map(|x| &x.0)
-        .chain(initial_nominators.iter())
-        .for_each(|x| {
-            if !endowed_accounts.contains(&x) {
-                endowed_accounts.push(x.clone())
-            }
-        });
-
     // stakers: all validators and nominators.
     let mut rng = rand::thread_rng();
     let stakers = initial_authorities
@@ -242,8 +219,8 @@ fn testnet_genesis(
         }))
         .collect::<Vec<_>>();
 
-    const ENDOWMENT: Balance = 10_000_000_000 * 10_u128.pow(TOKEN_DECIMALS);
-    const STASH: Balance = ENDOWMENT / 1000;
+    const ENDOWMENT: Balance = 10_000_000_000 * BHO;
+    const STASH: Balance = 10_000 * BHO;
 
     GenesisConfig {
         frame_system: SystemConfig {
