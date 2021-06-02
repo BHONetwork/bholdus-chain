@@ -105,7 +105,17 @@ pub fn development_config() -> Result<ChainSpec, String> {
                 // Sudo account
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
                 // Pre-funded accounts
-                vec![get_account_id_from_seed::<sr25519::Public>("Alice")],
+                vec![
+                    (
+                        get_account_id_from_seed::<sr25519::Public>("Alice"),
+                        1_000 * BHO,
+                    ),
+                    (
+                        get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+                        10_000_000_000 * BHO,
+                    ),
+                ],
+                10_000 * BHO,
                 true,
             )
         },
@@ -150,19 +160,16 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
                 // Pre-funded accounts
                 vec![
-                    get_account_id_from_seed::<sr25519::Public>("Alice"),
-                    get_account_id_from_seed::<sr25519::Public>("Bob"),
-                    get_account_id_from_seed::<sr25519::Public>("Charlie"),
-                    get_account_id_from_seed::<sr25519::Public>("Dave"),
-                    get_account_id_from_seed::<sr25519::Public>("Eve"),
-                    get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-                    get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+                    (
+                        get_account_id_from_seed::<sr25519::Public>("Alice"),
+                        10_000_000_000 * BHO,
+                    ),
+                    (
+                        get_account_id_from_seed::<sr25519::Public>("Bob"),
+                        10_000_000 * BHO,
+                    ),
                 ],
+                10_000 * BHO,
                 true,
             )
         },
@@ -192,14 +199,15 @@ fn testnet_genesis(
     )>,
     initial_nominators: Vec<AccountId>,
     root_key: AccountId,
-    endowed_accounts: Vec<AccountId>,
+    endowed_accounts: Vec<(AccountId, Balance)>,
+    stash: Balance,
     enable_println: bool,
 ) -> GenesisConfig {
     // stakers: all validators and nominators.
     let mut rng = rand::thread_rng();
     let stakers = initial_authorities
         .iter()
-        .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
+        .map(|x| (x.0.clone(), x.1.clone(), stash, StakerStatus::Validator))
         .chain(initial_nominators.iter().map(|x| {
             use rand::{seq::SliceRandom, Rng};
             let limit = (MAX_NOMINATIONS as usize).min(initial_authorities.len());
@@ -213,14 +221,11 @@ fn testnet_genesis(
             (
                 x.clone(),
                 x.clone(),
-                STASH,
+                stash,
                 StakerStatus::Nominator(nominations),
             )
         }))
         .collect::<Vec<_>>();
-
-    const ENDOWMENT: Balance = 10_000_000_000 * BHO;
-    const STASH: Balance = 10_000 * BHO;
 
     GenesisConfig {
         frame_system: SystemConfig {
@@ -229,11 +234,7 @@ fn testnet_genesis(
             changes_trie_config: Default::default(),
         },
         pallet_balances: BalancesConfig {
-            balances: endowed_accounts
-                .iter()
-                .cloned()
-                .map(|x| (x, ENDOWMENT))
-                .collect(),
+            balances: endowed_accounts.iter().cloned().collect(),
         },
         pallet_indices: IndicesConfig { indices: vec![] },
         pallet_session: SessionConfig {
