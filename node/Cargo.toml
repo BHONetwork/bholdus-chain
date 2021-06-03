@@ -6,7 +6,7 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '1.0.0-1'
+version = '1.0.0'
 
 [[bin]]
 name = 'bholdus'
@@ -72,7 +72,7 @@ sp-keystore = { version = '0.9.0', git = 'https://github.com/paritytech/substrat
 substrate-frame-rpc-system = { version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
 
 # local dependencies
-bholdus-runtime = { version = '1.0.0-1', path = '../runtime' }
+bholdus-runtime = { version = '1.0.0', path = '../runtime' }
 bholdus-primitives = { version = '1.0.0', path = '../primitives' }
 
 [features]
