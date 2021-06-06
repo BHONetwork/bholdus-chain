@@ -21,3 +21,6 @@ key-insert
 
 # Nohup log file
 nohup.out
+
+# Node temporary files
+tmp
