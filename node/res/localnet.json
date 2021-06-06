@@ -1,9 +1,10 @@
 {
-  "name": "Bholdus Devnet",
-  "id": "bholdus_devnet",
+  "name": "Bholdus Localnet",
+  "id": "bholdus_localnet",
   "chainType": "Local",
   "bootNodes": [
-    "/dns/bholdus-chain.dev.hawking.technology/tcp/30333/p2p/12D3KooWMnPDgBTddaZ5nfuTWWekJ2mZbeSmxCqHeb4VfNwoudbT"
+    "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWQiJv5i1DWDAyZBGHhCbpbMLEZS9xUyKAHXKGaguXJ4ej",
+    "/ip4/127.0.0.1/tcp/30334/p2p/12D3KooWC71ypSJFSqpJvmjTE6eZQtBCH3m3ii8upuqRqdmYixCN"
   ],
   "telemetryEndpoints": [
     [
@@ -31,17 +32,25 @@
       "palletBalances": {
         "balances": [
           [
-            "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
+            "5DLr2nAvGbMgBgN2rKBALFnRBZ3ySKw51QQyg8DFK2474BN8",
             10000000000000000000000000000
           ],
           [
-            "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
-            10000000000000000000000000
+            "5F4RHZQfgiZU2sQfGd9bbSwyANrBfkQYd16K1VSJNximRzKu",
+            10000000000000000000000
+          ],
+          [
+            "5DFmXfLUYy8xmgEFjJmHtseyu6QoqUkjEs5UghmR2hnceNoR",
+            10000000000000000000000
+          ],
+          [
+            "5CJCorVB2C1Xqdw4jftjwRfTRXwpzi3WoxL7wg4xZCzxa84A",
+            10000000000000000000000
           ]
         ]
       },
       "palletSudo": {
-        "key": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+        "key": "5F4RHZQfgiZU2sQfGd9bbSwyANrBfkQYd16K1VSJNximRzKu"
       },
       "palletCollectiveInstance1": {
         "phantom": null,
@@ -61,13 +70,23 @@
       "palletSession": {
         "keys": [
           [
-            "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
-            "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
+            "5DFmXfLUYy8xmgEFjJmHtseyu6QoqUkjEs5UghmR2hnceNoR",
+            "5DFmXfLUYy8xmgEFjJmHtseyu6QoqUkjEs5UghmR2hnceNoR",
             {
-              "grandpa": "5FA9nQDVg267DEd8m1ZypXLBnvN7SFxYwV7ndqSYGiN9TTpu",
-              "babe": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-              "im_online": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-              "authority_discovery": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+              "grandpa": "5D1cBcfCGgLyuwWVPVzZVZHMsbyCYkw2hPmetihwwAHnq6C6",
+              "babe": "5Gxkjr87nRzL1THRN64zPEvZRgYkxQaaQRyuysDBoB1H6yH5",
+              "im_online": "5Gxkjr87nRzL1THRN64zPEvZRgYkxQaaQRyuysDBoB1H6yH5",
+              "authority_discovery": "5Gxkjr87nRzL1THRN64zPEvZRgYkxQaaQRyuysDBoB1H6yH5"
+            }
+          ],
+          [
+            "5CJCorVB2C1Xqdw4jftjwRfTRXwpzi3WoxL7wg4xZCzxa84A",
+            "5CJCorVB2C1Xqdw4jftjwRfTRXwpzi3WoxL7wg4xZCzxa84A",
+            {
+              "grandpa": "5HJfKdhZUvJPNwiwMsvkcgELoYutbj1vFQiUWK65YD3Kbx8N",
+              "babe": "5G7MSDg3V17gR5o275AyNbK9uPkY82eTrZcYwKea1fYrtPKU",
+              "im_online": "5G7MSDg3V17gR5o275AyNbK9uPkY82eTrZcYwKea1fYrtPKU",
+              "authority_discovery": "5G7MSDg3V17gR5o275AyNbK9uPkY82eTrZcYwKea1fYrtPKU"
             }
           ]
         ]
@@ -83,15 +102,22 @@
         "validatorCount": 4,
         "minimumValidatorCount": 2,
         "invulnerables": [
-          "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY"
+          "5DFmXfLUYy8xmgEFjJmHtseyu6QoqUkjEs5UghmR2hnceNoR",
+          "5CJCorVB2C1Xqdw4jftjwRfTRXwpzi3WoxL7wg4xZCzxa84A"
         ],
         "forceEra": "NotForcing",
         "slashRewardFraction": 100000000,
         "canceledPayout": 0,
         "stakers": [
           [
-            "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5DFmXfLUYy8xmgEFjJmHtseyu6QoqUkjEs5UghmR2hnceNoR",
+            "5Gxkjr87nRzL1THRN64zPEvZRgYkxQaaQRyuysDBoB1H6yH5",
+            1000000000000000000000,
+            "Validator"
+          ],
+          [
+            "5CJCorVB2C1Xqdw4jftjwRfTRXwpzi3WoxL7wg4xZCzxa84A",
+            "5G7MSDg3V17gR5o275AyNbK9uPkY82eTrZcYwKea1fYrtPKU",
             1000000000000000000000,
             "Validator"
           ]
