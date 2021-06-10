@@ -53,6 +53,10 @@ pallet-contracts-rpc-runtime-api = { default-features = false, version = '3.0.0'
 pallet-contracts-primitives = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
 pallet-mmr = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
 pallet-scheduler = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+pallet-multisig = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+pallet-proxy = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+pallet-identity = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+pallet-recovery = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
 
 # Substrate primitives
 sp-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
@@ -99,6 +103,9 @@ runtime-benchmarks = [
 	'pallet-bounties/runtime-benchmarks',
 	'pallet-contracts/runtime-benchmarks',
 	'pallet-mmr/runtime-benchmarks',
+	'pallet-multisig/runtime-benchmarks',
+	'pallet-proxy/runtime-benchmarks',
+	'pallet-identity/runtime-benchmarks',
 	'sp-runtime/runtime-benchmarks',
 ]
 std = [
@@ -131,6 +138,10 @@ std = [
 	'pallet-contracts/std',
 	'pallet-contracts-rpc-runtime-api/std',
 	'pallet-mmr/std',
+	'pallet-multisig/std',
+	'pallet-proxy/std',
+	'pallet-identity/std',
+	'pallet-recovery/std',
 	'sp-api/std',
 	'sp-block-builder/std',
 	'sp-core/std',
