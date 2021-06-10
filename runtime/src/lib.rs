@@ -836,6 +836,23 @@ impl pallet_identity::Config for Runtime {
     type WeightInfo = pallet_identity::weights::SubstrateWeight<Runtime>;
 }
 
+parameter_types! {
+    pub const ConfigDepositBase: Balance = 5* DOLLARS;
+    pub const FriendDepositFactor: Balance = 50 * CENTS;
+    pub MaxFriends: u16 = 9;
+    pub const RecoveryDeposit: Balance = 5 * DOLLARS;
+}
+
+impl pallet_recovery::Config for Runtime {
+    type Event = Event;
+    type Call = Call;
+    type Currency = Balances;
+    type ConfigDepositBase = ConfigDepositBase;
+    type FriendDepositFactor = FriendDepositFactor;
+    type MaxFriends = MaxFriends;
+    type RecoveryDeposit = RecoveryDeposit;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -866,6 +883,7 @@ construct_runtime!(
         Authorship: pallet_authorship::{Pallet, Call, Storage, Inherent},
         Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>},
         Mmr: pallet_mmr::{Pallet, Storage},
+        Recovery: pallet_recovery::{Pallet, Call, Storage, Event<T>},
         Scheduler: pallet_scheduler::{Pallet, Call, Storage, Event<T>},
         Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>},
         Identity: pallet_identity::{Pallet, Call, Storage, Event<T>},
