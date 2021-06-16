@@ -1211,7 +1211,6 @@ impl_runtime_apis! {
 
             impl frame_system_benchmarking::Config for Runtime {}
             impl pallet_offences_benchmarking::Config for Runtime {}
-            impl frame_system_benchmarking::Config for Runtime {}
 
             let whitelist: Vec<TrackedStorageKey> = vec![
                 // Block Number
