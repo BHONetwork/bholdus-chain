@@ -4,13 +4,13 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus-runtime'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '1.0.0'
+version = '1.0.1'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
 [build-dependencies]
-substrate-wasm-builder = { version = '4.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+substrate-wasm-builder = { version = '4.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 [dependencies]
 # external dependencies
@@ -19,60 +19,60 @@ hex-literal = { optional = true, version = '0.3.1' }
 log = { version = "0.4.14", default-features = false }
 
 # FRAME dependencies
-frame-benchmarking = { default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-executive = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-support = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-system = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-system-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-system-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-balances = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-grandpa = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-randomness-collective-flip = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-sudo = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-timestamp = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-transaction-payment = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-transaction-payment-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-assets = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-staking = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-babe = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-session = { default-features = false, features = ["historical"], version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-session-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-staking-reward-curve = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-im-online = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-authority-discovery = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-offences = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-offences-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-treasury = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-collective = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-election-provider-multi-phase = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-indices = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-bounties = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-authorship = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-contracts = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-contracts-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-contracts-primitives = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-mmr = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-scheduler = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-multisig = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-proxy = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-identity = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-recovery = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+frame-benchmarking = { default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-executive = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-support = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-system = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-system-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-system-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-balances = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-grandpa = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-randomness-collective-flip = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-sudo = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-timestamp = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-transaction-payment = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-transaction-payment-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-assets = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-staking = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-babe = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-session = { default-features = false, features = ["historical"], version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-session-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-staking-reward-curve = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-im-online = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-authority-discovery = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-offences = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-offences-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-treasury = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-collective = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-election-provider-multi-phase = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-indices = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-bounties = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-authorship = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-contracts = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-contracts-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-contracts-primitives = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-mmr = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-scheduler = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-multisig = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-proxy = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-identity = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-recovery = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 # Substrate primitives
-sp-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-block-builder = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-core = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-inherents = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-offchain = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-session = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-std = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-transaction-pool = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-version = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-staking = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-authority-discovery = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-npos-elections = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-consensus-babe = { default-features = false, version = '0.9.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+sp-api = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-block-builder = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-core = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-inherents = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-offchain = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-session = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-std = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-transaction-pool = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-version = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-staking = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-authority-discovery = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-npos-elections = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-consensus-babe = { default-features = false, version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 # local dependencies
 pallet-template = { default-features = false, version = '3.0.0', path = '../pallets/template' }

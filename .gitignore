@@ -24,3 +24,5 @@ nohup.out
 
 # Node temporary files
 tmp
+
+*.json

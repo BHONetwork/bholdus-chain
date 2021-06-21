@@ -16,20 +16,20 @@ targets = ['x86_64-unknown-linux-gnu']
 codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
 
 # Substrate FRAME
-frame-benchmarking = { default-features = false, version = '3.1.0', optional = true, git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-system = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-frame-support = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+frame-benchmarking = { default-features = false, version = '3.1.0', optional = true, git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-system = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+frame-support = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 # Substrate primitives
-sp-std = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+sp-std = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 [dev-dependencies]
 serde = { version = "1.0.119" }
-sp-core = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-sp-io = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-balances = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
-pallet-scheduler = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', tag = 'monthly-2021-05' }
+sp-core = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-io = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-balances = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-scheduler = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 [features]
 default = ['std']
