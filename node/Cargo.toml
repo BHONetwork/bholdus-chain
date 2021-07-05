@@ -19,7 +19,7 @@ substrate-build-script-utils = { version = '3.0.0', git = 'https://github.com/bh
 
 [dependencies]
 jsonrpc-core = '15.1.0'
-structopt = '0.3.8'
+structopt = '0.3.22'
 rand = "0.8.4"
 futures = { version = "0.3.9", features = ["compat"] }
 
