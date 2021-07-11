@@ -1,9 +1,10 @@
-[profile.release]
-panic = 'unwind'
-
 [workspace]
 members = [
-	'node',
-	'pallets/*',
-	'runtime',
+    'node',
+    'pallets/template',
+    'pallets/bholdus-private-sales',
+    'pallets/tokens',
+    'runtime',
 ]
+[profile.release]
+panic = 'unwind'

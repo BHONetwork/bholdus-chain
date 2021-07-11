@@ -14,8 +14,13 @@ name = 'bholdus'
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
-[build-dependencies]
-substrate-build-script-utils = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# [build-dependencies]
+# substrate-build-script-utils = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+
+[build-dependencies.substrate-build-script-utils]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
 
 [dependencies]
 jsonrpc-core = '15.1.0'
@@ -24,56 +29,294 @@ rand = "0.8.4"
 futures = { version = "0.3.9", features = ["compat"] }
 
 # FRAME dependencies
-frame-benchmarking = { version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-frame-benchmarking-cli = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-pallet-transaction-payment-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-pallet-im-online = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-pallet-contracts = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-pallet-contracts-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# frame-benchmarking = { version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# frame-benchmarking-cli = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
-# Substrate client dependencies
-sc-basic-authorship = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-cli = { features = ['wasmtime'], version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-client-api = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-consensus = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-consensus-babe = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-consensus-babe-rpc = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-consensus-epochs = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-consensus-slots = { version = "0.9.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-executor = { features = ['wasmtime'], version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-finality-grandpa = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-finality-grandpa-rpc = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-keystore = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-rpc-api = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-service = { features = ['wasmtime'], version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-telemetry = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-transaction-pool = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-network = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-authority-discovery = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-sync-state-rpc = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sc-chain-spec = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# pallet-transaction-payment-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# pallet-im-online = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# pallet-contracts = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# pallet-contracts-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+
+[dependencies.frame-benchmarking]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.1.0'
+
+[dependencies.frame-benchmarking-cli]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.pallet-transaction-payment-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.pallet-im-online]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.pallet-contracts]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.pallet-contracts-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.pallet-mmr-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+
+## Substrate client dependencies
+
+# sc-basic-authorship = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# sc-cli = { features = ['wasmtime'], version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# sc-client-api = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-consensus = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-executor = { features = ['wasmtime'], version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-consensus-babe = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-consensus-babe-rpc = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-consensus-epochs = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-consensus-slots = { version = "0.9.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-finality-grandpa = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-finality-grandpa-rpc = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-keystore = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-rpc-api = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-service = { features = ['wasmtime'], version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-telemetry = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-transaction-pool = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sc-network = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# sc-authority-discovery = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# sc-sync-state-rpc = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# sc-chain-spec = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+
+[dependencies.sc-basic-authorship]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-cli]
+features = ['wasmtime']
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-client-api]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-consensus]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-executor]
+features = ['wasmtime']
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-consensus-babe]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-consensus-uncles]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-consensus-babe-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-consensus-epochs]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-consensus-slots]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-finality-grandpa]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-finality-grandpa-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-keystore]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-rpc-api]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-service]
+features = ['wasmtime']
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-telemetry]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-transaction-pool]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-network]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-authority-discovery]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-sync-state-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-chain-spec]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+
 
 # Substrate primitives
-sp-api = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-block-builder = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-blockchain = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-consensus = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-consensus-babe = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-core = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-finality-grandpa = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-inherents = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-runtime = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-transaction-pool = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-authority-discovery = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-sp-keystore = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+[dependencies.sp-api]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
 
-substrate-frame-rpc-system = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+[dependencies.sp-block-builder]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-blockchain]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-consensus]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sp-consensus-babe]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sp-core]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+# branch = 'bholdus-monthly-2021-07'
+# path = '../sub-primitives/core'
+
+[dependencies.sp-finality-grandpa]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-inherents]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-runtime]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-timestamp]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-authorship]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-transaction-pool]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-authority-discovery]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-keystore]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.substrate-frame-rpc-system]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+#sp-api = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-block-builder = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-blockchain = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-consensus = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-consensus-babe = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-core = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-finality-grandpa = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-inherents = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-runtime = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-transaction-pool = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-authority-discovery = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#sp-keystore = { version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+#substrate-frame-rpc-system = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 # local dependencies
-bholdus-runtime = { version = '1.0.1', path = '../runtime' }
-bholdus-primitives = { version = '1.0.0', path = '../primitives' }
+[dependencies.bholdus-runtime]
+version = '1.0.1'
+path = '../runtime'
+
+[dependencies.bholdus-primitives]
+version = '1.0.0'
+path = '../primitives'
+
+# bholdus-runtime = { version = '1.0.1', path = '../runtime' }
+# bholdus-primitives = { version = '1.0.0', path = '../primitives' }
 
 [features]
 default = []
