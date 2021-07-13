@@ -285,7 +285,7 @@ parameter_types! {
     pub const MetadataDepositPerByte: Balance = 1;
 }
 
-impl pallet_assets::Config for Runtime {
+impl pallet_tokens::Config for Runtime {
     type Event = Event;
     type Balance = u64;
     type AssetId = u32;
@@ -302,7 +302,7 @@ impl pallet_assets::Config for Runtime {
     type StringLimit = StringLimit;
     type Freezer = ();
     type Extra = ();
-    type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = pallet_tokens::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -459,6 +459,12 @@ parameter_types! {
 }
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
+
+impl pallet_utility::Config for Runtime {
+    type Event = Event;
+    type Call = Call;
+    type WeightInfo = pallet_utility::weights::SubstrateWeight<Runtime>;
+}
 
 impl pallet_babe::Config for Runtime {
     type EpochDuration = EpochDuration;
@@ -773,8 +779,9 @@ parameter_types! {
 )]
 pub enum ProxyType {
     Any,
-    // TODO: update
-    CancelProxy,
+    NonTransfer,
+    Governance,
+    Staking,
 }
 impl Default for ProxyType {
     fn default() -> Self {
@@ -785,14 +792,24 @@ impl InstanceFilter<Call> for ProxyType {
     fn filter(&self, c: &Call) -> bool {
         match self {
             ProxyType::Any => true,
-            // TODO: update
-            ProxyType::CancelProxy => {
-                matches!(c, Call::Proxy(pallet_proxy::Call::reject_announcement(..)))
-            }
+            ProxyType::NonTransfer => !matches!(
+                c,
+                Call::Balances(..)
+                    | Call::BholdusTokens(..)
+                    | Call::Indices(pallet_indices::Call::transfer(..))
+            ),
+            ProxyType::Governance => matches!(c, Call::Council(..) | Call::Treasury(..)),
+            ProxyType::Staking => matches!(c, Call::Staking(..)),
         }
     }
     fn is_superset(&self, o: &Self) -> bool {
-        matches!((self, o), (ProxyType::Any, _))
+        match (self, o) {
+            (x, y) if x == y => true,
+            (ProxyType::Any, _) => true,
+            (_, ProxyType::Any) => false,
+            (ProxyType::NonTransfer, _) => true,
+            _ => false,
+        }
     }
 }
 
@@ -804,7 +821,7 @@ impl pallet_proxy::Config for Runtime {
     type ProxyDepositBase = ProxyDepositBase;
     type ProxyDepositFactor = ProxyDepositFactor;
     type MaxProxies = MaxProxies;
-    type WeightInfo = ();
+    type WeightInfo = pallet_proxy::weights::SubstrateWeight<Runtime>;
     type MaxPending = MaxPending;
     type CallHasher = BlakeTwo256;
     type AnnouncementDepositBase = AnnouncementDepositBase;
@@ -882,13 +899,14 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+        Utility: pallet_utility::{Pallet, Call, Event},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage},
         Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
         Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
-        Assets: pallet_assets::{Pallet, Call, Storage, Event<T>},
+        BholdusTokens: pallet_tokens::{Pallet, Call, Storage, Event<T>},
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
         Babe: pallet_babe::{Pallet, Call, Storage, Config, ValidateUnsigned},
         Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
@@ -1251,7 +1269,7 @@ impl_runtime_apis! {
             let mut batches = Vec::<BenchmarkBatch>::new();
             let params = (&config, &whitelist);
 
-            //add_benchmark!(params, batches, pallet_assets, Assets);
+            //add_benchmark!(params, batches, pallet_tokens, BholdusTokens);
             add_benchmark!(params, batches, pallet_babe, Babe);
             add_benchmark!(params, batches, pallet_balances, Balances);
             add_benchmark!(params, batches, pallet_bounties, Bounties);

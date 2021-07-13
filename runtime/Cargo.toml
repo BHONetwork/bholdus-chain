@@ -59,7 +59,6 @@ version = '0.4'
 # pallet-timestamp = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 # pallet-transaction-payment = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 # pallet-transaction-payment-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# pallet-assets = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 # pallet-staking = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 # pallet-babe = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 # pallet-session = { default-features = false, features = ["historical"], version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
@@ -251,6 +250,12 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
 
+[dependencies.pallet-utility]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
 [dependencies.pallet-collective]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
@@ -428,7 +433,7 @@ default-features = false
 version = '1.0.0'
 path = '../primitives'
 
-[dependencies.pallet-assets]
+[dependencies.pallet-tokens]
 default-features = false
 version = '1.0.0'
 path = '../pallets/tokens'
@@ -459,7 +464,6 @@ runtime-benchmarks = [
 	'pallet-balances/runtime-benchmarks',
 	'pallet-template/runtime-benchmarks',
 	'pallet-timestamp/runtime-benchmarks',
-#	'pallet-assets/runtime-benchmarks',
 	'pallet-staking/runtime-benchmarks',
 	'pallet-babe/runtime-benchmarks',
 	'pallet-session-benchmarking',
@@ -491,7 +495,7 @@ runtime-benchmarks = [
 		'pallet-timestamp/std',
 		'pallet-transaction-payment-rpc-runtime-api/std',
 		'pallet-transaction-payment/std',
-		'pallet-assets/std',
+		'pallet-tokens/std',
 		'pallet-staking/std',
 		'pallet-babe/std',
 		'pallet-session/std',
@@ -499,6 +503,7 @@ runtime-benchmarks = [
 		'pallet-authority-discovery/std',
 		'pallet-offences/std',
 		'pallet-treasury/std',
+		'pallet-utility/std',
 		'pallet-collective/std',
 		'pallet-election-provider-multi-phase/std',
 		'pallet-indices/std',
