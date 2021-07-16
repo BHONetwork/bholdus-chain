@@ -309,7 +309,15 @@ version = '3.0.0'
 # local dependencies
 [dependencies.bholdus-runtime]
 version = '1.0.1'
-path = '../runtime'
+path = '../runtime/bholdus'
+
+[dependencies.bholdus-cli]
+version = '1.0.0'
+path = 'cli'
+
+[dependencies.bholdus-service]
+version = '1.0.0'
+path = 'service'
 
 [dependencies.bholdus-primitives]
 version = '1.0.0'
@@ -321,3 +329,8 @@ path = '../primitives'
 [features]
 default = []
 runtime-benchmarks = ['bholdus-runtime/runtime-benchmarks']
+
+with-bholdus-runtime = [
+    "bholdus-service/with-bholdus-runtime",
+    "bholdus-cli/with-bholdus-runtime",
+]

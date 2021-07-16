@@ -1,10 +1,13 @@
 [workspace]
 members = [
     'node',
+    'node/cli',
+    'node/service',
+    'rpc',
+    'runtime/bholdus',
     'pallets/template',
     'pallets/bholdus-private-sales',
     'pallets/tokens',
-    'runtime',
 ]
 [profile.release]
 panic = 'unwind'

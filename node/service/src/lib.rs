@@ -1,7 +1,11 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
-use bholdus_primitives::Block;
+#[cfg(feature = "with-bholdus-runtime")]
+pub use bholdus_runtime;
+#[cfg(feature = "with-bholdus-runtime")]
 use bholdus_runtime::RuntimeApi;
+
+use bholdus_primitives::Block;
 use futures::prelude::*;
 use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sc_consensus_babe;
@@ -15,9 +19,13 @@ use sp_inherents::InherentDataProvider;
 use sp_runtime::traits::Block as BlockT;
 use std::sync::Arc;
 
-use crate::rpc::{self as bholdus_rpc};
+use bholdus_rpc;
+
+pub mod chain_spec;
+mod client;
 
 // Our native executor instance.
+#[cfg(feature = "with-bholdus-runtime")]
 native_executor_instance!(
     pub Executor,
     bholdus_runtime::api::dispatch,

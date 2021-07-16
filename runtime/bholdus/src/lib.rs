@@ -1248,8 +1248,9 @@ impl_runtime_apis! {
             use pallet_offences_benchmarking::Pallet as OffencesBench;
             use frame_system_benchmarking::Pallet as SystemBench;
 
-            impl frame_system_benchmarking::Config for Runtime {}
+            impl pallet_session_benchmarking::Config for Runtime {}
             impl pallet_offences_benchmarking::Config for Runtime {}
+            impl frame_system_benchmarking::Config for Runtime {}
 
             let whitelist: Vec<TrackedStorageKey> = vec![
                 // Block Number
