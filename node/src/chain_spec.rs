@@ -1,10 +1,12 @@
 use bholdus_primitives::{AccountId, Balance, Signature};
 use bholdus_runtime::{
-    opaque::SessionKeys, AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig,
-    CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-    StakerStatus, StakingConfig, SudoConfig, SystemConfig, BABE_GENESIS_EPOCH_CONFIG, BHO,
-    MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    opaque::SessionKeys, AuthorityDiscoveryConfig, BabeConfig, BalancesConfig,
+    ChainBridgeTransferConfig, ContractsConfig, CouncilConfig, GenesisConfig, GrandpaConfig,
+    ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig,
+    SystemConfig, BABE_GENESIS_EPOCH_CONFIG, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL,
+    WASM_BINARY,
 };
+use hex::FromHex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
@@ -281,6 +283,12 @@ fn testnet_genesis(
         pallet_contracts: ContractsConfig {
             // println should only be enabled on development chains
             current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
+        },
+        bholdus_chainbridge_transfer: ChainBridgeTransferConfig {
+            native_resource_id: <[u8; 32]>::from_hex(
+                "0000000000000000000000000000000000000000000000000000000000000000",
+            )
+            .unwrap(),
         },
     }
 }

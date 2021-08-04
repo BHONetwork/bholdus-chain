@@ -853,6 +853,27 @@ impl pallet_recovery::Config for Runtime {
     type RecoveryDeposit = RecoveryDeposit;
 }
 
+parameter_types! {
+    // Proposal expired after 10 minutes
+    pub const BridgeProposalLifetime: u32 = 100;
+    pub const ChainId: u8 = 0;
+}
+
+impl bholdus_chainbridge::Config for Runtime {
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
+    type ChainId = ChainId;
+    type Event = Event;
+    type ProposalLifetime = BridgeProposalLifetime;
+    type Proposal = Call;
+}
+
+impl bholdus_chainbridge_transfer::Config for Runtime {
+    type Event = Event;
+    type BridgeOrigin = bholdus_chainbridge::EnsureBridge<Runtime>;
+    type Currency = Balances;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -889,6 +910,8 @@ construct_runtime!(
         Identity: pallet_identity::{Pallet, Call, Storage, Event<T>},
         Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>},
         BholdusPrivateSales: pallet_bholdus_private_sales::{Pallet, Call, Storage, Event<T>},
+        ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
+        ChainBridgeTransfer: bholdus_chainbridge_transfer::{Pallet, Call, Storage, Config, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
     }

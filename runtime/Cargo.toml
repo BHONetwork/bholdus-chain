@@ -78,6 +78,8 @@ sp-consensus-babe = { default-features = false, version = '0.9.0', git = 'https:
 pallet-template = { default-features = false, version = '3.0.0', path = '../pallets/template' }
 bholdus-primitives = { default-features = false, version = '1.0.0', path = '../primitives' }
 pallet-bholdus-private-sales = { default-features = false, version = '1.0.0', path = '../pallets/bholdus-private-sales' }
+bholdus-chainbridge = { default-features = false, verion = '3.0.2', git = 'https://github.com/bholdus/chainbridge-substrate.git' }
+bholdus-chainbridge-transfer = { default-features = false, verion = '3.0.0', path = '../pallets/bholdus-chainbridge-transfer' }
 
 [features]
 default = ['std']
@@ -106,6 +108,8 @@ runtime-benchmarks = [
 	'pallet-multisig/runtime-benchmarks',
 	'pallet-proxy/runtime-benchmarks',
 	'pallet-identity/runtime-benchmarks',
+	'bholdus-chainbridge/runtime-benchmarks',
+	'bholdus-chainbridge-transfer/runtime-benchmarks',
 	'sp-runtime/runtime-benchmarks',
 ]
 std = [
@@ -142,6 +146,8 @@ std = [
 	'pallet-proxy/std',
 	'pallet-identity/std',
 	'pallet-recovery/std',
+	'bholdus-chainbridge/std',
+	'bholdus-chainbridge-transfer/std',
 	'sp-api/std',
 	'sp-block-builder/std',
 	'sp-core/std',
