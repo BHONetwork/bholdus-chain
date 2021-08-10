@@ -25,7 +25,7 @@ sp-std = { default-features = false, version = '3.0.0', git = 'https://github.co
 sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 [dev-dependencies]
-serde = { version = "1.0.119" }
+serde = { version = "1.0.127" }
 sp-core = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 sp-io = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 pallet-balances = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }

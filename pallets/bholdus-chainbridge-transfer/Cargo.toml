@@ -27,7 +27,7 @@ sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com
 bholdus-chainbridge = {default-features = false, version = '3.0.2', git = 'https://github.com/bholdus/chainbridge-substrate.git'}
 
 [dev-dependencies]
-serde = '1.0.119'
+serde = '1.0.127'
 sp-io = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
 hex = '0.4.3'
 pallet-balances = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
