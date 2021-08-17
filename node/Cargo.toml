@@ -74,7 +74,7 @@ substrate-frame-rpc-system = { version = '3.0.0', git = 'https://github.com/bhol
 
 # local dependencies
 bholdus-runtime = { version = '1.0.1', path = '../runtime' }
-bholdus-primitives = { version = '1.0.0', path = '../primitives' }
+bholdus-primitives = { version = '3.0.0', path = '../primitives' }
 
 [features]
 default = []

@@ -524,13 +524,32 @@ dependencies = [
 ]
 
 [[package]]
-name = "bholdus-primitives"
-version = "1.0.0"
+name = "bholdus-dex"
+version = "3.0.0"
 dependencies = [
+ "bholdus-primitives",
+ "bholdus-support",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+]
+
+[[package]]
+name = "bholdus-primitives"
+version = "3.0.0"
+dependencies = [
+ "parity-scale-codec",
  "pretty_assertions",
+ "serde",
  "sp-core",
  "sp-runtime",
  "sp-serializer",
+ "sp-std",
 ]
 
 [[package]]
@@ -598,6 +617,20 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "bholdus-support"
+version = "3.0.0"
+dependencies = [
+ "frame-support",
+ "impl-trait-for-tuples",
+ "num-traits",
+ "parity-scale-codec",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

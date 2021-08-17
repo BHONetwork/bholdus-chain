@@ -27,7 +27,6 @@ sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com
 bholdus-chainbridge = {default-features = false, version = '3.0.2', git = 'https://github.com/bholdus/chainbridge-substrate.git'}
 
 # local dependencies
-bholdus-support = { package = "bholdus_support", version = '0.1.0', path = '../support', default-features = false }
 
 [dev-dependencies]
 serde = '1.0.119'
@@ -47,6 +46,5 @@ std = [
 	'sp-io/std',
 	'pallet-balances/std',
 	'bholdus-chainbridge/std',
-	'bholdus-support/std'
 ]
 try-runtime = ['frame-support/try-runtime']

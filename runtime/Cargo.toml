@@ -76,7 +76,7 @@ sp-consensus-babe = { default-features = false, version = '0.9.0', git = 'https:
 
 # local dependencies
 pallet-template = { default-features = false, version = '3.0.0', path = '../pallets/template' }
-bholdus-primitives = { default-features = false, version = '1.0.0', path = '../primitives' }
+bholdus-primitives = { default-features = false, version = '3.0.0', path = '../primitives' }
 pallet-bholdus-private-sales = { default-features = false, version = '1.0.0', path = '../pallets/bholdus-private-sales' }
 bholdus-chainbridge = { default-features = false, verion = '3.0.2', git = 'https://github.com/bholdus/chainbridge-substrate.git' }
 bholdus-chainbridge-transfer = { default-features = false, verion = '3.0.0', path = '../pallets/bholdus-chainbridge-transfer' }

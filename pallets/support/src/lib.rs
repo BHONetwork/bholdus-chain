@@ -11,11 +11,14 @@ use sp_std::{
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 
-pub use currency::{
-    BalanceStatus, BasicCurrency, BasicCurrencyExtended, BasicLockableCurrency,
-    BasicReservableCurrency, LockIdentifier, MultiCurrency, MultiCurrencyExtended,
-    MultiLockableCurrency, MultiReservableCurrency, OnDust,
-};
+mod arithmetic;
+mod currency;
 
-pub mod arithmetic;
-pub mod currency;
+pub mod traits {
+    use super::*;
+    pub use currency::{
+        BalanceStatus, BasicCurrency, BasicCurrencyExtended, BasicLockableCurrency,
+        BasicReservableCurrency, LockIdentifier, MultiCurrency, MultiCurrencyExtended,
+        MultiLockableCurrency, MultiReservableCurrency, OnDust,
+    };
+}
