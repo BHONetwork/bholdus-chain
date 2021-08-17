@@ -1,0 +1,45 @@
+[package]
+authors = ['Bholdus <https://github.com/bholdus>']
+description = 'Bholdus DEX'
+edition = '2018'
+homepage = 'https://bholdus.com'
+license = 'Unlicense'
+name = 'bholdus-dex'
+readme = 'README.md'
+repository = 'https://github.com/bholdus/bholdus-chain/'
+version = '3.0.0'
+
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+[dependencies]
+# external dependencies
+codec = {default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0'}
+
+# Substrate dependencies
+frame-benchmarking = {default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+frame-support = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+frame-system = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+
+# Local dependencies
+bholdus-primitives = {default-features = false, version = '3.0.0', path = '../../primitives'}
+bholdus-support = {default-features = false, version = '3.0.0', path = '../support'}
+
+[dev-dependencies]
+serde = '1.0.119'
+sp-core = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+sp-io = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+sp-runtime = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+
+[features]
+default = ['std']
+runtime-benchmarks = ['frame-benchmarking']
+std = [
+	'codec/std',
+	'frame-support/std',
+	'frame-system/std',
+	'frame-benchmarking/std',
+	'bholdus-primitives/std',
+	'bholdus-support/std'
+]
+try-runtime = ['frame-support/try-runtime']
