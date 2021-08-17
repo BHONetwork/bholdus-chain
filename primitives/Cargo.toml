@@ -5,14 +5,20 @@ homepage = "https://bholdus.com"
 license = "Apache-2.0"
 name = "bholdus-primitives"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.0"
+version = "3.0.0"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
+# Third party dependencies
+codec = { default-features = false, features = ["derive"], package = 'parity-scale-codec', version = '2.0.0'}
+serde = { version = "1.0.124", optional = true}
+
+# Substrate dependencies
 sp-core = { default-features = false, version = "3.0.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 sp-runtime = { default-features = false, version = "3.0.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-std = { default-features = false, version = "3.0.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
@@ -20,4 +26,5 @@ sp-serializer = { version = "3.0.0", git = 'https://github.com/bholdus/substrate
 
 [features]
 default = ["std"]
-std = ["sp-core/std", "sp-runtime/std"]
+std = ["serde", "codec/std","sp-core/std", "sp-runtime/std", "sp-std/std"]
+

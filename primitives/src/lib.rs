@@ -3,11 +3,17 @@
 #![warn(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod dex;
+pub mod currency;
+
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentifyAccount, Verify},
     MultiSignature, OpaqueExtrinsic,
 };
+
+pub use dex::*;
+pub use currency::*;
 
 /// An index to a block.
 pub type BlockNumber = u32;
