@@ -26,3 +26,6 @@ nohup.out
 tmp
 
 *.json
+
+# Vim bookmarks
+.vim-bookmarks
