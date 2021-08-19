@@ -17,6 +17,7 @@ use sp_core::{
 use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::traits::{
     self, BlakeTwo256, Block as BlockT, NumberFor, OpaqueKeys, SaturatedConversion, StaticLookup,
+    Zero,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
@@ -44,6 +45,9 @@ use frame_system::{
     limits::{BlockLength, BlockWeights},
     EnsureOneOf, EnsureRoot,
 };
+
+use bholdus_support::parameter_type_with_key;
+
 pub use pallet_balances::Call as BalancesCall;
 use pallet_contracts::weights::WeightInfo;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -285,9 +289,16 @@ parameter_types! {
     pub const MetadataDepositPerByte: Balance = 1;
 }
 
-impl pallet_tokens::Config for Runtime {
+parameter_type_with_key! {
+    pub ExistentialDeposits: |_currency_id: u32| -> Balance {
+        Zero::zero()
+    };
+}
+
+impl bholdus_tokens::Config for Runtime {
     type Event = Event;
-    type Balance = u64;
+    type Balance = Balance;
+    type Amount = Amount;
     type AssetId = u32;
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
@@ -302,7 +313,8 @@ impl pallet_tokens::Config for Runtime {
     type StringLimit = StringLimit;
     type Freezer = ();
     type Extra = ();
-    type WeightInfo = pallet_tokens::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = bholdus_tokens::weights::SubstrateWeight<Runtime>;
+    type ExistentialDeposits = ExistentialDeposits;
 }
 
 parameter_types! {
@@ -927,7 +939,7 @@ construct_runtime!(
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
-        BholdusTokens: pallet_tokens::{Pallet, Call, Storage, Event<T>},
+        BholdusTokens: bholdus_tokens::{Pallet, Call, Storage, Event<T>},
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
         Babe: pallet_babe::{Pallet, Call, Storage, Config, ValidateUnsigned},
         Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
@@ -1293,7 +1305,7 @@ impl_runtime_apis! {
             let mut batches = Vec::<BenchmarkBatch>::new();
             let params = (&config, &whitelist);
 
-            //add_benchmark!(params, batches, pallet_tokens, BholdusTokens);
+            //add_benchmark!(params, batches, bholdus_tokens, BholdusTokens);
             add_benchmark!(params, batches, pallet_babe, Babe);
             add_benchmark!(params, batches, pallet_balances, Balances);
             add_benchmark!(params, batches, pallet_bounties, Bounties);

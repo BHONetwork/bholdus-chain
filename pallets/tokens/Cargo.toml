@@ -3,7 +3,7 @@ authors = ['Bholdus <https://github.com/bholdus>']
 description = 'Pallet Tokens'
 edition = '2018'
 homepage = 'https://bholdus.com'
-name = 'pallet-tokens'
+name = 'bholdus-tokens'
 license = "Apache-2.0"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain'
@@ -80,6 +80,12 @@ version = '3.0.0'
 # branch = 'bholdus-monthly-2021-07'
 # path = '../sub-primitives/core'
 
+[dependencies.bholdus-support]
+default-features = false
+version = '0.1.0'
+package = "bholdus-support"
+path = '../support'
+
 [dev-dependencies.sp-io]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
@@ -103,6 +109,7 @@ version = '3.0.0'
 default = ['std']
 std = [
 	'codec/std',
+	'bholdus-support/std',
 	'max-encoded-len/std',
 	'frame-support/std',
 	'frame-system/std',

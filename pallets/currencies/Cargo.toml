@@ -1,0 +1,96 @@
+[package]
+name = "currencies"
+version = "0.1.0"
+authors = ["Nhi Tran <nhi.tran@hawking.network>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.124", optional = true }
+#codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false }
+
+[dependencies.codec]
+default-features = false
+features = ['derive']
+package = 'parity-scale-codec'
+version = '2.0.0'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-io]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.bholdus-support]
+default-features = false
+version = '0.1.0'
+package = "bholdus-support"
+path = '../support'
+
+#bholdus-support = { path = "../../pallets/support", package = "bholdus-support", default-features = false }
+
+# [dev-dependencies]
+# pallet-balances = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+# orml-tokens = { path = "../tokens", package = "orml-tokens", default-features = false }
+# bholdus-tokens = { path = "../../pallets/tokens", package = "bholdus-tokens", default-features = false }
+
+[dev-dependencies.pallet-balances]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dev-dependencies.sp-io]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dev-dependencies.sp-core]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dev-dependencies.bholdus-tokens]
+version = '1.0.0'
+package = "bholdus-tokens"
+path = '../tokens'
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	"sp-runtime/std",
+	"sp-std/std",
+	"sp-io/std",
+	"frame-support/std",
+	"frame-system/std",
+	"bholdus-support/std",
+#"orml-utilities/std",
+]
+try-runtime = ["frame-support/try-runtime"]
+

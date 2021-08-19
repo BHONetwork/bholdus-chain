@@ -315,6 +315,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
                     t.sufficient = Self::new_account(beneficiary, details)?;
                 }
                 t.balance = new_balance;
+                t.free = new_balance;
                 Ok(())
             })?;
             Ok(())
