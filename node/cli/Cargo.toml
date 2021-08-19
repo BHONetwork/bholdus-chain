@@ -1,0 +1,119 @@
+[package]
+authors = ['Bholdus <https://github.com/bholdus>']
+description = 'Real world decentralized finance.'
+edition = '2018'
+homepage = 'https://bholdus.com'
+name = 'bholdus-cli'
+repository = 'https://github.com/bholdus/bholdus-chain/'
+version = '1.0.0'
+
+
+# [build-dependencies]
+# orml-build-script-utils = { path = "../../orml/build-script-utils"}
+
+[build-dependencies.substrate-build-script-utils]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies]
+log = "0.4.8"
+structopt = "0.3.8"
+
+[dependencies.frame-benchmarking]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.1.0'
+
+[dependencies.frame-benchmarking-cli]
+optional = true
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.try-runtime-cli]
+optional = true
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.pallet-transaction-payment-rpc]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-cli]
+optional = true
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-client-api]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-service]
+optional = true
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '0.9.0'
+
+[dependencies.sc-telemetry]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sc-tracing]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-runtime]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-core]
+optional = true
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+#local dependencies
+[dependencies.service]
+package = "bholdus-service"
+optional = true
+version = '1.0.0'
+path = '../service'
+
+[dependencies.bholdus-runtime]
+version = '1.0.1'
+path = '../../runtime/bholdus'
+
+# [dependencies.bholdus-primitives]
+# version = '1.0.0'
+# path = '../../primitives'
+
+
+[features]
+default = ["cli"]
+cli = [
+	"service",
+	"sp-core",
+	"sc-cli",
+	"sc-service",
+	"frame-benchmarking-cli",
+	"try-runtime-cli",
+]
+runtime-benchmarks = ['service/runtime-benchmarks']
+try-runtime = [
+	"try-runtime-cli",
+	"service/try-runtime",
+]
+
+with-bholdus-runtime = [
+    "service/with-bholdus-runtime",
+]
+
+

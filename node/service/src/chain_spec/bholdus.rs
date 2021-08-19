@@ -1,12 +1,11 @@
 use bholdus_primitives::{AccountId, Balance, Signature};
 use bholdus_runtime::{
     opaque::SessionKeys, AuthorityDiscoveryConfig, BabeConfig, BalancesConfig,
-    ChainBridgeTransferConfig, ContractsConfig, CouncilConfig, GenesisConfig, GrandpaConfig,
-    ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig,
-    SystemConfig, BABE_GENESIS_EPOCH_CONFIG, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL,
-    WASM_BINARY,
+    ChainBridgeTransferConfig, CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig,
+    IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+    BABE_GENESIS_EPOCH_CONFIG, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
-use hex::FromHex;
+use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
@@ -236,16 +235,16 @@ fn testnet_genesis(
         .collect::<Vec<_>>();
 
     GenesisConfig {
-        frame_system: SystemConfig {
+        system: SystemConfig {
             // Add Wasm runtime to storage.
             code: wasm_binary.to_vec(),
             changes_trie_config: Default::default(),
         },
-        pallet_balances: BalancesConfig {
+        balances: BalancesConfig {
             balances: endowed_accounts.iter().cloned().collect(),
         },
-        pallet_indices: IndicesConfig { indices: vec![] },
-        pallet_session: SessionConfig {
+        indices: IndicesConfig { indices: vec![] },
+        session: SessionConfig {
             keys: initial_authorities
                 .iter()
                 .map(|x| {
@@ -257,7 +256,7 @@ fn testnet_genesis(
                 })
                 .collect::<Vec<_>>(),
         },
-        pallet_staking: StakingConfig {
+        staking: StakingConfig {
             validator_count: initial_authorities.len() as u32 * 2,
             minimum_validator_count: initial_authorities.len() as u32,
             invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
@@ -265,30 +264,29 @@ fn testnet_genesis(
             stakers,
             ..Default::default()
         },
-        pallet_collective_Instance1: CouncilConfig::default(),
-        pallet_sudo: SudoConfig {
+        council: CouncilConfig::default(),
+        sudo: SudoConfig {
             // Assign network admin rights.
             key: root_key,
         },
-        pallet_babe: BabeConfig {
+        babe: BabeConfig {
             authorities: vec![],
             epoch_config: Some(BABE_GENESIS_EPOCH_CONFIG),
         },
-        pallet_im_online: ImOnlineConfig { keys: vec![] },
-        pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-        pallet_grandpa: GrandpaConfig {
+        im_online: ImOnlineConfig { keys: vec![] },
+        authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
+        grandpa: GrandpaConfig {
             authorities: vec![],
         },
-        pallet_treasury: Default::default(),
-        pallet_contracts: ContractsConfig {
-            // println should only be enabled on development chains
-            current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
-        },
-        bholdus_chainbridge_transfer: ChainBridgeTransferConfig {
-            native_resource_id: <[u8; 32]>::from_hex(
-                "0000000000000000000000000000000000000000000000000000000000000000",
-            )
-            .unwrap(),
+        treasury: Default::default(),
+        // contracts: ContractsConfig {
+        // println should only be enabled on development chains
+        // current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
+        // },
+        chain_bridge_transfer: ChainBridgeTransferConfig {
+            native_resource_id: hex!(
+                "0000000000000000000000000000000000000000000000000000000000000000"
+            ),
         },
     }
 }
