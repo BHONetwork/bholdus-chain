@@ -119,7 +119,7 @@ pub struct AssetBalance<Balance, Extra> {
     pub free: Balance,
     pub reserved: Balance,
     /// The balance.
-    pub(super) balance: Balance,
+    // pub(super) balance: Balance,
     /// Whether the account is frozen.
     pub(super) is_frozen: bool,
     /// `true` if this balance gave the account a self-sufficient reference.
