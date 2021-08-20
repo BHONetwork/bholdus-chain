@@ -383,10 +383,20 @@ default-features = false
 version = '1.0.0'
 path = '../../primitives'
 
-[dependencies.pallet-tokens]
+[dependencies.bholdus-tokens]
 default-features = false
 version = '1.0.0'
 path = '../../pallets/tokens'
+
+[dependencies.bholdus-support]
+default-features = false
+version = '0.1.0'
+path = '../../pallets/support'
+
+[dependencies.bholdus-currencies]
+default-features = false
+version = '0.1.0'
+path = '../../pallets/currencies'
 
 [dependencies.pallet-template]
 default-features = false
@@ -452,7 +462,6 @@ runtime-benchmarks = [
 		'pallet-timestamp/std',
 		'pallet-transaction-payment-rpc-runtime-api/std',
 		'pallet-transaction-payment/std',
-		'pallet-tokens/std',
 		'pallet-staking/std',
 		'pallet-babe/std',
 		'pallet-session/std',
@@ -474,6 +483,9 @@ runtime-benchmarks = [
 		'pallet-identity/std',
 		'pallet-recovery/std',
 		'bholdus-chainbridge/std',
+		'bholdus-tokens/std',
+		'bholdus-support/std',
+		'bholdus-currencies/std',
 		'sp-api/std',
 		'sp-block-builder/std',
 		'sp-core/std',

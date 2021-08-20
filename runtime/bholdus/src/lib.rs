@@ -46,6 +46,7 @@ use frame_system::{
     EnsureOneOf, EnsureRoot,
 };
 
+use bholdus_currencies::BasicCurrencyAdapter;
 use bholdus_support::parameter_type_with_key;
 
 pub use pallet_balances::Call as BalancesCall;
@@ -66,6 +67,7 @@ use bholdus_primitives::*;
 
 /// Import some useful constants
 pub mod constants;
+pub mod weights;
 pub use constants::{currency::*, time::*};
 
 /// Import the template pallet.
@@ -293,6 +295,18 @@ parameter_type_with_key! {
     pub ExistentialDeposits: |_currency_id: u32| -> Balance {
         Zero::zero()
     };
+}
+
+parameter_types! {
+    pub const GetNativeCurrencyId: u32 = 0;
+}
+
+impl bholdus_currencies::Config for Runtime {
+    type Event = Event;
+    type MultiCurrency = BholdusTokens;
+    type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
+    type GetNativeCurrencyId = GetNativeCurrencyId;
+    type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
 }
 
 impl bholdus_tokens::Config for Runtime {
@@ -940,6 +954,7 @@ construct_runtime!(
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
         BholdusTokens: bholdus_tokens::{Pallet, Call, Storage, Event<T>},
+        BholdusCurrencies: bholdus_currencies::{Pallet, Call, Event<T>},
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
         Babe: pallet_babe::{Pallet, Call, Storage, Config, ValidateUnsigned},
         Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
