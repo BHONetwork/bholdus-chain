@@ -12,10 +12,13 @@ fn basic_minting_should_work() {
     new_test_ext().execute_with(|| {
         assert_ok!(BholdusTokens::force_create(Origin::root(), 0, 1, true, 1));
         assert_ok!(BholdusTokens::mint(Origin::signed(1), 0, 1, 100));
-        assert_eq!(BholdusTokens::balance(0, 1), 100);
+        assert_eq!(BholdusTokens::total_balance(0, &1), 100);
+        assert_eq!(BholdusTokens::total_supply(0), 100);
+        assert_ok!(BholdusTokens::mint(Origin::signed(1), 0, 1, 100));
+        assert_eq!(BholdusTokens::total_supply(0), 200);
 
         assert_ok!(BholdusTokens::mint(Origin::signed(1), 0, 2, 100));
-        assert_eq!(BholdusTokens::balance(0, 2), 100);
+        assert_eq!(BholdusTokens::total_balance(0, &2), 100);
     });
 }
 
@@ -25,7 +28,7 @@ fn transferring_frozen_asset_should_not_work() {
         assert_ok!(BholdusTokens::force_create(Origin::root(), 0, 1, true, 1));
 
         assert_ok!(BholdusTokens::mint(Origin::signed(1), 0, 1, 100));
-        assert_eq!(BholdusTokens::balance(0, 1), 100);
+        assert_eq!(BholdusTokens::total_balance(0, &1), 100);
         assert_ok!(BholdusTokens::freeze(Origin::signed(1), 0, 1));
 
         assert_noop!(
@@ -178,7 +181,7 @@ fn transferring_to_frozen_account_should_work() {
         assert_ok!(BholdusTokens::mint(Origin::signed(1), 0, 2, 100));
         assert_ok!(BholdusTokens::freeze(Origin::signed(1), 0, 2));
         assert_ok!(BholdusTokens::transfer(Origin::signed(1), 0, 2, 50));
-        assert_eq!(BholdusTokens::balance(0, 2), 150);
+        assert_eq!(BholdusTokens::total_balance(0, &2), 150);
     });
 }
 

@@ -31,10 +31,10 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         ExtraMutator::maybe_new(id, who)
     }
 
-    /// Get the asset `id` balance of `who`.
-    pub fn balance(id: T::AssetId, who: impl sp_std::borrow::Borrow<T::AccountId>) -> T::Balance {
-        Account::<T, I>::get(id, who.borrow()).balance
-    }
+    // /// Get the asset `id` balance of `who`.
+    // pub fn balance(id: T::AssetId, who: impl sp_std::borrow::Borrow<T::AccountId>) -> T::Balance {
+    //     Account::<T, I>::get(id, who.borrow()).balance
+    // }
 
     /// Get the total supply of an asset `id`.
     pub fn total_supply(id: T::AssetId) -> T::Balance {
@@ -89,10 +89,10 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             return DepositConsequence::Overflow;
         }
         let account = Account::<T, I>::get(id, who);
-        if account.balance.checked_add(&amount).is_none() {
+        if account.free.checked_add(&amount).is_none() {
             return DepositConsequence::Overflow;
         }
-        if account.balance.is_zero() {
+        if account.free.is_zero() {
             if amount < details.min_balance {
                 return DepositConsequence::BelowMinimum;
             }
@@ -129,7 +129,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         if account.is_frozen {
             return Frozen;
         }
-        if let Some(rest) = account.balance.checked_sub(&amount) {
+        if let Some(rest) = account.free.checked_sub(&amount) {
             if let Some(frozen) = T::Freezer::frozen_balance(id, who) {
                 match frozen.checked_add(&details.min_balance) {
                     Some(required) if rest < required => return Frozen,
@@ -174,16 +174,16 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             let required = frozen
                 .checked_add(&details.min_balance)
                 .ok_or(ArithmeticError::Overflow)?;
-            account.balance.saturating_sub(required)
+            account.free.saturating_sub(required)
         } else {
             let is_provider = false;
             let is_required = is_provider && !frame_system::Pallet::<T>::can_dec_provider(who);
             if keep_alive || is_required {
                 // We want to keep the account around.
-                account.balance.saturating_sub(details.min_balance)
+                account.free.saturating_sub(details.min_balance)
             } else {
                 // Don't care if the account dies
-                account.balance
+                account.free
             }
         };
         Ok(amount.min(details.supply))
@@ -309,12 +309,12 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             check(details)?;
 
             Account::<T, I>::try_mutate(id, beneficiary, |t| -> DispatchResult {
-                let new_balance = t.balance.saturating_add(amount);
+                let new_balance = t.free.saturating_add(amount);
                 ensure!(new_balance >= details.min_balance, TokenError::BelowMinimum);
-                if t.balance.is_zero() {
+                if t.free.is_zero() {
                     t.sufficient = Self::new_account(beneficiary, details)?;
                 }
-                t.balance = new_balance;
+                t.free = new_balance;
                 Ok(())
             })?;
             Ok(())
@@ -382,12 +382,12 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 
             Account::<T, I>::try_mutate_exists(id, target, |maybe_account| -> DispatchResult {
                 let mut account = maybe_account.take().unwrap_or_default();
-                debug_assert!(account.balance >= actual, "checked in prep; qed");
+                debug_assert!(account.free >= actual, "checked in prep; qed");
 
                 // Make the debit.
-                account.balance = account.balance.saturating_sub(actual);
-                *maybe_account = if account.balance < details.min_balance {
-                    debug_assert!(account.balance.is_zero(), "checked in prep; qed");
+                account.free = account.free.saturating_sub(actual);
+                *maybe_account = if account.free < details.min_balance {
+                    debug_assert!(account.free.is_zero(), "checked in prep; qed");
                     Self::dead_account(id, target, details, account.sufficient);
                     None
                 } else {
@@ -451,29 +451,29 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             }
 
             // Debit balance from source; this will not saturate since it's already checked in prep.
-            debug_assert!(source_account.balance >= debit, "checked in prep; qed");
-            source_account.balance = source_account.balance.saturating_sub(debit);
+            debug_assert!(source_account.free >= debit, "checked in prep; qed");
+            source_account.free = source_account.free.saturating_sub(debit);
 
             Account::<T, I>::try_mutate(id, &dest, |a| -> DispatchResult {
                 // Calculate new balance; this will not saturate since it's already checked in prep.
                 debug_assert!(
-                    a.balance.checked_add(&credit).is_some(),
+                    a.free.checked_add(&credit).is_some(),
                     "checked in prep; qed"
                 );
-                let new_balance = a.balance.saturating_add(credit);
+                let new_balance = a.free.saturating_add(credit);
 
                 // Create a new account if there wasn't one already.
-                if a.balance.is_zero() {
+                if a.free.is_zero() {
                     a.sufficient = Self::new_account(&dest, details)?;
                 }
 
-                a.balance = new_balance;
+                a.free = new_balance;
                 Ok(())
             })?;
 
             // Remove source account if it's now dead.
-            if source_account.balance < details.min_balance {
-                debug_assert!(source_account.balance.is_zero(), "checked in prep; qed");
+            if source_account.free < details.min_balance {
+                debug_assert!(source_account.free.is_zero(), "checked in prep; qed");
                 Self::dead_account(id, &source, details, source_account.sufficient);
                 Account::<T, I>::remove(id, &source);
             } else {

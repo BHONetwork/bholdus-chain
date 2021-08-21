@@ -3,7 +3,9 @@
 use super::*;
 use crate as pallet_tokens;
 
+use bholdus_support::parameter_type_with_key;
 use frame_support::{construct_runtime, parameter_types};
+
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
@@ -86,10 +88,21 @@ parameter_types! {
     pub const MaxRegistrars: u32 = 20;
 }
 
+// pub type AccountId = AccountId32;
+pub type AssetId = u32;
+pub type Balance = u64;
+
+parameter_type_with_key! {
+    pub ExistentialDeposits: |currency_id: AssetId| -> Balance {
+        0
+    };
+}
+
 impl Config for Test {
     type Event = Event;
-    type Balance = u64;
-    type AssetId = u32;
+    type Balance = Balance;
+    type Amount = i64;
+    type AssetId = AssetId;
     type Currency = Balances;
     type ForceOrigin = frame_system::EnsureRoot<u64>;
     type AssetDeposit = AssetDeposit;
@@ -103,6 +116,7 @@ impl Config for Test {
     type MaxRegistrars = MaxRegistrars;
     type Freezer = TestFreezer;
     type WeightInfo = ();
+    type ExistentialDeposits = ExistentialDeposits;
     type Extra = ();
 }
 

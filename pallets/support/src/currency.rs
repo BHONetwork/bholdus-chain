@@ -50,7 +50,7 @@ pub trait MultiCurrency<AccountId> {
         amount: Self::Balance,
     ) -> DispatchResult;
 
-    // Public mutables
+    //// Public mutables
 
     /// Transfer some amount from one account to another.
     fn transfer(

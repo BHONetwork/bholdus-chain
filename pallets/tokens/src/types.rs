@@ -4,11 +4,11 @@ use super::*;
 use frame_support::pallet_prelude::*;
 
 pub(super) type DepositBalanceOf<T, I = ()> =
-    <<T as Config<I>>::Currency as Currency<<T as SystemConfig>::AccountId>>::Balance;
+    <<T as Config<I>>::Currency as PalletCurrency<<T as SystemConfig>::AccountId>>::Balance;
 
 pub type BalanceOf<T, I = ()> =
-    <<T as Config<I>>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
-pub type NegativeImbalanceOf<T, I = ()> = <<T as Config<I>>::Currency as Currency<
+    <<T as Config<I>>::Currency as PalletCurrency<<T as frame_system::Config>::AccountId>>::Balance;
+pub type NegativeImbalanceOf<T, I = ()> = <<T as Config<I>>::Currency as PalletCurrency<
     <T as frame_system::Config>::AccountId,
 >>::NegativeImbalance;
 
@@ -115,8 +115,11 @@ pub(super) struct DebitFlags {
 
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default)]
 pub struct AssetBalance<Balance, Extra> {
+    /// This is the only balance that maters in terms of most operations on tokens
+    pub free: Balance,
+    pub reserved: Balance,
     /// The balance.
-    pub(super) balance: Balance,
+    // pub(super) balance: Balance,
     /// Whether the account is frozen.
     pub(super) is_frozen: bool,
     /// `true` if this balance gave the account a self-sufficient reference.

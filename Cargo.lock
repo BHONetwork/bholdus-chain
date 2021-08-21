@@ -560,6 +560,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-currencies"
+version = "0.1.0"
+dependencies = [
+ "bholdus-support",
+ "bholdus-tokens",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "bholdus-dex"
 version = "3.0.0"
 dependencies = [
@@ -632,7 +649,10 @@ version = "1.0.1"
 dependencies = [
  "bholdus-chainbridge",
  "bholdus-chainbridge-transfer",
+ "bholdus-currencies",
  "bholdus-primitives",
+ "bholdus-support",
+ "bholdus-tokens",
  "frame-benchmarking",
  "frame-election-provider-support",
  "frame-executive",
@@ -673,7 +693,6 @@ dependencies = [
  "pallet-sudo",
  "pallet-template",
  "pallet-timestamp",
- "pallet-tokens",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-treasury",
@@ -770,6 +789,24 @@ dependencies = [
  "num-traits",
  "parity-scale-codec",
  "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "bholdus-tokens"
+version = "1.0.0"
+dependencies = [
+ "bholdus-support",
+ "enumflags2",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "max-encoded-len",
+ "pallet-balances",
+ "parity-scale-codec",
+ "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",
@@ -4924,23 +4961,6 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "sp-timestamp",
-]
-
-[[package]]
-name = "pallet-tokens"
-version = "1.0.0"
-dependencies = [
- "enumflags2",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "max-encoded-len",
- "pallet-balances",
- "parity-scale-codec",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
 ]
 
 [[package]]
