@@ -1,4 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(missing_docs)]
 
 use codec::{Decode, Encode};
 use sp_runtime::RuntimeDebug;
@@ -7,31 +8,27 @@ use sp_std::prelude::*;
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Default, RuntimeDebug)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
-pub struct DigitalTokenInfo {
-    pub name: Vec<u8>,
-    pub id: Vec<u8>,
-    pub decimals: u8,
-}
+pub struct TokenInfo {}
 
-#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, RuntimeDebug)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub enum TokenSymbol {
     Native,
-    DigitalToken(DigitalTokenInfo),
+    Token(TokenInfo),
 }
 
-#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, RuntimeDebug)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub enum DexShare {
     Token(TokenSymbol),
 }
 
-#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, RuntimeDebug)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub enum CurrencyId {
@@ -51,8 +48,8 @@ impl CurrencyId {
     pub fn split_dex_share_currency_id(&self) -> Option<(Self, Self)> {
         match self {
             CurrencyId::DexShare(dex_share_0, dex_share_1) => {
-                let currency_id_0: CurrencyId = (*dex_share_0).into();
-                let currency_id_1: CurrencyId = (*dex_share_1).into();
+                let currency_id_0: CurrencyId = dex_share_0.clone().into();
+                let currency_id_1: CurrencyId = dex_share_1.clone().into();
                 Some((currency_id_0, currency_id_1))
             }
             _ => None,

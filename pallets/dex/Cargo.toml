@@ -17,9 +17,13 @@ targets = ['x86_64-unknown-linux-gnu']
 codec = {default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0'}
 
 # Substrate dependencies
-frame-benchmarking = {default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
-frame-support = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
-frame-system = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
+frame-benchmarking = {default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+frame-support = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+frame-system = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+sp-core = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+sp-io = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+sp-runtime = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07' }
 
 # Local dependencies
 bholdus-primitives = {default-features = false, version = '3.0.0', path = '../../primitives'}
@@ -27,9 +31,6 @@ bholdus-support = {default-features = false, version = '3.0.0', path = '../suppo
 
 [dev-dependencies]
 serde = '1.0.119'
-sp-core = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
-sp-io = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
-sp-runtime = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update'}
 
 [features]
 default = ['std']
@@ -38,6 +39,9 @@ std = [
 	'codec/std',
 	'frame-support/std',
 	'frame-system/std',
+	'sp-core/std',
+	'sp-runtime/std',
+	'sp-std/std',
 	'frame-benchmarking/std',
 	'bholdus-primitives/std',
 	'bholdus-support/std'

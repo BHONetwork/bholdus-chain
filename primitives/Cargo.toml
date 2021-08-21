@@ -10,16 +10,21 @@ version = "3.0.0"
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
-#[dependencies]
-# sp-core = { default-features = false, version = "3.0.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# sp-runtime = { default-features = false, version = "3.0.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+[dependencies.serde]
+default-features = false
+version = '1.0.124'
+optional = true
+
+[dependencies.codec]
+default-features = false
+version = '2.2.0'
+package = 'parity-scale-codec'
+
 [dependencies.sp-core]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
-# branch = 'bholdus-monthly-2021-07'
-# path = '../sub-primitives/core'
 
 [dependencies.sp-runtime]
 default-features = false
@@ -27,9 +32,11 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
 
-#[dev-dependencies]
-# pretty_assertions = "0.6.1"
-# sp-serializer = { version = "3.0.0", git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
 
 [dependencies.pretty_assertions]
 optional = true

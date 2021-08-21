@@ -8,6 +8,7 @@ members = [
     'pallets/template',
     'pallets/bholdus-private-sales',
     'pallets/tokens',
+    'pallets/dex'
 ]
 [profile.release]
 panic = 'unwind'

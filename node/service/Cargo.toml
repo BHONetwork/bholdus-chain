@@ -266,7 +266,7 @@ version = '1.0.1'
 path = '../../runtime/bholdus'
 
 [dependencies.bholdus-primitives]
-version = '1.0.0'
+version = '3.0.0'
 path = '../../primitives'
 
 [dependencies.bholdus-rpc]

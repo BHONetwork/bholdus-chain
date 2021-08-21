@@ -3,17 +3,17 @@
 #![warn(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod dex;
 pub mod currency;
+pub mod dex;
 
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentifyAccount, Verify},
-    MultiSignature, OpaqueExtrinsic,
+    FixedU128, MultiSignature, OpaqueExtrinsic,
 };
 
-pub use dex::*;
 pub use currency::*;
+pub use dex::*;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -54,3 +54,5 @@ pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
+
+pub type Ratio = FixedU128;

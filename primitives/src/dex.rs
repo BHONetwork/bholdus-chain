@@ -1,9 +1,11 @@
+#![allow(missing_docs)]
+
 use crate::*;
 use codec::{Decode, Encode};
-use sp_runtime::RuntimeDebug;
+use sp_runtime::{FixedU128, RuntimeDebug};
 use sp_std::prelude::*;
 
-#[derive(Encode, PartialEq, Eq, Clone, RuntimeDebug, PartialOrd, Ord)]
+#[derive(Encode, PartialEq, Eq, Clone, Copy, RuntimeDebug, PartialOrd, Ord)]
 pub struct TradingPair(CurrencyId, CurrencyId);
 
 impl TradingPair {
@@ -43,3 +45,5 @@ impl Decode for TradingPair {
             .ok_or_else(|| codec::Error::from("invalid currency"))
     }
 }
+
+pub type ExchangeRate = FixedU128;

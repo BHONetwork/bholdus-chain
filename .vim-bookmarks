@@ -1,3 +1,0 @@
-let l:bm_file_version = 1
-let l:bm_sessions = {'default': {'/Users/dunglam/projects/bholdus/bholdus-chain/pallets/dex/src/lib.rs': [{'sign_idx': 9506, 'line_nr': 258, 'content': ''},],}}
-let l:bm_current_session = 'default'
