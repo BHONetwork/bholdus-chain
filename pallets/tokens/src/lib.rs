@@ -191,9 +191,9 @@ pub mod pallet {
         /// Identifier for the class of asset.
         type AssetId: Member
             + Parameter
-            + Default
+            // + Default
             + Copy
-            + HasCompact
+            // + HasCompact
             + MaybeSerializeDeserialize
             + MaxEncodedLen;
 
@@ -435,7 +435,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::create())]
         pub fn create(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             admin: <T::Lookup as StaticLookup>::Source,
             min_balance: T::Balance,
         ) -> DispatchResult {
@@ -494,7 +494,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::force_create())]
         pub fn force_create(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             owner: <T::Lookup as StaticLookup>::Source,
             is_sufficient: bool,
             #[pallet::compact] min_balance: T::Balance,
@@ -547,7 +547,7 @@ pub mod pallet {
         ))]
         pub fn destroy(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             witness: DestroyWitness,
         ) -> DispatchResult {
             let maybe_check_owner = match T::ForceOrigin::try_origin(origin) {
@@ -622,7 +622,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::mint())]
         pub fn mint(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             beneficiary: <T::Lookup as StaticLookup>::Source,
             #[pallet::compact] amount: T::Balance,
         ) -> DispatchResult {
@@ -655,7 +655,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::transfer())]
         pub fn transfer(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             target: <T::Lookup as StaticLookup>::Source,
             #[pallet::compact] amount: T::Balance,
         ) -> DispatchResult {
@@ -683,7 +683,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::freeze())]
         pub fn freeze(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             who: <T::Lookup as StaticLookup>::Source,
         ) -> DispatchResult {
             let origin = ensure_signed(origin)?;
@@ -714,7 +714,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::thaw())]
         pub fn thaw(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             who: <T::Lookup as StaticLookup>::Source,
         ) -> DispatchResult {
             let origin = ensure_signed(origin)?;
@@ -746,7 +746,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::freeze_asset())]
         pub fn freeze_asset(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
         ) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
@@ -773,7 +773,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::thaw_asset())]
         pub fn thaw_asset(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
         ) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
@@ -798,7 +798,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::verify_asset())]
         pub fn verify_asset(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
         ) -> DispatchResult {
             //let origin = ensure_signed(origin)?;
             T::ForceOrigin::ensure_origin(origin)?;
@@ -833,7 +833,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::set_metadata(name.len() as u32, symbol.len() as u32))]
         pub fn set_metadata(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             name: Vec<u8>,
             symbol: Vec<u8>,
             decimals: u8,
@@ -895,7 +895,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::clear_metadata())]
         pub fn clear_metadata(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
         ) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
@@ -934,7 +934,7 @@ pub mod pallet {
         ))]
         pub fn set_identity(
             origin: OriginFor<T>,
-            #[pallet::compact] id: T::AssetId,
+            id: T::AssetId,
             info: AssetIdentity,
         ) -> DispatchResultWithPostInfo {
             let origin = ensure_signed(origin)?;
