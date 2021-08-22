@@ -29,8 +29,12 @@ sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com
 bholdus-primitives = {default-features = false, version = '3.0.0', path = '../../primitives'}
 bholdus-support = {default-features = false, version = '3.0.0', path = '../support'}
 
+
 [dev-dependencies]
 serde = '1.0.119'
+pallet-balances = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07' }
+bholdus-tokens = {default-features = false, version = '3.0.0', path = '../tokens'}
+bholdus-currencies = {default-features = false, version = '3.0.0', path = '../currencies'}
 
 [features]
 default = ['std']
@@ -43,7 +47,10 @@ std = [
 	'sp-runtime/std',
 	'sp-std/std',
 	'frame-benchmarking/std',
+	'pallet-balances/std',
 	'bholdus-primitives/std',
-	'bholdus-support/std'
+	'bholdus-support/std',
+	'bholdus-currencies/std',
+	'bholdus-tokens/std',
 ]
 try-runtime = ['frame-support/try-runtime']

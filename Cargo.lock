@@ -561,7 +561,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-currencies"
-version = "0.1.0"
+version = "3.0.0"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -580,11 +580,14 @@ dependencies = [
 name = "bholdus-dex"
 version = "3.0.0"
 dependencies = [
+ "bholdus-currencies",
  "bholdus-primitives",
  "bholdus-support",
+ "bholdus-tokens",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "pallet-balances",
  "parity-scale-codec",
  "serde",
  "sp-core",
@@ -796,7 +799,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-tokens"
-version = "1.0.0"
+version = "3.0.0"
 dependencies = [
  "bholdus-support",
  "enumflags2",
