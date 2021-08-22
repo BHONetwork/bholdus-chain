@@ -7,7 +7,7 @@ name = 'bholdus-tokens'
 license = "Apache-2.0"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain'
-version = '1.0.0'
+version = '3.0.0'
 
 
 [dependencies]
@@ -58,19 +58,6 @@ default-features = false
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
-
-# sp-std = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# frame-support = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# frame-system = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# frame-benchmarking = { default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-
-
-[dev-dependencies]
-# sp-core = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# sp-std = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# sp-io = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-# pallet-balances = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 [dependencies.sp-core]
 default-features = false

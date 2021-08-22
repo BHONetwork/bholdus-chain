@@ -385,7 +385,7 @@ path = '../../primitives'
 
 [dependencies.bholdus-tokens]
 default-features = false
-version = '1.0.0'
+version = '3.0.0'
 path = '../../pallets/tokens'
 
 [dependencies.bholdus-support]
@@ -395,7 +395,7 @@ path = '../../pallets/support'
 
 [dependencies.bholdus-currencies]
 default-features = false
-version = '0.1.0'
+version = '3.0.0'
 path = '../../pallets/currencies'
 
 [dependencies.pallet-template]

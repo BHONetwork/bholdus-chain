@@ -1,6 +1,6 @@
 [package]
 name = "bholdus-currencies"
-version = "0.1.0"
+version = "3.0.0"
 authors = ["Nhi Tran <nhi.tran@hawking.network>"]
 edition = "2018"
 
@@ -68,7 +68,7 @@ branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
 
 [dev-dependencies.bholdus-tokens]
-version = '1.0.0'
+version = '3.0.0'
 package = "bholdus-tokens"
 path = '../tokens'
 
