@@ -158,6 +158,39 @@ pub mod pallet {
     use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
     use frame_system::pallet_prelude::*;
 
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config<I>, I: 'static = ()> {
+        pub balances: Vec<(T::AccountId, T::AssetId, T::Balance)>,
+    }
+    #[cfg(feature = "std")]
+    impl<T: Config<I>, I: 'static> Default for GenesisConfig<T, I> {
+        fn default() -> Self {
+            GenesisConfig { balances: vec![] }
+        }
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config<I>, I: 'static> GenesisBuild<T, I> for GenesisConfig<T, I> {
+        fn build(&self) {
+            // ensure no duplicates exist.
+            let unique_endowed_accounts = self
+                .balances
+                .iter()
+                .map(|(account_id, currency_id, _)| (account_id, currency_id))
+                .collect::<std::collections::BTreeSet<_>>();
+            assert!(
+                unique_endowed_accounts.len() == self.balances.len(),
+                "duplicate endowed accounts in genesis."
+            );
+
+            self.balances
+                .iter()
+                .for_each(|(account_id, currency_id, initial_balance)| {
+                    Pallet::<T, I>::set_genesis(*currency_id, account_id, *initial_balance)
+                });
+        }
+    }
+
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T, I = ()>(_);
@@ -191,6 +224,7 @@ pub mod pallet {
         /// Identifier for the class of asset.
         type AssetId: Member
             + Parameter
+            + Ord
             // + Default
             + Copy
             // + HasCompact
@@ -329,6 +363,7 @@ pub mod pallet {
     //     BoundedVec<BalanceLock<T::Balance>, T::MaxLocks>,
     //     ValueQuery,
     // >;
+    //
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
@@ -744,10 +779,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::freeze_asset())]
-        pub fn freeze_asset(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn freeze_asset(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
             Asset::<T, I>::try_mutate(id, |maybe_details| {
@@ -771,10 +803,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::thaw_asset())]
-        pub fn thaw_asset(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn thaw_asset(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
             Asset::<T, I>::try_mutate(id, |maybe_details| {
@@ -796,10 +825,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::verify_asset())]
-        pub fn verify_asset(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn verify_asset(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             //let origin = ensure_signed(origin)?;
             T::ForceOrigin::ensure_origin(origin)?;
             let d = Asset::<T, I>::get(id).ok_or(Error::<T, I>::Unknown)?;
@@ -893,10 +919,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::clear_metadata())]
-        pub fn clear_metadata(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn clear_metadata(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
             let d = Asset::<T, I>::get(id).ok_or(Error::<T, I>::Unknown)?;
@@ -975,6 +998,10 @@ pub mod pallet {
 }
 
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    pub(crate) fn set_genesis(currency_id: T::AssetId, who: &T::AccountId, amount: T::Balance) {
+        Self::do_set_genesis(currency_id, who, amount);
+    }
+
     pub(crate) fn try_mutate_account<R, E>(
         who: &T::AccountId,
         currency_id: T::AssetId,

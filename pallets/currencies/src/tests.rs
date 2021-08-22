@@ -11,9 +11,12 @@ fn multi_currency_should_work() {
         PalletBalances::make_free_balance_be(&ALICE, 100);
         assert_ok!(BholdusTokens::create(Origin::signed(ALICE), 1, ALICE, 1));
         assert_ok!(BholdusTokens::mint(Origin::signed(ALICE), 1, ALICE, 100));
+        assert_ok!(BholdusTokens::mint(Origin::signed(ALICE), 2, ALICE, 100));
 
         assert_eq!(BholdusTokens::free_balance(1, &ALICE), 100);
         assert_eq!(Currencies::free_balance(1, &ALICE), 100);
+        assert_eq!(BholdusTokens::free_balance(2, &ALICE), 200);
+        assert_eq!(Currencies::free_balance(2, &ALICE), 200);
 
         assert_ok!(Currencies::transfer(Some(ALICE).into(), BOB, 1, 50));
         assert_eq!(BholdusTokens::free_balance(1, &ALICE), 50);

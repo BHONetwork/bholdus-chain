@@ -170,13 +170,13 @@ pub struct ExtBuilder {
 impl Default for ExtBuilder {
     fn default() -> Self {
         Self {
-            balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100)],
+            balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100), (ALICE, X_TOKEN_ID, 100)],
         }
     }
 }
 
 pub const NATIVE_CURRENCY_ID: CurrencyId = 0;
-pub const X_TOKEN_ID: CurrencyId = 1;
+pub const X_TOKEN_ID: CurrencyId = 2;
 
 impl ExtBuilder {
     pub fn balances(mut self, balances: Vec<(AccountId, CurrencyId, Balance)>) -> Self {
@@ -185,10 +185,10 @@ impl ExtBuilder {
     }
     pub fn one_hundred_for_alice_n_bob(self) -> Self {
         self.balances(vec![
-            (ALICE, NATIVE_CURRENCY_ID, 100),
-            (BOB, NATIVE_CURRENCY_ID, 100),
+            // (ALICE, NATIVE_CURRENCY_ID, 100),
+            // (BOB, NATIVE_CURRENCY_ID, 100),
             (ALICE, X_TOKEN_ID, 100),
-            (BOB, X_TOKEN_ID, 100),
+            // (BOB, X_TOKEN_ID, 100),
         ])
     }
 
@@ -209,15 +209,15 @@ impl ExtBuilder {
         .assimilate_storage(&mut t)
         .unwrap();
 
-        // orml_tokens::GenesisConfig::<Runtime> {
-        //     balances: self
-        //         .balances
-        //         .into_iter()
-        //         .filter(|(_, currency_id, _)| *currency_id != NATIVE_CURRENCY_ID)
-        //         .collect::<Vec<_>>(),
-        // }
-        // .assimilate_storage(&mut t)
-        // .unwrap();
+        bholdus_tokens::GenesisConfig::<Runtime> {
+            balances: self
+                .balances
+                .into_iter()
+                .filter(|(_, currency_id, _)| *currency_id != NATIVE_CURRENCY_ID)
+                .collect::<Vec<_>>(),
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
 
         t.into()
     }

@@ -322,6 +322,37 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         Ok(())
     }
 
+    /// Set GenesisConfig
+    pub(super) fn do_set_genesis(
+        id: T::AssetId,
+        who: &T::AccountId,
+        amount: T::Balance,
+    ) -> Result<bool, DispatchError> {
+        Asset::<T, I>::insert(
+            id,
+            AssetDetails {
+                owner: who.clone(),
+                issuer: who.clone(),
+                admin: who.clone(),
+                freezer: who.clone(),
+                supply: Zero::zero(),
+                deposit: Zero::zero(),
+                min_balance: Zero::zero(),
+                is_sufficient: true,
+                accounts: 0,
+                sufficients: 0,
+                approvals: 0,
+                is_frozen: false,
+            },
+        );
+
+        Self::increase_balance(id, who, amount, |details| -> DispatchResult {
+            details.supply = details.supply.saturating_add(amount);
+            Ok(())
+        })?;
+        Ok(true)
+    }
+
     /// Reduces asset `id` balance of `target` by `amount`. Flags `f` can be given to alter whether
     /// it attempts a `best_effort` or makes sure to `keep_alive` the account.
     ///
