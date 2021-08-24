@@ -1,8 +1,8 @@
 use crate as dex;
 use bholdus_currencies::{BasicCurrencyAdapter, NativeCurrencyOf};
-use bholdus_primitives::CurrencyId;
+use bholdus_primitives::{CurrencyId, TokenInfo, TokenSymbol, TradingPair};
 use bholdus_support::parameter_type_with_key;
-use dex::Config;
+use dex::*;
 use frame_support::{parameter_types, PalletId};
 use frame_system as system;
 use sp_core::H256;
@@ -121,7 +121,7 @@ pub type AdaptedBasicCurrency = BasicCurrencyAdapter<Runtime, Balances, i64, u64
 
 parameter_types! {
     pub const DexPalletId: PalletId = PalletId(*b"bhod/dex");
-    pub const ExchangeFee: (u32, u32) = (3,1000);
+    pub const ExchangeFee: (u32, u32) = (10,100); // 10$ fee
     pub const TradingPathLimit: u32 = 3;
 
 }
@@ -148,14 +148,113 @@ frame_support::construct_runtime!(
         BholdusTokens: bholdus_tokens::{Pallet, Storage, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
-        Dex: dex::{Pallet, Call, Storage, Event<T>},
+        Dex: dex::{Pallet, Call, Storage, Config<T>, Event<T>},
     }
 );
 
-// Build genesis storage according to the mock runtime.
-pub fn new_test_ext() -> sp_io::TestExternalities {
-    system::GenesisConfig::default()
-        .build_storage::<Runtime>()
-        .unwrap()
-        .into()
+// Mock Currencies
+pub const BHO: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
+pub const BNB: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 1 }));
+pub const DOT: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 2 }));
+pub const BTC: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 3 }));
+pub const NATIVE_CURRENCY_ID: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
+
+// Mock TradingPairs
+parameter_types! {
+    pub static BHOBNBPair: TradingPair = TradingPair::from_currency_ids(BHO, BNB).unwrap();
+    pub static BNBDOTPair: TradingPair = TradingPair::from_currency_ids(BNB, DOT).unwrap();
+    pub static DOTBTCPair: TradingPair = TradingPair::from_currency_ids(DOT,BTC).unwrap();
+}
+
+// Mock Accounts
+pub const ALICE: AccountId = 1;
+pub const BOB: AccountId = 2;
+pub const BNB_ADMIN: AccountId = 3;
+pub const DOT_ADMIN: AccountId = 4;
+
+pub struct ExtBuilder {
+    pub balances: Vec<(CurrencyId, AccountId, Balance)>,
+    pub initial_provisioning_trading_pairs:
+        Vec<(TradingPair, (Balance, Balance), (Balance, Balance))>,
+    pub initial_enabled_trading_pairs: Vec<TradingPair>,
+    pub initial_added_liquidity_pools: Vec<(
+        <Runtime as frame_system::Config>::AccountId,
+        Vec<(TradingPair, (Balance, Balance))>,
+    )>,
+}
+
+#[cfg(feature = "std")]
+impl Default for ExtBuilder {
+    fn default() -> Self {
+        Self {
+            balances: vec![
+                (BHO, ALICE, 1_000_000_000u128),
+                (BHO, BOB, 1_000_000_000u128),
+                (BNB, ALICE, 1_000_000_000u128),
+                (BNB, BOB, 1_000_000_000u128),
+                (DOT, ALICE, 1_000_000_000u128),
+                (DOT, BOB, 1_000_000_000u128),
+                (BTC, ALICE, 1_000_000_000u128),
+                (BTC, BOB, 1_000_000_000u128),
+            ],
+            initial_provisioning_trading_pairs: vec![],
+            initial_added_liquidity_pools: vec![],
+            initial_enabled_trading_pairs: vec![],
+        }
+    }
+}
+
+impl ExtBuilder {
+    fn initialize_enabled_trading_pairs(mut self) -> Self {
+        self.initial_enabled_trading_pairs = vec![BHOBNBPair::get()];
+        self
+    }
+
+    fn initialize_added_liquidity(
+        mut self,
+        who: <Runtime as frame_system::Config>::AccountId,
+    ) -> Self {
+        self.initial_added_liquidity_pools = vec![(
+            who,
+            vec![
+                (BHOBNBPair::get(), (1_000_000u128, 2_000_000u128)),
+                (BNBDOTPair::get(), (1_000_000u128, 2_000_000u128)),
+            ],
+        )];
+        self
+    }
+
+    pub fn build(&self) -> sp_io::TestExternalities {
+        let mut t = system::GenesisConfig::default()
+            .build_storage::<Runtime>()
+            .unwrap()
+            .into();
+
+        pallet_balances::GenesisConfig::<Runtime> {
+            balances: self
+                .balances
+                .clone()
+                .into_iter()
+                .filter_map(|(currency_id, account_id, balance)| {
+                    if currency_id == NATIVE_CURRENCY_ID {
+                        Some((account_id.clone(), balance))
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        dex::GenesisConfig::<Runtime> {
+            initial_added_liquidity_pools: self.initial_added_liquidity_pools.clone(),
+            initial_enabled_trading_pairs: self.initial_enabled_trading_pairs.clone(),
+            initial_provisioning_trading_pairs: self.initial_provisioning_trading_pairs.clone(),
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        sp_io::TestExternalities::from(t)
+    }
 }

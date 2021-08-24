@@ -1,33 +1,21 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(missing_docs)]
 
-use codec::{Decode, Encode, MaxEncodedLen};
+use codec::{Decode, Encode};
 use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
 
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 
-#[derive(
-    Encode,
-    Decode,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Clone,
-    Copy,
-    Default,
-    MaxEncodedLen,
-    RuntimeDebug,
-)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
-pub struct TokenInfo {}
+pub struct TokenInfo {
+    pub id: u32,
+}
 
-#[derive(
-    Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, MaxEncodedLen, RuntimeDebug,
-)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub enum TokenSymbol {
@@ -35,18 +23,14 @@ pub enum TokenSymbol {
     Token(TokenInfo),
 }
 
-#[derive(
-    Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, MaxEncodedLen, RuntimeDebug,
-)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub enum DexShare {
     Token(TokenSymbol),
 }
 
-#[derive(
-    Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, MaxEncodedLen, RuntimeDebug,
-)]
+#[derive(Encode, Decode, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub enum CurrencyId {

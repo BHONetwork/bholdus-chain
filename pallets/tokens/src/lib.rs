@@ -189,13 +189,7 @@ pub mod pallet {
             + MaybeSerializeDeserialize;
 
         /// Identifier for the class of asset.
-        type AssetId: Member
-            + Parameter
-            // + Default
-            + Copy
-            // + HasCompact
-            + MaybeSerializeDeserialize
-            + MaxEncodedLen;
+        type AssetId: Member + Parameter + Copy + MaybeSerializeDeserialize;
 
         /// The currency mechanism.
         type Currency: PalletReservableCurrency<Self::AccountId>;
@@ -744,10 +738,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::freeze_asset())]
-        pub fn freeze_asset(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn freeze_asset(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
             Asset::<T, I>::try_mutate(id, |maybe_details| {
@@ -771,10 +762,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::thaw_asset())]
-        pub fn thaw_asset(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn thaw_asset(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
             Asset::<T, I>::try_mutate(id, |maybe_details| {
@@ -796,10 +784,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::verify_asset())]
-        pub fn verify_asset(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn verify_asset(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             //let origin = ensure_signed(origin)?;
             T::ForceOrigin::ensure_origin(origin)?;
             let d = Asset::<T, I>::get(id).ok_or(Error::<T, I>::Unknown)?;
@@ -893,10 +878,7 @@ pub mod pallet {
         ///
         /// Weight: `O(1)`
         #[pallet::weight(T::WeightInfo::clear_metadata())]
-        pub fn clear_metadata(
-            origin: OriginFor<T>,
-            id: T::AssetId,
-        ) -> DispatchResult {
+        pub fn clear_metadata(origin: OriginFor<T>, id: T::AssetId) -> DispatchResult {
             let origin = ensure_signed(origin)?;
 
             let d = Asset::<T, I>::get(id).ok_or(Error::<T, I>::Unknown)?;

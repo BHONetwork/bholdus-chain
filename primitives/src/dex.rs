@@ -2,10 +2,13 @@
 
 use crate::*;
 use codec::{Decode, Encode};
+use serde::{Deserialize, Serialize};
 use sp_runtime::{FixedU128, RuntimeDebug};
 use sp_std::prelude::*;
 
 #[derive(Encode, PartialEq, Eq, Clone, Copy, RuntimeDebug, PartialOrd, Ord)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "std", serde(rename_all = "camelCase"))]
 pub struct TradingPair(CurrencyId, CurrencyId);
 
 impl TradingPair {

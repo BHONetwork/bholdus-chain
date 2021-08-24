@@ -25,20 +25,20 @@ mod tests;
 mod benchmarking;
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, RuntimeDebug)]
-pub struct ProvisioningParameters {
+pub struct ProvisioningParameters<Balance> {
     pub min_contribution: (Balance, Balance),
     pub target_contribution: (Balance, Balance),
     pub accumulated_contribution: (Balance, Balance),
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
-pub enum TradingPairStatus {
+pub enum TradingPairStatus<Balance> {
     Disabled,
-    Provisioning(ProvisioningParameters),
+    Provisioning(ProvisioningParameters<Balance>),
     Enabled,
 }
 
-impl Default for TradingPairStatus {
+impl<Balance> Default for TradingPairStatus<Balance> {
     fn default() -> Self {
         Self::Disabled
     }
@@ -81,7 +81,7 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn trading_pair_statuses)]
     pub type TradingPairStatuses<T: Config> =
-        StorageMap<_, Blake2_128Concat, TradingPair, TradingPairStatus, ValueQuery>;
+        StorageMap<_, Blake2_128Concat, TradingPair, TradingPairStatus<Balance>, ValueQuery>;
 
     /// Provision of each user added to a trading pair when that trading pair is in `provisioning`
     /// status.
@@ -103,6 +103,71 @@ pub mod pallet {
     #[pallet::getter(fn initial_share_exchange_rates)]
     pub type InitialShareExchangeRate<T: Config> =
         StorageMap<_, Blake2_128Concat, TradingPair, (ExchangeRate, ExchangeRate), ValueQuery>;
+
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config> {
+        pub initial_provisioning_trading_pairs:
+            Vec<(TradingPair, (Balance, Balance), (Balance, Balance))>,
+        pub initial_enabled_trading_pairs: Vec<TradingPair>,
+        pub initial_added_liquidity_pools:
+            Vec<(T::AccountId, Vec<(TradingPair, (Balance, Balance))>)>,
+    }
+
+    #[cfg(feature = "std")]
+    impl<T: Config> Default for GenesisConfig<T> {
+        fn default() -> Self {
+            GenesisConfig {
+                initial_provisioning_trading_pairs: vec![],
+                initial_enabled_trading_pairs: vec![],
+                initial_added_liquidity_pools: vec![],
+            }
+        }
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+        fn build(&self) {
+            self.initial_provisioning_trading_pairs.iter().for_each(
+                |(trading_pair, min_contribution, target_contribution)| {
+                    TradingPairStatuses::<T>::insert(
+                        trading_pair,
+                        TradingPairStatus::<_>::Provisioning(ProvisioningParameters {
+                            min_contribution: *min_contribution,
+                            target_contribution: *target_contribution,
+                            accumulated_contribution: Default::default(),
+                        }),
+                    );
+                },
+            );
+
+            self.initial_enabled_trading_pairs
+                .iter()
+                .for_each(|trading_pair| {
+                    TradingPairStatuses::<T>::insert(trading_pair, TradingPairStatus::<_>::Enabled);
+                });
+
+            self.initial_added_liquidity_pools
+                .iter()
+                .for_each(|(who, trading_pairs_data)| {
+                    trading_pairs_data.iter().for_each(
+                        |(trading_pair, (deposit_amount_0, deposit_amount_1))| {
+                            let result = match <Pallet<T>>::trading_pair_statuses(trading_pair) {
+                                TradingPairStatus::<_>::Enabled => <Pallet<T>>::do_add_liquidity(
+                                    &who,
+                                    trading_pair.first(),
+                                    trading_pair.second(),
+                                    *deposit_amount_0,
+                                    *deposit_amount_1,
+                                ),
+                                _ => Err(Error::<T>::TradingPairMustBeEnabled.into()),
+                            };
+
+                            assert!(result.is_ok(), "genesis add lidquidity pool failed.");
+                        },
+                    );
+                });
+        }
+    }
 
     #[pallet::event]
     #[pallet::metadata(T::AccountId = "AccountId")]
@@ -151,44 +216,46 @@ pub mod pallet {
         /// Currency provided is not supported for swapping.
         /// Only "Token" currency are supported.
         InvalidCurrencyId,
-        /// Trading pair must be disabled to work
+        /// Trading pair must be disabled to work.
         TradingPairMustBeDisabled,
-        /// Trading pair must be in provisioning
+        /// Trading pair must be in provisioning.
         TradingPairMustBeProvisioning,
-        /// Trading pair must be enabled to work
+        /// Trading pair must be enabled to work.
         TradingPairMustBeEnabled,
-        /// Calculated target amount returned by a swap less than target amount user accepts to
+        /// Calculated target amount returned by a swap less than target amount user accepts to.
         /// receive.
         InsufficientTargetAmount,
-        /// Calculated supply amount returned by a swap greater than supply amount user can pay
+        /// Calculated supply amount returned by a swap greater than supply amount user can pay.
         InsufficientSupplyAmount,
         /// Target amount is zero.
         ZeroTargetAmount,
-        /// Supply amount is zero
+        /// Supply amount is zero.
         ZeroSupplyAmount,
         /// Insufficient liqudity pool for swapping.
         InsufficientLiquidity,
         /// Trading path limit is reached.
         InvalidTradingPathLength,
         /// New invariant after swap is smaller than invariant before swap.
-        /// This may happen because of arithmetic error
+        /// This may happen because of arithmetic error.
         InvariantAfterCheckFailed,
-        /// Provision contribution not sastisfies minimum contribution requirements
+        /// Provision contribution not sastisfies minimum contribution requirements.
         InvalidContributionIncrement,
-        /// Invalid liquidity increment
+        /// Invalid liquidity increment.
         InvalidLiquidityIncrement,
-        /// Provisioning trading pair is not qualified to be enabled yet
+        /// Provisioning trading pair is not qualified to be enabled yet.
         UnqualifiedProvision,
         /// Trading pair is already enabled.
         TradingPairAlreadyEnabled,
         /// Trading pair is already provisioned so it can't be enabled.
         TradingPairAlreadyProvisioned,
-        /// Remove share amount is invalid
+        /// Remove share amount is invalid.
         InvalidRemoveShareAmount,
-        /// Withdrawn amount is unacceptable by user
+        /// Withdrawn amount is unacceptable by user.
         UnacceptableWithdrawnAmount,
-        /// User didn't provide liquidity for this trading pair in provisioning but try to claim dex share
+        /// User didn't provide liquidity for this trading pair in provisioning but try to claim dex share.
         UserNotAddProvision,
+        /// Total share amount is zero.
+        ZeroTotalShare,
     }
 
     #[pallet::hooks]
@@ -413,11 +480,14 @@ impl<T: Config> Pallet<T> {
 
     /// Get share and pool increment
     ///
-    /// - `pool_0`: liquidity pool of currency_0
-    /// - `pool_1`: liquidity pool of currency_1
+    /// - `pool_0`: current liquidity pool of currency_0
+    /// - `pool_1`: current liquidity pool of currency_1
     /// - `max_amount_0`: maximum amount of currency_0 users wants to add liquidity
     /// - `max_amount_1`: maximum amount of currency_1 users wants to add liquidity
-    /// - `total_share_amount`: total shares of this trading pair
+    /// - `total_share_amount`: current total shares of this trading pair.
+    ///
+    /// `total_share_amount = 0` indicates that calculation for first liquidity providers should be
+    /// taken. In this case, `pool_0` and `pool_1` is ignored.
     ///
     /// Returns:
     /// (pool_0_increment, pool_1_increment, share_increment)
@@ -436,7 +506,7 @@ impl<T: Config> Pallet<T> {
             // share token.
             let (exchange_rate_0, exchange_rate_1) = (
                 ExchangeRate::one(),
-                ExchangeRate::checked_from_rational(pool_0, pool_1)
+                ExchangeRate::checked_from_rational(max_amount_0, max_amount_1)
                     .ok_or(ArithmeticError::Overflow)?,
             );
 
@@ -538,7 +608,7 @@ impl<T: Config> Pallet<T> {
         ensure!(
             matches!(
                 Self::trading_pair_statuses(trading_pair),
-                TradingPairStatus::Enabled
+                TradingPairStatus::<_>::Enabled
             ),
             Error::<T>::TradingPairMustBeEnabled
         );
@@ -595,6 +665,8 @@ impl<T: Config> Pallet<T> {
         let pallet_account_id = Self::account_id();
         let total_share_amount = T::Currency::total_issuance(share_currency_id);
 
+        ensure!(!total_share_amount.is_zero(), Error::<T>::ZeroTotalShare);
+
         LiquidityPool::<T>::try_mutate(trading_pair, |(pool_0, pool_1)| -> DispatchResult {
             let min_withdrawn_amount = if currency_id_0 == trading_pair.first() {
                 (min_withdrawn_amount_0, min_withdrawn_amount_1)
@@ -633,7 +705,7 @@ impl<T: Config> Pallet<T> {
             *pool_0 = pool_0
                 .checked_sub(pool_0_decrement)
                 .ok_or(ArithmeticError::Underflow)?;
-            *pool_1 = pool_0
+            *pool_1 = pool_1
                 .checked_sub(pool_1_decrement)
                 .ok_or(ArithmeticError::Underflow)?;
 
@@ -666,7 +738,7 @@ impl<T: Config> Pallet<T> {
         ensure!(
             matches!(
                 Self::trading_pair_statuses(trading_pair),
-                TradingPairStatus::Enabled
+                TradingPairStatus::<_>::Enabled
             ),
             Error::<T>::TradingPairMustBeEnabled
         );
@@ -740,7 +812,7 @@ impl<T: Config> Pallet<T> {
             .ok_or(Error::<T>::InvalidCurrencyId)?;
 
         match Self::trading_pair_statuses(trading_pair) {
-            TradingPairStatus::Provisioning(provisioning_parameters) => {
+            TradingPairStatus::<_>::Provisioning(provisioning_parameters) => {
                 let (contribution_0, contribution_1) =
                     provisioning_parameters.accumulated_contribution;
                 ensure!(
@@ -748,11 +820,15 @@ impl<T: Config> Pallet<T> {
                     Error::<T>::TradingPairAlreadyProvisioned
                 );
             }
-            TradingPairStatus::Disabled => (),
-            TradingPairStatus::Enabled => return Err(Error::<T>::TradingPairAlreadyEnabled.into()),
+            TradingPairStatus::<_>::Disabled => (),
+            TradingPairStatus::<_>::Enabled => {
+                return Err(Error::<T>::TradingPairAlreadyEnabled.into())
+            }
         }
 
-        TradingPairStatuses::<T>::insert(trading_pair, TradingPairStatus::Enabled);
+        TradingPairStatuses::<T>::insert(trading_pair, TradingPairStatus::<_>::Enabled);
+
+        Self::deposit_event(Event::TradingPairEnabled(trading_pair));
 
         Ok(())
     }
@@ -766,7 +842,7 @@ impl<T: Config> Pallet<T> {
             .ok_or(Error::<T>::InvalidCurrencyId)?;
 
         let provisioning_parameters = match Self::trading_pair_statuses(trading_pair) {
-            TradingPairStatus::Provisioning(p) => p,
+            TradingPairStatus::<_>::Provisioning(p) => p,
             _ => return Err(Error::<T>::TradingPairMustBeProvisioning.into()),
         };
 
@@ -782,8 +858,8 @@ impl<T: Config> Pallet<T> {
 
         let (pool_0_increment, pool_1_increment, share_amount_to_issue) =
             Self::get_share_and_pool_increment(
-                total_provision_0,
-                total_provision_1,
+                0,
+                0,
                 total_provision_0,
                 total_provision_1,
                 Zero::zero(),
@@ -810,7 +886,7 @@ impl<T: Config> Pallet<T> {
             Ok(())
         })?;
 
-        TradingPairStatuses::<T>::insert(trading_pair, TradingPairStatus::Enabled);
+        TradingPairStatuses::<T>::insert(trading_pair, TradingPairStatus::<_>::Enabled);
 
         InitialShareExchangeRate::<T>::insert(
             trading_pair,
@@ -844,7 +920,9 @@ impl<T: Config> Pallet<T> {
             .ok_or(Error::<T>::InvalidCurrencyId)?;
 
         let mut provisioning_parameters = match Self::trading_pair_statuses(trading_pair) {
-            TradingPairStatus::Provisioning(provisioning_parameters) => provisioning_parameters,
+            TradingPairStatus::<_>::Provisioning(provisioning_parameters) => {
+                provisioning_parameters
+            }
             _ => return Err(Error::<T>::TradingPairMustBeProvisioning.into()),
         };
 
@@ -911,7 +989,7 @@ impl<T: Config> Pallet<T> {
 
                 TradingPairStatuses::<T>::insert(
                     trading_pair,
-                    TradingPairStatus::Provisioning(ProvisioningParameters {
+                    TradingPairStatus::<_>::Provisioning(ProvisioningParameters {
                         min_contribution: provisioning_parameters.min_contribution,
                         target_contribution: provisioning_parameters.target_contribution,
                         accumulated_contribution: provisioning_parameters.accumulated_contribution,
@@ -944,7 +1022,7 @@ impl<T: Config> Pallet<T> {
             .ok_or(Error::<T>::InvalidCurrencyId)?;
 
         match Self::trading_pair_statuses(trading_pair) {
-            TradingPairStatus::Provisioning(provisioning_parameters) => {
+            TradingPairStatus::<_>::Provisioning(provisioning_parameters) => {
                 let (min_contribution, target_contribution) =
                     if currency_id_0 == trading_pair.first() {
                         (
@@ -960,7 +1038,7 @@ impl<T: Config> Pallet<T> {
 
                 TradingPairStatuses::<T>::insert(
                     trading_pair,
-                    TradingPairStatus::Provisioning(ProvisioningParameters {
+                    TradingPairStatus::<_>::Provisioning(ProvisioningParameters {
                         min_contribution,
                         target_contribution,
                         accumulated_contribution: provisioning_parameters.accumulated_contribution,
@@ -988,7 +1066,7 @@ impl<T: Config> Pallet<T> {
         ensure!(
             matches!(
                 Self::trading_pair_statuses(trading_pair),
-                TradingPairStatus::Disabled
+                TradingPairStatus::<_>::Disabled
             ),
             Error::<T>::TradingPairMustBeDisabled
         );
@@ -1007,7 +1085,7 @@ impl<T: Config> Pallet<T> {
 
         TradingPairStatuses::<T>::insert(
             trading_pair,
-            TradingPairStatus::Provisioning(ProvisioningParameters {
+            TradingPairStatus::<_>::Provisioning(ProvisioningParameters {
                 min_contribution,
                 target_contribution,
                 accumulated_contribution: Default::default(),
@@ -1078,13 +1156,18 @@ impl<T: Config> Pallet<T> {
         let pallet_account_id = Self::account_id();
         T::Currency::transfer(path[0], who, &pallet_account_id, actual_supply_amount)?;
         Self::_swap_by_path(path, &amounts)?;
-        T::Currency::transfer(path[path.len() - 1], &pallet_account_id, who, target_amount)?;
+        T::Currency::transfer(
+            path[path.len() - 1],
+            &pallet_account_id,
+            who,
+            amounts[amounts.len() - 1],
+        )?;
 
         Self::deposit_event(Event::Swap(
             who.clone(),
             path.to_vec(),
             actual_supply_amount,
-            target_amount,
+            amounts[amounts.len() - 1],
         ));
         Ok(actual_supply_amount)
     }
@@ -1157,7 +1240,7 @@ impl<T: Config> Pallet<T> {
             ensure!(
                 matches!(
                     Self::trading_pair_statuses(trading_pair),
-                    TradingPairStatus::Enabled
+                    TradingPairStatus::<_>::Enabled
                 ),
                 Error::<T>::TradingPairMustBeEnabled
             );
@@ -1192,7 +1275,7 @@ impl<T: Config> Pallet<T> {
                 .saturating_mul(U256::from(fee_denominator));
             let denominator: U256 = U256::from(target_pool)
                 .saturating_sub(U256::from(target_amount))
-                .saturating_mul(U256::from(fee_denominator.saturating_mul(fee_numerator)));
+                .saturating_mul(U256::from(fee_denominator.saturating_sub(fee_numerator)));
 
             numerator
                 .checked_div(denominator)
@@ -1222,7 +1305,7 @@ impl<T: Config> Pallet<T> {
             ensure!(
                 matches!(
                     Self::trading_pair_statuses(trading_pair),
-                    TradingPairStatus::Enabled
+                    TradingPairStatus::<_>::Enabled
                 ),
                 Error::<T>::TradingPairMustBeEnabled
             );
@@ -1232,6 +1315,7 @@ impl<T: Config> Pallet<T> {
                 !supply_pool.is_zero() && !target_pool.is_zero(),
                 Error::<T>::InsufficientLiquidity
             );
+            ensure!(target_pool >= amounts[i], Error::<T>::InsufficientLiquidity);
 
             let supply_amount = Self::get_supply_amount(supply_pool, target_pool, amounts[i]);
             ensure!(!supply_amount.is_zero(), Error::<T>::ZeroSupplyAmount);
