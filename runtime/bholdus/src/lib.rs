@@ -953,7 +953,7 @@ construct_runtime!(
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
-        BholdusTokens: bholdus_tokens::{Pallet, Call, Storage, Event<T>},
+        BholdusTokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         BholdusCurrencies: bholdus_currencies::{Pallet, Call, Event<T>},
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
         Babe: pallet_babe::{Pallet, Call, Storage, Config, ValidateUnsigned},

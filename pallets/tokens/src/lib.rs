@@ -158,6 +158,51 @@ pub mod pallet {
     use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
     use frame_system::pallet_prelude::*;
 
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config<I>, I: 'static = ()> {
+        pub balances: Vec<(T::AccountId, T::AssetId, T::Balance)>,
+    }
+    #[cfg(feature = "std")]
+    impl<T: Config<I>, I: 'static> Default for GenesisConfig<T, I> {
+        fn default() -> Self {
+            GenesisConfig { balances: vec![] }
+        }
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config<I>, I: 'static> GenesisBuild<T, I> for GenesisConfig<T, I> {
+        fn build(&self) {
+            // ensure no duplicates exist.
+            let unique_endowed_accounts = self
+                .balances
+                .iter()
+                .map(|(account_id, asset_id, _)| (account_id, asset_id))
+                .collect::<std::collections::BTreeSet<_>>();
+            assert!(
+                unique_endowed_accounts.len() == self.balances.len(),
+                "duplicate endowed accounts in genesis."
+            );
+
+            self.balances
+                .iter()
+                .for_each(|(account_id, asset_id, initial_balance)| {
+                    assert!(
+                        *initial_balance >= T::ExistentialDeposits::get(&asset_id),
+                        "the balance must be greater than existential deposit.",
+                    );
+                    Pallet::<T, I>::set_genesis(*asset_id, account_id, *initial_balance);
+                    Asset::<T, I>::mutate(*asset_id, |maybe_details| -> DispatchResult {
+                        let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
+                        details.supply = details
+                            .supply
+                            .checked_add(initial_balance)
+                            .expect("total issuance cannot overflow when building genesis");
+                        Ok(())
+                    });
+                });
+        }
+    }
+
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T, I = ()>(_);
@@ -247,6 +292,7 @@ pub mod pallet {
     }
 
     #[pallet::storage]
+    #[pallet::getter(fn asset)]
     /// Details of an asset.
     pub(super) type Asset<T: Config<I>, I: 'static = ()> = StorageMap<
         _,
@@ -254,6 +300,7 @@ pub mod pallet {
         T::AssetId,
         AssetDetails<T::Balance, T::AccountId, DepositBalanceOf<T, I>>,
     >;
+
     #[pallet::storage]
     #[pallet::getter(fn account)]
     /// The number of units of assets held by any given account.
@@ -304,12 +351,6 @@ pub mod pallet {
     pub(super) type IdentityOf<T: Config<I>, I: 'static = ()> =
         StorageMap<_, Blake2_128Concat, T::AssetId, Registration<BalanceOf<T, I>>, OptionQuery>;
 
-    /// The total issuance of a token type.
-    #[pallet::storage]
-    #[pallet::getter(fn total_issuance)]
-    pub type TotalIssuance<T: Config<I>, I: 'static = ()> =
-        StorageMap<_, Twox64Concat, T::AssetId, T::Balance, ValueQuery>;
-
     // /// Any liquidity locks of a token type under an account.
     // /// NOTE: Should only be accessed when setting, changing and freeing a lock.
     // #[pallet::storage]
@@ -323,6 +364,7 @@ pub mod pallet {
     //     BoundedVec<BalanceLock<T::Balance>, T::MaxLocks>,
     //     ValueQuery,
     // >;
+    //
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
@@ -346,6 +388,8 @@ pub mod pallet {
         Frozen(T::AssetId, T::AccountId),
         /// Some account `who` was frozen. \[asset_id, who]\
         Thawed(T::AssetId, T::AccountId),
+        /// An account was created with some free balance. \[asset_id, account, free_balance\]
+        Endowed(T::AssetId, T::AccountId, T::Balance),
         /// Some asset `asset_id` was frozen. \[asset_id]\
         AssetFrozen(T::AssetId),
         /// Some asset `asset_id` was thawed. \[asset_id]\
@@ -368,12 +412,16 @@ pub mod pallet {
     pub enum Error<T, I = ()> {
         /// Account balance must be greater than or equal to the transfer amount.
         BalanceLow,
+        /// Value too low to create account due to existential deposit
+        ExistentialDeposit,
         /// Cannot convert Amount into Balance type
         AmountIntoBalanceFailed,
         /// Failed because liquidity restrictions due to locking
         LiquidityRestrictions,
         /// Failed because the maximum locks was exceeded
         MaxLocksExceeded,
+        /// Transfer/payment would kill account
+        KeepAlive,
         /// Balance should be non-zero.
         BalanceZero,
         /// The signing account has no permission to do the operation.
@@ -653,15 +701,23 @@ pub mod pallet {
             target: <T::Lookup as StaticLookup>::Source,
             #[pallet::compact] amount: T::Balance,
         ) -> DispatchResult {
-            let origin = ensure_signed(origin)?;
-            let dest = T::Lookup::lookup(target)?;
-
             let f = TransferFlags {
                 keep_alive: false,
                 best_effort: false,
                 burn_dust: false,
             };
-            Self::do_transfer(id, &origin, &dest, amount, None, f).map(|_| ())
+            let origin = ensure_signed(origin)?;
+            let dest = T::Lookup::lookup(target)?;
+            Self::do_transfer(
+                id,
+                &origin,
+                &dest,
+                amount,
+                ExistenceRequirement::AllowDeath,
+                f,
+            )?;
+            Self::deposit_event(Event::Transferred(id, origin, dest, amount));
+            Ok(())
         }
 
         /// Disallow further ungrivileged transfers from an account
@@ -957,6 +1013,10 @@ pub mod pallet {
 }
 
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    pub(crate) fn set_genesis(currency_id: T::AssetId, who: &T::AccountId, amount: T::Balance) {
+        Self::do_set_genesis(currency_id, who, amount);
+    }
+
     pub(crate) fn try_mutate_account<R, E>(
         who: &T::AccountId,
         currency_id: T::AssetId,
@@ -966,25 +1026,30 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             let existed = maybe_account.is_some();
             let mut account = maybe_account.take().unwrap_or_default();
             f(&mut account, existed).map(move |result| {
-                let mut handle_dust: Option<T::Balance> = None;
+                let maybe_endowed = if !existed { Some(account.free) } else { None };
+                let mut maybe_dust: Option<T::Balance> = None;
                 let total = account.total();
                 *maybe_account = if total.is_zero() {
                     None
                 } else {
-                    // if non_zero total is below existential deposit and the account is not a
-                    // module account, should handle the dust.
-                    // if total < T::ExistentialDeposits::get(&currency_id)
-                    //     && !Self::is_module_account_id(who)
-                    // {
-                    //     handle_dust = Some(total);
-                    // }
+                    // if non_zero totalis below existential deposit, should handle the dust.
+                    if total < T::ExistentialDeposits::get(&currency_id) {
+                        maybe_dust = Some(total);
+                    }
+
                     Some(account)
                 };
 
-                (existed, maybe_account.is_some(), handle_dust, result)
+                (
+                    maybe_endowed,
+                    existed,
+                    maybe_account.is_some(),
+                    maybe_dust,
+                    result,
+                )
             })
         })
-        .map(|(existed, exists, handle_dust, result)| {
+        .map(|(maybe_endowed, existed, exists, maybe_dust, result)| {
             if existed && !exists {
                 // If existed before, decrease account provider.
                 // Ignore the result, because if it failed means that these’s remain consumers,
@@ -993,6 +1058,10 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             } else if !existed && exists {
                 // if new, increase account provider
                 frame_system::Pallet::<T>::inc_providers(who);
+            }
+
+            if let Some(endowed) = maybe_endowed {
+                Self::deposit_event(Event::Endowed(currency_id, who.clone(), endowed));
             }
 
             // if let Some(dust_amount) = handle_dust {
@@ -1033,6 +1102,26 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         });
     }
 
+    pub(crate) fn set_balance(
+        currency_id: T::AssetId,
+        who: &T::AccountId,
+        amount: T::Balance,
+    ) -> DispatchResult {
+        Asset::<T, I>::try_mutate(currency_id, |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
+
+            Self::mutate_account(who, currency_id, |account, _| -> DispatchResult {
+                account.free = amount;
+                if account.free.is_zero() {
+                    account.sufficient = Self::new_account(&who, details)?;
+                }
+                Ok(())
+            });
+            Ok(())
+        })?;
+        Ok(())
+    }
+
     /// Set reserved balance of `who` to a new value
     ///
     /// Note this will not maintain total issuance, and the caller is
@@ -1055,7 +1144,8 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
     }
 
     fn total_issuance(currency_id: Self::CurrencyId) -> Self::Balance {
-        <TotalIssuance<T, I>>::get(currency_id)
+        //<TotalIssuance<T, I>>::get(currency_id)
+        Self::total_issuance(currency_id)
     }
 
     fn total_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
@@ -1096,29 +1186,23 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
         to: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        if amount.is_zero() || from == to {
-            return Ok(());
-        }
-
-        Self::ensure_can_withdraw(currency_id, from, amount)?;
-
-        let from_balance = Self::free_balance(currency_id, from);
-        let to_balance = Self::free_balance(currency_id, to)
-            .checked_add(&amount)
-            .ok_or(ArithmeticError::Overflow)?;
-
-        // Cannot underflow because ensure_can_withdraw check
-        Self::set_free_balance(currency_id, from, from_balance - amount);
-        Self::set_free_balance(currency_id, to, to_balance);
-
         let f = TransferFlags {
             keep_alive: false,
             best_effort: false,
             burn_dust: false,
         };
+        // Cannot underflow because ensure_can_withdraw check
+        // Self::try_mutate_asset(currency_id, from, to, amount, f).map(|_| ())
 
-        // Self::do_transfer(currency_id, &from, &to, amount, None, f).map(|_| ());
-        Ok(())
+        // Self::do_transfer(currency_id, &from, &to, amount, None, f).map(|_| ())
+        Self::do_transfer(
+            currency_id,
+            from,
+            to,
+            amount,
+            ExistenceRequirement::AllowDeath,
+            f,
+        )
     }
 
     /// Deposit some `amount` into the free balance of account `who`.
@@ -1132,8 +1216,11 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
         if amount.is_zero() {
             return Ok(());
         }
-        TotalIssuance::<T, I>::try_mutate(currency_id, |total_issuance| -> DispatchResult {
-            *total_issuance = total_issuance
+
+        Asset::<T, I>::mutate(currency_id, |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
+            details.supply = details
+                .supply
                 .checked_add(&amount)
                 .ok_or(ArithmeticError::Overflow)?;
 
@@ -1155,7 +1242,15 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
             return Ok(());
         }
         Self::ensure_can_withdraw(currency_id, who, amount)?;
-        <TotalIssuance<T, I>>::mutate(currency_id, |v| *v -= amount);
+        Asset::<T, I>::mutate(currency_id, |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
+            details.supply = details
+                .supply
+                .checked_sub(&amount)
+                .expect("cannot withdraw");
+            Ok(())
+        });
+
         Self::set_free_balance(
             currency_id,
             who,
@@ -1213,7 +1308,12 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
         }
 
         // Cannot underflow because the slashed value cannot be greater than total issuance
-        <TotalIssuance<T, I>>::mutate(currency_id, |v| *v -= amount - remaining_slash);
+
+        Asset::<T, I>::mutate(currency_id, |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
+            details.supply -= amount - remaining_slash;
+            Ok(())
+        });
         remaining_slash
     }
 }
@@ -1362,7 +1462,14 @@ impl<T: Config<I>, I: 'static> MultiReservableCurrency<T::AccountId> for Pallet<
         let reserved_balance = Self::reserved_balance(currency_id, who);
         let actual = reserved_balance.min(value);
         Self::set_reserved_balance(currency_id, who, reserved_balance - actual);
-        <TotalIssuance<T, I>>::mutate(currency_id, |v| *v -= actual);
+        Asset::<T, I>::mutate(currency_id, |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
+            details.supply = details
+                .supply
+                .checked_sub(&actual)
+                .expect("cannot slash reserved");
+            Ok(())
+        });
         value - actual
     }
 
@@ -1487,12 +1594,22 @@ where
         if amount.is_zero() {
             return PositiveImbalance::zero();
         }
-        <TotalIssuance<T>>::mutate(GetCurrencyId::get(), |issued| {
-            *issued = issued.checked_sub(&amount).unwrap_or_else(|| {
-                amount = *issued;
+        // <TotalIssuance<T>>::mutate(GetCurrencyId::get(), |issued| {
+        //     *issued = issued.checked_sub(&amount).unwrap_or_else(|| {
+        //         amount = *issued;
+        //         Zero::zero()
+        //     });
+        // });
+
+        Asset::<T>::mutate(GetCurrencyId::get(), |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T>::Unknown)?;
+            details.supply = details.supply.checked_sub(&amount).unwrap_or_else(|| {
+                amount = details.supply;
                 Zero::zero()
             });
+            Ok(())
         });
+
         PositiveImbalance::new(amount)
     }
 
@@ -1500,12 +1617,16 @@ where
         if amount.is_zero() {
             return NegativeImbalance::zero();
         }
-        <TotalIssuance<T>>::mutate(GetCurrencyId::get(), |issued| {
-            *issued = issued.checked_add(&amount).unwrap_or_else(|| {
-                amount = Self::Balance::max_value() - *issued;
+
+        Asset::<T>::mutate(GetCurrencyId::get(), |maybe_details| -> DispatchResult {
+            let details = maybe_details.as_mut().ok_or(Error::<T>::Unknown)?;
+            details.supply = details.supply.checked_add(&amount).unwrap_or_else(|| {
+                amount = Self::Balance::max_value() - details.supply;
                 Self::Balance::max_value()
-            })
+            });
+            Ok(())
         });
+
         NegativeImbalance::new(amount)
     }
 

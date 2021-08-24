@@ -106,12 +106,17 @@ impl<T: Config<I>, I: 'static> fungibles::Transfer<T::AccountId> for Pallet<T, I
         amount: T::Balance,
         keep_alive: bool,
     ) -> Result<T::Balance, DispatchError> {
+        let existence_requirement = if keep_alive {
+            ExistenceRequirement::KeepAlive
+        } else {
+            ExistenceRequirement::AllowDeath
+        };
         let f = TransferFlags {
             keep_alive,
             best_effort: false,
             burn_dust: false,
         };
-        Self::do_transfer(asset, source, dest, amount, None, f)
+        Self::do_transfer(asset, source, dest, amount, existence_requirement, f).map(|_| amount)
     }
 }
 

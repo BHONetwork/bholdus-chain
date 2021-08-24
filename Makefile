@@ -17,3 +17,8 @@ build: githooks
 .PHONY: check-debug
 check-debug:
 	RUSTFLAGS="-Z macro-backtrace" SKIP_WASM_BUILD= cargo +nightly check --features with-bholdus-runtime
+
+
+.PHONY: test
+test:
+	SKIP_WASM_BUILD= cargo test --features with-bholdus-runtime -- --nocapture
