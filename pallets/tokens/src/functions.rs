@@ -31,13 +31,8 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         ExtraMutator::maybe_new(id, who)
     }
 
-    // /// Get the asset `id` balance of `who`.
-    // pub fn balance(id: T::AssetId, who: impl sp_std::borrow::Borrow<T::AccountId>) -> T::Balance {
-    //     Account::<T, I>::get(id, who.borrow()).balance
-    // }
-
-    /// Get the total supply of an asset `id`.
-    pub fn total_supply(id: T::AssetId) -> T::Balance {
+    ///The total issuance of a token type.
+    pub fn total_issuance(id: T::AssetId) -> T::Balance {
         Asset::<T, I>::get(id)
             .map(|x| x.supply)
             .unwrap_or_else(Zero::zero)
@@ -433,88 +428,78 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         Ok(actual)
     }
 
-    /// Reduces the asset `id` balance of `source` by some `amount` and increases the balance of
-    /// `dest` by (similar) amount.
-    ///
-    /// Returns the actual amount placed into `dest`. Exact semantics are determined by the flags
-    /// `f`.
-    ///
-    /// Will fail if the amount transferred is so small that it cannot create the destination due
-    /// to minimum balance requirements.
-    pub(super) fn do_transfer(
-        id: T::AssetId,
-        source: &T::AccountId,
-        dest: &T::AccountId,
+    /// Transfer some free balance from `from` to `to`.
+    pub(crate) fn do_transfer(
+        currency_id: T::AssetId,
+        from: &T::AccountId,
+        to: &T::AccountId,
         amount: T::Balance,
-        maybe_need_admin: Option<T::AccountId>,
+        existence_requirement: ExistenceRequirement,
         f: TransferFlags,
-    ) -> Result<T::Balance, DispatchError> {
-        // Early exist if no-op.
-        if amount.is_zero() {
-            Self::deposit_event(Event::Transferred(id, source.clone(), dest.clone(), amount));
-            return Ok(amount);
+    ) -> DispatchResult {
+        if amount.is_zero() || from == to {
+            return Ok(());
         }
 
         // Figure out the debit and credit, together with side-effects.
-        let debit = Self::prep_debit(id, &source, amount, f.into())?;
-        let (credit, maybe_burn) = Self::prep_credit(id, &dest, amount, debit, f.burn_dust)?;
+        let debit = Self::prep_debit(currency_id, &from, amount, f.into())?;
+        let (credit, maybe_burn) = Self::prep_credit(currency_id, &to, amount, debit, f.burn_dust)?;
 
-        let mut source_account = Account::<T, I>::get(id, &source);
-
-        Asset::<T, I>::try_mutate(id, |maybe_details| -> DispatchResult {
+        Asset::<T, I>::try_mutate(currency_id, |maybe_details| -> DispatchResult {
             let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
-
-            // Check admin rights.
-            if let Some(need_admin) = maybe_need_admin {
-                ensure!(&need_admin == &details.admin, Error::<T, I>::NoPermission);
-            }
-
-            // Skip if source == dest
-            if source == dest {
-                return Ok(());
-            }
-
             // Burn any dust if needed.
             if let Some(burn) = maybe_burn {
-                // Debit dust from supply; this will not saturate since it's already checked in prep.
+                // Debit dust from supply; this will not saturate since it's already checked in
+                // prep.
                 debug_assert!(details.supply >= burn, "checked in prep; qed");
                 details.supply = details.supply.saturating_sub(burn);
             }
+            Self::try_mutate_account(to, currency_id, |to_account, _existed| -> DispatchResult {
+                Self::try_mutate_account(
+                    from,
+                    currency_id,
+                    |from_account, _existed| -> DispatchResult {
+                        from_account.free = from_account
+                            .free
+                            .checked_sub(&debit)
+                            .ok_or(Error::<T, I>::BalanceLow)?;
 
-            // Debit balance from source; this will not saturate since it's already checked in prep.
-            debug_assert!(source_account.free >= debit, "checked in prep; qed");
-            source_account.free = source_account.free.saturating_sub(debit);
+                        // Calculate new balance; this will not saturate since it's already checked
+                        // in prep.
+                        debug_assert!(
+                            to_account.free.checked_add(&credit).is_some(),
+                            "checked in prep; qed"
+                        );
 
-            Account::<T, I>::try_mutate(id, &dest, |a| -> DispatchResult {
-                // Calculate new balance; this will not saturate since it's already checked in prep.
-                debug_assert!(
-                    a.free.checked_add(&credit).is_some(),
-                    "checked in prep; qed"
-                );
-                let new_balance = a.free.saturating_add(credit);
+                        // Create a new account if there wasn't one already.
+                        if to_account.free.is_zero() {
+                            to_account.sufficient = Self::new_account(&to, details)?;
+                        }
 
-                // Create a new account if there wasn't one already.
-                if a.free.is_zero() {
-                    a.sufficient = Self::new_account(&dest, details)?;
-                }
-
-                a.free = new_balance;
+                        to_account.free = to_account
+                            .free
+                            .checked_add(&credit)
+                            .ok_or(ArithmeticError::Overflow)?;
+                        let ed = T::ExistentialDeposits::get(&currency_id);
+                        // if to_account non_zero total is below existential deposit, would return an
+                        // error.
+                        ensure!(to_account.total() >= ed, Error::<T, I>::ExistentialDeposit);
+                        Self::ensure_can_withdraw(currency_id, from, amount)?;
+                        let allow_death = existence_requirement == ExistenceRequirement::AllowDeath;
+                        let allow_death =
+                            allow_death && frame_system::Pallet::<T>::can_dec_provider(from);
+                        // if from_account does not allow death and non_zero total is below existential
+                        // deposit, would return an error.
+                        ensure!(
+                            allow_death || from_account.total() >= ed,
+                            Error::<T, I>::KeepAlive
+                        );
+                        Ok(())
+                    },
+                )?;
                 Ok(())
             })?;
-
-            // Remove source account if it's now dead.
-            if source_account.free < details.min_balance {
-                debug_assert!(source_account.free.is_zero(), "checked in prep; qed");
-                Self::dead_account(id, &source, details, source_account.sufficient);
-                Account::<T, I>::remove(id, &source);
-            } else {
-                Account::<T, I>::insert(id, &source, &source_account)
-            }
-
             Ok(())
-        })?;
-
-        Self::deposit_event(Event::Transferred(id, source.clone(), dest.clone(), credit));
-        Ok(credit)
+        })
     }
 }

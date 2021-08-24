@@ -1,7 +1,7 @@
 //! Test environment for Tokens pallet.
 
 use super::*;
-use crate as pallet_tokens;
+use crate as bholdus_tokens;
 
 use bholdus_support::parameter_type_with_key;
 use frame_support::{construct_runtime, parameter_types};
@@ -10,20 +10,30 @@ use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
+    AccountId32,
 };
 
-type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
-type Block = frame_system::mocking::MockBlock<Test>;
+// pub type AccountId = AccountId32;
+pub type AssetId = u32;
+pub type Balance = u64;
+pub type AccountId = u64;
+
+pub const BUSD: AssetId = 1;
+pub const ALICE: AccountId = 0;
+pub const BOB: AccountId = 1;
+
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>;
+type Block = frame_system::mocking::MockBlock<Runtime>;
 
 construct_runtime!(
-    pub enum Test where
+    pub enum Runtime where
     Block = Block,
     NodeBlock = Block,
     UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
-        BholdusTokens: pallet_tokens::{Pallet, Call, Storage, Event<T>},
+        BholdusTokens: bholdus_tokens::{Pallet, Call, Storage, Event<T>},
     }
 );
 
@@ -31,7 +41,7 @@ parameter_types! {
     pub const BlockHashCount: u64 = 250;
 }
 
-impl frame_system::Config for Test {
+impl frame_system::Config for Runtime {
     type BaseCallFilter = ();
     type BlockWeights = ();
     type BlockLength = ();
@@ -61,7 +71,7 @@ parameter_types! {
     pub const ExistentialDeposit: u64 = 1;
 }
 
-impl pallet_balances::Config for Test {
+impl pallet_balances::Config for Runtime {
     type Balance = u64;
     type DustRemoval = ();
     type Event = Event;
@@ -88,17 +98,18 @@ parameter_types! {
     pub const MaxRegistrars: u32 = 20;
 }
 
-// pub type AccountId = AccountId32;
-pub type AssetId = u32;
-pub type Balance = u64;
-
 parameter_type_with_key! {
     pub ExistentialDeposits: |currency_id: AssetId| -> Balance {
         0
     };
 }
 
-impl Config for Test {
+parameter_types! {
+    pub DustAccount: AccountId = PalletId(*b"bhol/dst").into_account();
+    pub MaxLocks: u32 = 2;
+}
+
+impl Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = i64;
@@ -146,7 +157,7 @@ impl FrozenBalance<u32, u64, u64> for TestFreezer {
 
 pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
     let t = frame_system::GenesisConfig::default()
-        .build_storage::<Test>()
+        .build_storage::<Runtime>()
         .unwrap();
 
     let mut ext = sp_io::TestExternalities::new(t);
@@ -166,5 +177,47 @@ pub fn ten() -> AssetIdentity {
         },
         //official_project_website: Data::Raw(b"https://apps.bholdus.com".to_vec()),
         ..Default::default()
+    }
+}
+
+pub struct ExtBuilder {
+    balances: Vec<(AccountId, AssetId, Balance)>,
+}
+
+impl Default for ExtBuilder {
+    fn default() -> Self {
+        Self {
+            balances: vec![(DustAccount::get(), BUSD, ExistentialDeposits::get(&BUSD))],
+        }
+    }
+}
+
+impl ExtBuilder {
+    pub fn balances(mut self, mut balances: Vec<(AccountId, AssetId, Balance)>) -> Self {
+        self.balances.append(&mut balances);
+        self
+    }
+
+    pub fn one_hundred_for_alice(self) -> Self {
+        self.balances(vec![(ALICE, BUSD, 100)])
+    }
+
+    pub fn one_hundred_for_alice_n_bob(self) -> Self {
+        self.balances(vec![(ALICE, BUSD, 100), (BOB, BUSD, 100)])
+    }
+
+    pub fn build(self) -> sp_io::TestExternalities {
+        let mut t = frame_system::GenesisConfig::default()
+            .build_storage::<Runtime>()
+            .unwrap();
+        bholdus_tokens::GenesisConfig::<Runtime> {
+            balances: self.balances,
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        let mut ext = sp_io::TestExternalities::new(t);
+        ext.execute_with(|| System::set_block_number(1));
+        ext
     }
 }

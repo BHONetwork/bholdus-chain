@@ -21,4 +21,4 @@ check-debug:
 
 .PHONY: test
 test:
-	SKIP_WASM_BUILD= cargo test --features with-bholdus-runtime
+	SKIP_WASM_BUILD= cargo test --features with-bholdus-runtime -- --nocapture

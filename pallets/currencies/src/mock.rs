@@ -170,13 +170,14 @@ pub struct ExtBuilder {
 impl Default for ExtBuilder {
     fn default() -> Self {
         Self {
-            balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100), (ALICE, X_TOKEN_ID, 100)],
+            balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100), (ALICE, 1, 100)],
+            // balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100)],
         }
     }
 }
 
 pub const NATIVE_CURRENCY_ID: CurrencyId = 0;
-pub const X_TOKEN_ID: CurrencyId = 2;
+pub const X_TOKEN_ID: CurrencyId = 3;
 
 impl ExtBuilder {
     pub fn balances(mut self, balances: Vec<(AccountId, CurrencyId, Balance)>) -> Self {
