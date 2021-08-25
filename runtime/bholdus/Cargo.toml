@@ -9,20 +9,10 @@ version = '1.0.1'
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
-# [build-dependencies]
-# substrate-wasm-builder = { version = '4.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-
 [build-dependencies.substrate-wasm-builder]
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '4.0.0'
-
-[dependencies]
-# external dependencies
-# codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
-# hex-literal = { optional = true, version = '0.3.1' }
-# log = { version = "0.4.14", default-features = false }
-# max-encoded-len = { version = "3.0.0", default-features = false, path = "../max-encoded-len", features = [ "derive" ] }
 
 [dependencies.max-encoded-len]
 default-features = false
@@ -417,6 +407,11 @@ git = 'https://github.com/bholdus/chainbridge-substrate.git'
 default-features = false
 version = '3.0.0'
 path = '../../pallets/bholdus-chainbridge-transfer'
+
+[dependencies.bholdus-dex]
+default-features = false
+version = '3.0.0'
+path = '../../pallets/dex'
 
 [features]
 default = ['std']

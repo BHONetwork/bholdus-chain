@@ -47,6 +47,7 @@ use frame_system::{
 };
 
 use bholdus_currencies::BasicCurrencyAdapter;
+use bholdus_primitives::CurrencyId;
 use bholdus_support::parameter_type_with_key;
 
 pub use pallet_balances::Call as BalancesCall;
@@ -292,18 +293,18 @@ parameter_types! {
 }
 
 parameter_type_with_key! {
-    pub ExistentialDeposits: |_currency_id: u32| -> Balance {
+    pub ExistentialDeposits: |_currency_id: CurrencyId| -> Balance {
         Zero::zero()
     };
 }
 
 parameter_types! {
-    pub const GetNativeCurrencyId: u32 = 0;
+    pub const GetNativeCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
 }
 
 impl bholdus_currencies::Config for Runtime {
     type Event = Event;
-    type MultiCurrency = BholdusTokens;
+    type MultiCurrency = Tokens;
     type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
     type GetNativeCurrencyId = GetNativeCurrencyId;
     type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
@@ -313,7 +314,7 @@ impl bholdus_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = Amount;
-    type AssetId = u32;
+    type AssetId = CurrencyId;
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
     type FieldDeposit = FieldDeposit;
@@ -821,7 +822,7 @@ impl InstanceFilter<Call> for ProxyType {
             ProxyType::NonTransfer => !matches!(
                 c,
                 Call::Balances(..)
-                    | Call::BholdusTokens(..)
+                    | Call::Tokens(..)
                     | Call::Indices(pallet_indices::Call::transfer(..))
             ),
             ProxyType::Governance => matches!(c, Call::Council(..) | Call::Treasury(..)),
@@ -938,6 +939,20 @@ impl bholdus_chainbridge_transfer::Config for Runtime {
     type AdminOrigin = EnsureRoot<Self::AccountId>;
 }
 
+parameter_types! {
+    pub const ExchangeFee: (u32, u32) = (3,1000);
+    pub const TradingPathLimit: u32 = 3;
+    pub const DexPalletId: PalletId = PalletId(*b"bhol/dex");
+}
+impl bholdus_dex::Config for Runtime {
+    type Event = Event;
+    type ListingOrigin = EnsureRoot<Self::AccountId>;
+    type ExchangeFee = ExchangeFee;
+    type TradingPathLimit = TradingPathLimit;
+    type Currency = Currencies;
+    type PalletId = DexPalletId;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -953,8 +968,8 @@ construct_runtime!(
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
-        BholdusTokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
-        BholdusCurrencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
+        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
         Babe: pallet_babe::{Pallet, Call, Storage, Config, ValidateUnsigned},
         Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
@@ -978,6 +993,7 @@ construct_runtime!(
         BholdusPrivateSales: pallet_bholdus_private_sales::{Pallet, Call, Storage, Event<T>},
         ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
         ChainBridgeTransfer: bholdus_chainbridge_transfer::{Pallet, Call, Storage, Config, Event<T>},
+        Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
     }

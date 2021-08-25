@@ -62,6 +62,7 @@ pub mod pallet {
         #[pallet::constant]
         type ExchangeFee: Get<(u32, u32)>;
         /// Trading path limit
+        #[pallet::constant]
         type TradingPathLimit: Get<u32>;
         /// Multi currency mechanism
         type Currency: MultiCurrency<Self::AccountId, CurrencyId = CurrencyId, Balance = Balance>;

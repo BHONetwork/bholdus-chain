@@ -234,7 +234,7 @@ pub mod pallet {
             + MaybeSerializeDeserialize;
 
         /// Identifier for the class of asset.
-        type AssetId: Member + Parameter + Copy + MaybeSerializeDeserialize;
+        type AssetId: Member + Parameter + Copy + MaybeSerializeDeserialize + Ord;
 
         /// The currency mechanism.
         type Currency: PalletReservableCurrency<Self::AccountId>;

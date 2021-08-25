@@ -2,6 +2,7 @@
 
 use crate::*;
 use codec::{Decode, Encode};
+#[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::{FixedU128, RuntimeDebug};
 use sp_std::prelude::*;

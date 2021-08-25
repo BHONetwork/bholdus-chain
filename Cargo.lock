@@ -653,6 +653,7 @@ dependencies = [
  "bholdus-chainbridge",
  "bholdus-chainbridge-transfer",
  "bholdus-currencies",
+ "bholdus-dex",
  "bholdus-primitives",
  "bholdus-support",
  "bholdus-tokens",
