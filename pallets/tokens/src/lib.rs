@@ -191,14 +191,6 @@ pub mod pallet {
                         "the balance must be greater than existential deposit.",
                     );
                     Pallet::<T, I>::set_genesis(*asset_id, account_id, *initial_balance);
-                    Asset::<T, I>::mutate(*asset_id, |maybe_details| -> DispatchResult {
-                        let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
-                        details.supply = details
-                            .supply
-                            .checked_add(initial_balance)
-                            .expect("total issuance cannot overflow when building genesis");
-                        Ok(())
-                    });
                 });
         }
     }

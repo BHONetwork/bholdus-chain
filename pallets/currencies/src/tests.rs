@@ -21,7 +21,7 @@ fn multi_currency_should_work() {
         assert_eq!(Currencies::free_balance(1, &ALICE), 50);
         assert_eq!(Currencies::free_balance(1, &BOB), 50);
         assert_ok!(BholdusTokens::mint(Origin::signed(ALICE), 1, BOB, 100));
-        assert_eq!(BholdusTokens::total_issuance(1), 300);
+        assert_eq!(BholdusTokens::total_issuance(1), 200);
 
         // Test: transfer CurrencyId = 2
         PalletBalances::make_free_balance_be(&ALICE, 100);

@@ -14,10 +14,10 @@ fn genesis_issuance_should_work() {
         .build()
         .execute_with(|| {
             assert_eq!(BholdusTokens::free_balance(BUSD, &ALICE), 100);
-            assert_eq!(BholdusTokens::total_issuance(BUSD), 200);
+            assert_eq!(BholdusTokens::total_issuance(BUSD), 100);
             assert_eq!(BholdusTokens::total_balance(BUSD, &ALICE), 100);
             BholdusTokens::transfer(Origin::signed(ALICE), BUSD, BOB, 50);
-            assert_eq!(BholdusTokens::total_issuance(BUSD), 200);
+            assert_eq!(BholdusTokens::total_issuance(BUSD), 100);
             assert_eq!(BholdusTokens::total_balance(BUSD, &ALICE), 50);
         })
 }
