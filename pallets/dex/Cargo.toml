@@ -31,7 +31,7 @@ bholdus-support = {default-features = false, version = '3.0.0', path = '../suppo
 
 
 [dev-dependencies]
-serde = '1.0.119'
+serde = '1.0.129'
 pallet-balances = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07' }
 bholdus-tokens = {default-features = false, version = '3.0.0', path = '../tokens'}
 bholdus-currencies = {default-features = false, version = '3.0.0', path = '../currencies'}
