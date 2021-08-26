@@ -51,7 +51,7 @@ impl system::Config for Test {
     type BlockHashCount = BlockHashCount;
     type Version = ();
     type PalletInfo = PalletInfo;
-    type AccountData = pallet_balances::AccountData<u64>;
+    type AccountData = pallet_balances::AccountData<u128>;
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
@@ -61,17 +61,17 @@ impl system::Config for Test {
 
 parameter_types! {
     pub const ExistentialDeposit: u64 = 1;
-    pub const MaxLocks: u32 = 100;
 }
-
 impl pallet_balances::Config for Test {
-    type Event = Event;
-    type AccountStore = System;
+    type Balance = u128;
     type DustRemoval = ();
+    type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;
-    type Balance = u64;
+    type AccountStore = frame_system::Pallet<Test>;
+    type MaxLocks = ();
+    type MaxReserves = ();
+    type ReserveIdentifier = [u8; 8];
     type WeightInfo = ();
-    type MaxLocks = MaxLocks;
 }
 
 parameter_types! {
@@ -91,6 +91,7 @@ impl chainbridge_transfer::Config for Test {
     type Event = Event;
     type BridgeOrigin = chainbridge::EnsureBridge<Test>;
     type Currency = Balances;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
 }
 
 pub const USER_ID: u64 = 1;

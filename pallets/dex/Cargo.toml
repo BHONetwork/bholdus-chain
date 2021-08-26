@@ -47,10 +47,5 @@ std = [
 	'sp-runtime/std',
 	'sp-std/std',
 	'frame-benchmarking/std',
-	'pallet-balances/std',
-	'bholdus-primitives/std',
-	'bholdus-support/std',
-	'bholdus-currencies/std',
-	'bholdus-tokens/std',
 ]
 try-runtime = ['frame-support/try-runtime']

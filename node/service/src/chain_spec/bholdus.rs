@@ -1,9 +1,12 @@
-use bholdus_primitives::{AccountId, Balance, Signature};
+use bholdus_primitives::{
+    AccountId, Balance, CurrencyId, Signature, TokenInfo, TokenSymbol, TradingPair,
+};
 use bholdus_runtime::{
     opaque::SessionKeys, AuthorityDiscoveryConfig, BabeConfig, BalancesConfig,
-    ChainBridgeTransferConfig, CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig,
-    IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-    BABE_GENESIS_EPOCH_CONFIG, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    ChainBridgeTransferConfig, CouncilConfig, DexConfig, GenesisConfig, GrandpaConfig,
+    ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig,
+    SystemConfig, TokensConfig, BABE_GENESIS_EPOCH_CONFIG, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS,
+    TOKEN_SYMBOL, WASM_BINARY,
 };
 use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -22,6 +25,37 @@ use sp_runtime::{
 const DEFAULT_PROTOCOL_ID: &str = "bho";
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
+
+struct Constants {
+    pub BHO_CURRENCY: CurrencyId,
+    pub BNB_CURRENCY: CurrencyId,
+    pub DOT_CURRENCY: CurrencyId,
+    pub BHO_BNB_PAIR: TradingPair,
+    pub BNB_DOT_PAIR: TradingPair,
+    pub BHO_BNB_SHARE_CURRENCY: CurrencyId,
+    pub BNB_DOT_SHARE_CURRENCY: CurrencyId,
+}
+
+impl Constants {
+    fn new() -> Constants {
+        let BHO_CURRENCY: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
+        let BNB_CURRENCY: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 1 }));
+        let DOT_CURRENCY: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 2 }));
+        let BHO_BNB_PAIR: TradingPair =
+            TradingPair::from_currency_ids(BNB_CURRENCY, BHO_CURRENCY).unwrap();
+        let BNB_DOT_PAIR: TradingPair =
+            TradingPair::from_currency_ids(BNB_CURRENCY, DOT_CURRENCY).unwrap();
+        Constants {
+            BHO_CURRENCY,
+            BNB_CURRENCY,
+            DOT_CURRENCY,
+            BHO_BNB_PAIR,
+            BNB_DOT_PAIR,
+            BHO_BNB_SHARE_CURRENCY: BHO_BNB_PAIR.dex_share_currency_id(),
+            BNB_DOT_SHARE_CURRENCY: BNB_DOT_PAIR.dex_share_currency_id(),
+        }
+    }
+}
 
 /// Generate a crypto pair from seed.
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -90,6 +124,7 @@ pub fn authority_keys_from_seed(
 
 pub fn development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
+    let constants = Constants::new();
 
     Ok(ChainSpec::from_genesis(
         // Name
@@ -108,14 +143,35 @@ pub fn development_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     (
+                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice"),
-                        1_000 * BHO,
+                        1_000_000_000 * BHO,
+                        true,
                     ),
                     (
+                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                         10_000_000_000 * BHO,
+                        true,
+                    ),
+                    (
+                        constants.BNB_CURRENCY,
+                        get_account_id_from_seed::<sr25519::Public>("Alice"),
+                        10_000_000 * BHO,
+                        false,
+                    ),
+                    (
+                        constants.DOT_CURRENCY,
+                        get_account_id_from_seed::<sr25519::Public>("Alice"),
+                        10_000_000_000 * BHO,
+                        false,
                     ),
                 ],
+                vec![(
+                    get_account_id_from_seed::<sr25519::Public>("Alice"),
+                    (constants.BHO_CURRENCY, constants.BNB_CURRENCY),
+                    (100_000_000 * BHO, 200_000_000 * BHO),
+                )],
                 10_000 * BHO,
                 true,
             )
@@ -141,6 +197,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 
 pub fn local_testnet_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
+    let constants = Constants::new();
 
     Ok(ChainSpec::from_genesis(
         // Name
@@ -162,14 +219,19 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     (
+                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                         10_000_000_000 * BHO,
+                        true,
                     ),
                     (
+                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                         10_000_000 * BHO,
+                        true,
                     ),
                 ],
+                vec![],
                 1000 * BHO,
                 true,
             )
@@ -206,7 +268,8 @@ fn testnet_genesis(
     )>,
     initial_nominators: Vec<AccountId>,
     root_key: AccountId,
-    endowed_accounts: Vec<(AccountId, Balance)>,
+    endowed_accounts: Vec<(CurrencyId, AccountId, Balance, bool)>,
+    initial_dex_liquidity_pairs: Vec<(AccountId, (CurrencyId, CurrencyId), (Balance, Balance))>,
     stash: Balance,
     enable_println: bool,
 ) -> GenesisConfig {
@@ -241,7 +304,17 @@ fn testnet_genesis(
             changes_trie_config: Default::default(),
         },
         balances: BalancesConfig {
-            balances: endowed_accounts.iter().cloned().collect(),
+            balances: endowed_accounts
+                .iter()
+                .cloned()
+                .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
+                    if is_native_currency {
+                        Some((account_id, balance))
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
         },
         indices: IndicesConfig { indices: vec![] },
         session: SessionConfig {
@@ -287,6 +360,45 @@ fn testnet_genesis(
             native_resource_id: hex!(
                 "0000000000000000000000000000000000000000000000000000000000000000"
             ),
+        },
+        tokens: TokensConfig {
+            balances: endowed_accounts
+                .iter()
+                .cloned()
+                .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
+                    if !is_native_currency {
+                        Some((account_id, currency_id, balance))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>(),
+        },
+        dex: DexConfig {
+            initial_provisioning_trading_pairs: vec![],
+            initial_enabled_trading_pairs: initial_dex_liquidity_pairs
+                .iter()
+                .cloned()
+                .map(|(_, (currency_id_0, currency_id_1), ..)| {
+                    TradingPair::from_currency_ids(currency_id_0, currency_id_1).unwrap()
+                })
+                .collect(),
+            initial_added_liquidity_pools: initial_dex_liquidity_pairs
+                .iter()
+                .cloned()
+                .map(
+                    |(account_id, (currency_id_0, currency_id_1), (amount_0, amount_1))| {
+                        let trading_pair =
+                            TradingPair::from_currency_ids(currency_id_0, currency_id_1).unwrap();
+                        let pair_and_amount = if currency_id_0 == trading_pair.first() {
+                            vec![(trading_pair, (amount_0, amount_1))]
+                        } else {
+                            vec![(trading_pair, (amount_1, amount_0))]
+                        };
+                        (account_id, pair_and_amount)
+                    },
+                )
+                .collect(),
         },
     }
 }

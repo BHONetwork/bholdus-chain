@@ -13,7 +13,7 @@ use sp_runtime::{
     traits::{AccountIdConversion, One, Zero},
     ArithmeticError, FixedPointNumber, SaturatedConversion,
 };
-use sp_std::{convert::TryInto, prelude::*};
+use sp_std::{convert::TryInto, prelude::*, vec};
 
 #[cfg(test)]
 mod mock;

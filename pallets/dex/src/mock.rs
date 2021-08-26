@@ -190,6 +190,9 @@ impl Default for ExtBuilder {
             balances: vec![
                 (BHO, ALICE, 1_000_000_000u128),
                 (BHO, BOB, 1_000_000_000u128),
+                (BHO, Dex::account_id(), 1_000_000_000u128),
+                (BHO, BNB_ADMIN, 1_000_000_000u128),
+                (BHO, DOT_ADMIN, 1_000_000_000u128),
                 (BNB, ALICE, 1_000_000_000u128),
                 (BNB, BOB, 1_000_000_000u128),
                 (DOT, ALICE, 1_000_000_000u128),

@@ -23,20 +23,20 @@ fn initialize_tokens(builder: &ExtBuilder) {
     ));
 
     assert_ok!(BholdusTokens::create(
-        Origin::signed(Dex::account_id()),
+        Origin::signed(ALICE),
         TradingPair::from_currency_ids(BHO, BNB)
             .unwrap()
             .dex_share_currency_id(),
-        Dex::account_id(),
+        ALICE,
         1u128
     ));
 
     assert_ok!(BholdusTokens::create(
-        Origin::signed(Dex::account_id()),
+        Origin::signed(ALICE),
         TradingPair::from_currency_ids(BNB, DOT)
             .unwrap()
             .dex_share_currency_id(),
-        Dex::account_id(),
+        ALICE,
         1u128
     ));
 
