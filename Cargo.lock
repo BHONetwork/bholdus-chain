@@ -675,7 +675,6 @@ dependencies = [
  "pallet-authorship",
  "pallet-babe",
  "pallet-balances",
- "pallet-bholdus-private-sales",
  "pallet-bounties",
  "pallet-collective",
  "pallet-contracts",
@@ -4470,23 +4469,6 @@ dependencies = [
  "log",
  "max-encoded-len",
  "parity-scale-codec",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-bholdus-private-sales"
-version = "1.0.0"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-balances",
- "pallet-scheduler",
- "parity-scale-codec",
- "serde",
- "sp-core",
- "sp-io",
  "sp-runtime",
  "sp-std",
 ]

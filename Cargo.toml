@@ -5,12 +5,7 @@ members = [
     'node/service',
     'rpc',
     'runtime/bholdus',
-    'pallets/template',
-    'pallets/bholdus-private-sales',
-    'pallets/tokens',
-    'pallets/dex',
-    'pallets/currencies',
-    'pallets/support',
+    'pallets/*',
 ]
 [profile.release]
 panic = 'unwind'

@@ -775,15 +775,6 @@ impl pallet_scheduler::Config for Runtime {
     type WeightInfo = pallet_scheduler::weights::SubstrateWeight<Runtime>;
 }
 
-impl pallet_bholdus_private_sales::Config for Runtime {
-    type Event = Event;
-    type Call = Call;
-    type PalletsOrigin = OriginCaller;
-    type Currency = Balances;
-    type ForceOrigin = EnsureRoot<AccountId>;
-    type Scheduler = Scheduler;
-}
-
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
     type Event = Event;
@@ -991,7 +982,6 @@ construct_runtime!(
         Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>},
         Identity: pallet_identity::{Pallet, Call, Storage, Event<T>},
         Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>},
-        BholdusPrivateSales: pallet_bholdus_private_sales::{Pallet, Call, Storage, Event<T>},
         ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
         ChainBridgeTransfer: bholdus_chainbridge_transfer::{Pallet, Call, Storage, Config, Event<T>},
         Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
