@@ -725,7 +725,6 @@ impl<T: Config> Pallet<T> {
         Ok(())
     }
 
-    #[transactional]
     pub fn do_add_liquidity(
         who: &T::AccountId,
         currency_id_0: CurrencyId,
