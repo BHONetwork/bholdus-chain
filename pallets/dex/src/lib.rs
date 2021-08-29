@@ -191,7 +191,7 @@ pub mod pallet {
         AddProvision(T::AccountId, CurrencyId, Balance, CurrencyId, Balance),
         /// Add liqudity to a trading pair successfully. \[who, currency_id_0, pool_0_increment, currency_id_1,
         /// pool_1_increment, share_increment\]
-        AddLiqudity(
+        AddLiquidity(
             T::AccountId,
             CurrencyId,
             Balance,
@@ -788,7 +788,7 @@ impl<T: Config> Pallet<T> {
                 .checked_add(pool_1_increment)
                 .ok_or(ArithmeticError::Overflow)?;
 
-            Self::deposit_event(Event::AddLiqudity(
+            Self::deposit_event(Event::AddLiquidity(
                 who.clone(),
                 trading_pair.first(),
                 pool_0_increment,

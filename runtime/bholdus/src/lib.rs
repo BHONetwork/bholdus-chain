@@ -917,7 +917,7 @@ parameter_types! {
 
 impl bholdus_chainbridge::Config for Runtime {
     type AdminOrigin = EnsureRoot<Self::AccountId>;
-    type ChainId = ChainId;
+    type ChainIdentity = ChainId;
     type Event = Event;
     type ProposalLifetime = BridgeProposalLifetime;
     type Proposal = Call;

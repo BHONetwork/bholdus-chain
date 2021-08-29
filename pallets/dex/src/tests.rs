@@ -736,7 +736,7 @@ fn add_liquidity_should_work() {
             999_998_000u128
         );
         // Event must be emitted
-        System::assert_last_event(Event::Dex(crate::Event::AddLiqudity(
+        System::assert_last_event(Event::Dex(crate::Event::AddLiquidity(
             ALICE, BNB, 2_000u128, BHO, 1_000u128, 4_000u128,
         )));
         // Bob adds liquidity
@@ -777,7 +777,7 @@ fn add_liquidity_should_work() {
             999_996_000u128
         );
         // Event must be emitted
-        System::assert_last_event(Event::Dex(crate::Event::AddLiqudity(
+        System::assert_last_event(Event::Dex(crate::Event::AddLiquidity(
             BOB, BNB, 4_000u128, BHO, 2_000u128, 8_000u128,
         )));
         // Bob adds liquidity that has different exchange rate than current exchange rate. We should

@@ -505,7 +505,6 @@ dependencies = [
 [[package]]
 name = "bholdus-chainbridge"
 version = "3.0.0"
-source = "git+https://github.com/bholdus/chainbridge-substrate.git#d18c515e088df248c606a46958f22d3fdb1565e6"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
