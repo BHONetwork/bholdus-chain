@@ -148,7 +148,7 @@ impl chainbridge::Config for Runtime {
     type Proposal = Call;
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type ProposalLifetime = ProposalLifetime;
-    type ChainId = ChainId_;
+    type ChainIdentity = ChainId_;
 }
 
 impl chainbridge_transfer::Config for Runtime {

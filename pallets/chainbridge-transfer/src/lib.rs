@@ -269,7 +269,7 @@ impl<T: Config> Pallet<T> {
     }
 
     pub fn is_origin_chain_resource(resource_id: ResourceId) -> bool {
-        let chain_id = <T as bholdus_chainbridge::Config>::ChainId::get();
+        let chain_id = <T as bholdus_chainbridge::Config>::ChainIdentity::get();
         resource_id[31] == chain_id
     }
 }
