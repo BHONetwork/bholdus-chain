@@ -167,11 +167,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
                         false,
                     ),
                 ],
-                vec![(
-                    get_account_id_from_seed::<sr25519::Public>("Alice"),
-                    (constants.BHO_CURRENCY, constants.BNB_CURRENCY),
-                    (100_000_000 * BHO, 200_000_000 * BHO),
-                )],
+                vec![],
                 10_000 * BHO,
                 true,
             )
@@ -356,11 +352,7 @@ fn testnet_genesis(
         // println should only be enabled on development chains
         // current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
         // },
-        chain_bridge_transfer: ChainBridgeTransferConfig {
-            native_resource_id: hex!(
-                "0000000000000000000000000000000000000000000000000000000000000000"
-            ),
-        },
+        chain_bridge_transfer: ChainBridgeTransferConfig {},
         tokens: TokensConfig {
             balances: endowed_accounts
                 .iter()

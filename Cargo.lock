@@ -505,7 +505,6 @@ dependencies = [
 [[package]]
 name = "bholdus-chainbridge"
 version = "3.0.0"
-source = "git+https://github.com/bholdus/chainbridge-substrate.git#d18c515e088df248c606a46958f22d3fdb1565e6"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -524,10 +523,14 @@ name = "bholdus-chainbridge-transfer"
 version = "3.0.0"
 dependencies = [
  "bholdus-chainbridge",
+ "bholdus-currencies",
+ "bholdus-primitives",
+ "bholdus-support",
+ "bholdus-tokens",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
- "hex",
+ "hex-literal",
  "pallet-balances",
  "parity-scale-codec",
  "serde",
@@ -648,7 +651,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-runtime"
-version = "1.1.0"
+version = "1.2.1"
 dependencies = [
  "bholdus-chainbridge",
  "bholdus-chainbridge-transfer",
@@ -671,7 +674,6 @@ dependencies = [
  "pallet-authorship",
  "pallet-babe",
  "pallet-balances",
- "pallet-bholdus-private-sales",
  "pallet-bounties",
  "pallet-collective",
  "pallet-contracts",
@@ -4466,23 +4468,6 @@ dependencies = [
  "log",
  "max-encoded-len",
  "parity-scale-codec",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-bholdus-private-sales"
-version = "1.0.0"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-balances",
- "pallet-scheduler",
- "parity-scale-codec",
- "serde",
- "sp-core",
- "sp-io",
  "sp-runtime",
  "sp-std",
 ]

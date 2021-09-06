@@ -24,15 +24,20 @@ sp-core = {default-features = false, version = '3.0.0', git = 'https://github.co
 sp-runtime = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
 sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07' }
 
-bholdus-chainbridge = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/chainbridge-substrate.git'}
+bholdus-chainbridge = {default-features = false, version = '3.0.0', path = '../chainbridge'}
+bholdus-support = {default-features = false, version = '3.0.0', path = '../support'}
+bholdus-primitives ={default-features = false, version = '3.0.0', path = '../../primitives'}
+
 
 # local dependencies
 
 [dev-dependencies]
 serde = '1.0.119'
-sp-io = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-hex = '0.4.3'
-pallet-balances = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+sp-io = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+hex-literal = '0.3.3'
+pallet-balances = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
+bholdus-tokens = {version = '3.0.0', path = '../tokens'}
+bholdus-currencies = {version = '3.0.0', path = '../currencies'}
 
 [features]
 default = ['std']
@@ -45,5 +50,8 @@ std = [
 	'sp-std/std',
 	'sp-runtime/std',
 	'bholdus-chainbridge/std',
+	'bholdus-support/std',
+	'bholdus-primitives/std',
+
 ]
 try-runtime = ['frame-support/try-runtime']

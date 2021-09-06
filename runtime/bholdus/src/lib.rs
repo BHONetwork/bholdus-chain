@@ -104,7 +104,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_001_000,
+    spec_version: 1_002_001,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -775,15 +775,6 @@ impl pallet_scheduler::Config for Runtime {
     type WeightInfo = pallet_scheduler::weights::SubstrateWeight<Runtime>;
 }
 
-impl pallet_bholdus_private_sales::Config for Runtime {
-    type Event = Event;
-    type Call = Call;
-    type PalletsOrigin = OriginCaller;
-    type Currency = Balances;
-    type ForceOrigin = EnsureRoot<AccountId>;
-    type Scheduler = Scheduler;
-}
-
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
     type Event = Event;
@@ -926,7 +917,7 @@ parameter_types! {
 
 impl bholdus_chainbridge::Config for Runtime {
     type AdminOrigin = EnsureRoot<Self::AccountId>;
-    type ChainId = ChainId;
+    type ChainIdentity = ChainId;
     type Event = Event;
     type ProposalLifetime = BridgeProposalLifetime;
     type Proposal = Call;
@@ -935,8 +926,9 @@ impl bholdus_chainbridge::Config for Runtime {
 impl bholdus_chainbridge_transfer::Config for Runtime {
     type Event = Event;
     type BridgeOrigin = bholdus_chainbridge::EnsureBridge<Runtime>;
-    type Currency = Balances;
+    type Currency = Currencies;
     type AdminOrigin = EnsureRoot<Self::AccountId>;
+    type NativeCurrencyId = GetNativeCurrencyId;
 }
 
 parameter_types! {
@@ -990,7 +982,6 @@ construct_runtime!(
         Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>},
         Identity: pallet_identity::{Pallet, Call, Storage, Event<T>},
         Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>},
-        BholdusPrivateSales: pallet_bholdus_private_sales::{Pallet, Call, Storage, Event<T>},
         ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
         ChainBridgeTransfer: bholdus_chainbridge_transfer::{Pallet, Call, Storage, Config, Event<T>},
         Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},

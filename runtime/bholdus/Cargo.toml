@@ -4,7 +4,7 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus-runtime'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '1.1.0'
+version = '1.2.1'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -393,20 +393,15 @@ default-features = false
 version = '3.0.0'
 path = '../../pallets/template'
 
-[dependencies.pallet-bholdus-private-sales]
-default-features = false
-version = '1.0.0'
-path = '../../pallets/bholdus-private-sales'
-
 [dependencies.bholdus-chainbridge]
 default-features = false
 version = '3.0.0'
-git = 'https://github.com/bholdus/chainbridge-substrate.git'
+path = '../../pallets/chainbridge'
 
 [dependencies.bholdus-chainbridge-transfer]
 default-features = false
 version = '3.0.0'
-path = '../../pallets/bholdus-chainbridge-transfer'
+path = '../../pallets/chainbridge-transfer'
 
 [dependencies.bholdus-dex]
 default-features = false
