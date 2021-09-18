@@ -1,6 +1,6 @@
 use bholdus_primitives::{AccountId, Balance, Signature};
 use bholdus_runtime::{
-    opaque::SessionKeys, AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig,
+    opaque::SessionKeys, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig,
     CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
     StakerStatus, StakingConfig, SudoConfig, SystemConfig, BABE_GENESIS_EPOCH_CONFIG, BHO,
     MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
@@ -8,7 +8,7 @@ use bholdus_runtime::{
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
-use sp_consensus_babe::AuthorityId as BabeId;
+use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use sp_core::{sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
@@ -44,13 +44,13 @@ pub fn get_properties() -> Properties {
 
 fn session_keys(
     grandpa: GrandpaId,
-    babe: BabeId,
+    aura: AuraId,
     im_online: ImOnlineId,
     authority_discovery: AuthorityDiscoveryId,
 ) -> SessionKeys {
     SessionKeys {
         grandpa,
-        babe,
+        aura,
         im_online,
         authority_discovery,
     }
@@ -73,7 +73,7 @@ pub fn authority_keys_from_seed(
     AccountId,
     AccountId,
     GrandpaId,
-    BabeId,
+    AuraId,
     ImOnlineId,
     AuthorityDiscoveryId,
 ) {
@@ -81,7 +81,7 @@ pub fn authority_keys_from_seed(
         get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
         get_account_id_from_seed::<sr25519::Public>(seed),
         get_from_seed::<GrandpaId>(seed),
-        get_from_seed::<BabeId>(seed),
+        get_from_seed::<AuraId>(seed),
         get_from_seed::<ImOnlineId>(seed),
         get_from_seed::<AuthorityDiscoveryId>(seed),
     )
@@ -199,7 +199,7 @@ fn testnet_genesis(
         AccountId,
         AccountId,
         GrandpaId,
-        BabeId,
+        AuraId,
         ImOnlineId,
         AuthorityDiscoveryId,
     )>,
@@ -268,9 +268,8 @@ fn testnet_genesis(
             // Assign network admin rights.
             key: root_key,
         },
-        pallet_babe: BabeConfig {
+        pallet_aura: AuraConfig {
             authorities: vec![],
-            epoch_config: Some(BABE_GENESIS_EPOCH_CONFIG),
         },
         pallet_im_online: ImOnlineConfig { keys: vec![] },
         pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },

@@ -57,6 +57,7 @@ pallet-multisig = { default-features = false, version = '3.0.0', git = 'https://
 pallet-proxy = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 pallet-identity = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 pallet-recovery = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+pallet-aura = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 # Substrate primitives
 sp-api = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
@@ -73,6 +74,7 @@ sp-staking = { default-features = false, version = '3.0.0', git = 'https://githu
 sp-authority-discovery = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 sp-npos-elections = { default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 sp-consensus-babe = { default-features = false, version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
+sp-consensus-aura = { default-features = false, version = '0.9.0', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
 
 # local dependencies
 pallet-template = { default-features = false, version = '3.0.0', path = '../pallets/template' }
@@ -142,6 +144,7 @@ std = [
 	'pallet-proxy/std',
 	'pallet-identity/std',
 	'pallet-recovery/std',
+	'pallet-aura/std',
 	'sp-api/std',
 	'sp-block-builder/std',
 	'sp-core/std',
@@ -156,4 +159,5 @@ std = [
 	'sp-authority-discovery/std',
 	'sp-npos-elections/std',
 	'sp-consensus-babe/std',
+	'sp-consensus-aura/std',
 ]
