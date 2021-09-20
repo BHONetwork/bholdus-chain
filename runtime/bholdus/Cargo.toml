@@ -130,7 +130,7 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
 
-[dependencies.pallet-babe]
+[dependencies.pallet-aura]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
@@ -359,7 +359,7 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
 version = '3.0.0'
 
-[dependencies.sp-consensus-babe]
+[dependencies.sp-consensus-aura]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-07'
@@ -420,7 +420,6 @@ runtime-benchmarks = [
 	'pallet-template/runtime-benchmarks',
 	'pallet-timestamp/runtime-benchmarks',
 	'pallet-staking/runtime-benchmarks',
-	'pallet-babe/runtime-benchmarks',
 	'pallet-session-benchmarking',
 	'pallet-im-online/runtime-benchmarks',
 	'pallet-offences-benchmarking',
@@ -453,7 +452,7 @@ runtime-benchmarks = [
 		'pallet-transaction-payment-rpc-runtime-api/std',
 		'pallet-transaction-payment/std',
 		'pallet-staking/std',
-		'pallet-babe/std',
+		'pallet-aura/std',
 		'pallet-session/std',
 		'pallet-im-online/std',
 		'pallet-authority-discovery/std',
@@ -492,6 +491,6 @@ runtime-benchmarks = [
 		'sp-staking/std',
 		'sp-authority-discovery/std',
 		'sp-npos-elections/std',
-		'sp-consensus-babe/std',
+		'sp-consensus-aura/std',
 		'max-encoded-len/std',
 		]

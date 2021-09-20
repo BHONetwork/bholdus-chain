@@ -38,16 +38,6 @@ pub struct LightDeps<C, F, P> {
     pub fetcher: Arc<F>,
 }
 
-/// Extra dependencies for BABE.
-pub struct BabeDeps {
-    /// BABE protocol config.
-    pub babe_config: Config,
-    /// BABE pending epoch changes.
-    pub shared_epoch_changes: SharedEpochChanges<Block, Epoch>,
-    /// The keystore that manages the keys of the node.
-    pub keystore: SyncCryptoStorePtr,
-}
-
 /// Extra dependencies for GRANDPA
 pub struct GrandpaDeps<B> {
     /// Voting round info.
@@ -74,8 +64,6 @@ pub struct FullDeps<C, P, SC, B> {
     pub chain_spec: Box<dyn sc_chain_spec::ChainSpec>,
     /// Whether to deny unsafe calls
     pub deny_unsafe: DenyUnsafe,
-    /// BABE specific dependencies.
-    pub babe: BabeDeps,
     /// GRANDPA specific dependencies.
     pub grandpa: GrandpaDeps<B>,
 }
@@ -99,7 +87,6 @@ where
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
     C::Api: pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>,
     C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-    C::Api: BabeApi<Block>,
     C::Api: BlockBuilder<Block>,
     P: TransactionPool + 'static,
     SC: SelectChain<Block> + 'static,
@@ -118,15 +105,9 @@ where
         select_chain,
         chain_spec,
         deny_unsafe,
-        babe,
         grandpa,
     } = deps;
 
-    let BabeDeps {
-        keystore,
-        babe_config,
-        shared_epoch_changes,
-    } = babe;
     let GrandpaDeps {
         shared_voter_state,
         shared_authority_set,
@@ -140,6 +121,7 @@ where
         pool,
         deny_unsafe,
     )));
+
     // Making synchronous calls in light client freezes the browser currently,
     // more context: https://github.com/paritytech/substrate/pull/3480
     // These RPCs should use an asynchronous caller instead.
@@ -148,16 +130,7 @@ where
     io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(
         client.clone(),
     )));
-    io.extend_with(sc_consensus_babe_rpc::BabeApi::to_delegate(
-        BabeRpcHandler::new(
-            client.clone(),
-            shared_epoch_changes.clone(),
-            keystore,
-            babe_config,
-            select_chain,
-            deny_unsafe,
-        ),
-    ));
+
     io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
         GrandpaRpcHandler::new(
             shared_authority_set.clone(),
@@ -165,16 +138,6 @@ where
             justification_stream,
             subscription_executor,
             finality_provider,
-        ),
-    ));
-
-    io.extend_with(sc_sync_state_rpc::SyncStateRpcApi::to_delegate(
-        sc_sync_state_rpc::SyncStateRpcHandler::new(
-            chain_spec,
-            client,
-            shared_authority_set,
-            shared_epoch_changes,
-            deny_unsafe,
         ),
     ));
 

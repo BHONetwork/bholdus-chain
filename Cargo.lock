@@ -637,7 +637,6 @@ dependencies = [
  "sc-keystore",
  "sc-rpc",
  "sc-rpc-api",
- "sc-sync-state-rpc",
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
@@ -670,9 +669,9 @@ dependencies = [
  "hex-literal",
  "log",
  "max-encoded-len",
+ "pallet-aura",
  "pallet-authority-discovery",
  "pallet-authorship",
- "pallet-babe",
  "pallet-balances",
  "pallet-bounties",
  "pallet-collective",
@@ -707,7 +706,7 @@ dependencies = [
  "sp-api",
  "sp-authority-discovery",
  "sp-block-builder",
- "sp-consensus-babe",
+ "sp-consensus-aura",
  "sp-core",
  "sp-inherents",
  "sp-npos-elections",
@@ -745,8 +744,7 @@ dependencies = [
  "sc-cli",
  "sc-client-api",
  "sc-consensus",
- "sc-consensus-babe",
- "sc-consensus-babe-rpc",
+ "sc-consensus-aura",
  "sc-consensus-epochs",
  "sc-consensus-slots",
  "sc-consensus-uncles",
@@ -770,7 +768,6 @@ dependencies = [
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-aura",
- "sp-consensus-babe",
  "sp-core",
  "sp-finality-grandpa",
  "sp-inherents",
@@ -4406,6 +4403,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-aura"
+version = "3.0.0"
+source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-07#2db5fdfc1cbc0b74512c072ae1dc5780bbbb10ca"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-session",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "sp-application-crypto",
+ "sp-consensus-aura",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-authority-discovery"
 version = "3.0.0"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-07#2db5fdfc1cbc0b74512c072ae1dc5780bbbb10ca"
@@ -4439,7 +4452,6 @@ name = "pallet-babe"
 version = "3.0.0"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-07#2db5fdfc1cbc0b74512c072ae1dc5780bbbb10ca"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -6407,6 +6419,37 @@ dependencies = [
  "sp-blockchain",
  "sp-consensus",
  "sp-runtime",
+]
+
+[[package]]
+name = "sc-consensus-aura"
+version = "0.9.0"
+source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-07#2db5fdfc1cbc0b74512c072ae1dc5780bbbb10ca"
+dependencies = [
+ "async-trait",
+ "derive_more",
+ "futures 0.3.16",
+ "futures-timer 3.0.2",
+ "log",
+ "parity-scale-codec",
+ "sc-block-builder",
+ "sc-client-api",
+ "sc-consensus-slots",
+ "sc-telemetry",
+ "sp-api",
+ "sp-application-crypto",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-consensus-aura",
+ "sp-consensus-slots",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-keystore",
+ "sp-runtime",
+ "sp-version",
+ "substrate-prometheus-endpoint",
 ]
 
 [[package]]
