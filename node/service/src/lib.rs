@@ -11,6 +11,7 @@ use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_executor::native_executor_instance;
 use sc_finality_grandpa::{self as grandpa};
+use sc_keystore::LocalKeystore;
 use sc_network::{Event, NetworkService};
 use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
@@ -19,7 +20,6 @@ use sp_consensus_aura::ed25519::AuthorityPair as AuraPair;
 use sp_inherents::InherentDataProvider;
 use sp_runtime::traits::Block as BlockT;
 use std::sync::Arc;
-use sc_keystore::LocalKeystore;
 
 use bholdus_rpc;
 
@@ -492,10 +492,9 @@ pub fn new_light_base(
         select_chain.clone(),
         telemetry.as_ref().map(|x| x.handle()),
     )?;
-    
-let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-    let raw_duration = slot_duration.slot_duration();
 
+    let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
+    let raw_duration = slot_duration.slot_duration();
 
     let import_queue = sc_consensus_aura::import_queue::<
         sp_consensus_aura::ed25519::AuthorityPair,

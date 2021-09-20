@@ -58,8 +58,8 @@ pub use pallet_staking::StakerStatus;
 pub use pallet_timestamp::Call as TimestampCall;
 use pallet_transaction_payment::CurrencyAdapter;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
-use sp_runtime::generic::Era;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+use sp_runtime::generic::Era;
 
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
