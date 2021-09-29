@@ -6,6 +6,7 @@ members = [
     'rpc',
     'runtime/bholdus',
     'pallets/*',
+		'bholdus-libs/nft',
 ]
 [profile.release]
 panic = 'unwind'

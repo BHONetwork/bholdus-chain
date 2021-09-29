@@ -1,0 +1,125 @@
+[package]
+name = "bholdus-nft"
+version = "3.0.0"
+authors = ["Nhi Tran <nhi.tran@hawking.network>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dependencies.enumflags2]
+version = '0.6.3'
+
+[dependencies.serde]
+optional = true
+version = '1.0.124'
+
+[dependencies.max-encoded-len]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.codec]
+default-features = false
+features = ['derive']
+package = 'parity-scale-codec'
+version = '2.0.0'
+
+
+[dependencies.frame-benchmarking]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+optional = true
+branch = 'bholdus-monthly-2021-07'
+version = '3.1.0'
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.frame-system]
+default-features = false
+# path = '../frame/system'
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+## Bholdus pallets
+
+[dependencies.bholdus-primitives]
+default-features = false
+version = '3.0.0'
+path = '../../primitives'
+
+## Bholdus libs
+
+[dependencies.bholdus-lib-nft]
+default-features = false
+version = '3.0.0'
+path = '../../bholdus-libs/nft'
+
+[dependencies.bholdus-support]
+default-features = false
+version = '3.0.0'
+path = '../../pallets/support'
+
+[dev-dependencies.sp-core]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dev-dependencies.sp-io]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dev-dependencies.pallet-balances]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[dev-dependencies.pallet-utility]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-07'
+version = '3.0.0'
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	"enumflags2/serde",
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+#"pallet-proxy/std",
+	"bholdus-primitives/std",
+	"bholdus-support/std",
+	"bholdus-lib-nft/std",
+	"enumflags2/serde",
+]
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+#"bholdus-primitives/runtime-benchmarks"
+]
+try-runtime = ["frame-support/try-runtime"]
+

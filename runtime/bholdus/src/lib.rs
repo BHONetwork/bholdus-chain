@@ -105,7 +105,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_002_001,
+    spec_version: 1_002_003,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -324,6 +324,31 @@ impl bholdus_tokens::Config for Runtime {
     type Extra = ();
     type WeightInfo = bholdus_tokens::weights::SubstrateWeight<Runtime>;
     type ExistentialDeposits = ExistentialDeposits;
+}
+
+parameter_types! {
+    pub MaxAttributesBytes: u32 = 2048;
+}
+
+impl bholdus_nft::Config for Runtime {
+    type Event = Event;
+    type PalletId = NftPalletId;
+    type MaxAttributesBytes = MaxAttributesBytes;
+    type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
+}
+
+parameter_types! {
+    pub MaxClassMetadata: u32 = 1024;
+    pub MaxTokenMetadata: u32 = 1024;
+}
+
+impl bholdus_lib_nft::Config for Runtime {
+    type ClassId = u32;
+    type TokenId = u64;
+    type ClassData = bholdus_nft::ClassData;
+    type TokenData = bholdus_nft::TokenData;
+    type MaxClassMetadata = MaxClassMetadata;
+    type MaxTokenMetadata = MaxTokenMetadata;
 }
 
 parameter_types! {
@@ -624,6 +649,7 @@ parameter_types! {
     pub const BountyDepositBase: Balance = 1 * DOLLARS;
     pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
+    pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
     pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
     pub const MaximumReasonLength: u32 = 16384;
     pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
@@ -939,6 +965,7 @@ construct_runtime!(
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
+        NFT: bholdus_nft::{Pallet, Call, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
         Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
@@ -964,6 +991,9 @@ construct_runtime!(
         Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+
+        // Bholdus Libs
+        BholdusLibNFT: bholdus_lib_nft::{Pallet, Call, Storage},
     }
 );
 
