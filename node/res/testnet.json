@@ -1,15 +1,14 @@
 {
   "name": "Bholdus-Local Testnet",
   "id": "local_testnet",
-  "chainType": "Local",
+  "chainType": "Live",
   "bootNodes": [
-    "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWS12tYaPT4PR6nhYUQtXRJD8gUzdboxGwLBE56ZCi51UJ"
+    "/dns/p2p.0.testnet.bholdus.network/tcp/30333/p2p/12D3KooWA6q36HQ2mxtXRBGoXhSRXM1ZbHUjpUNhQcb8ikGLNFsJ",
+    "/dns/p2p.1.testnet.bholdus.network/tcp/30333/p2p/12D3KooWHEHrkgsdSDrdt5YNG6Rn9vZPVWLcZXyJv7xd68hvkak9",
+    "/dns/p2p.2.testnet.bholdus.network/tcp/30333/p2p/12D3KooWLyaCbp81PpJXSPt8kZLd79cPsohcdSD6jj3G3az2d18D"
   ],
   "telemetryEndpoints": [
-    [
-      "/dns/telemetry.polkadot.io/tcp/443/x-parity-wss/%2Fsubmit%2F",
-      0
-    ]
+    ["/dns/telemetry.polkadot.io/tcp/443/x-parity-wss/%2Fsubmit%2F", 0]
   ],
   "protocolId": "bho",
   "properties": {
