@@ -11,7 +11,7 @@ use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
-use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
