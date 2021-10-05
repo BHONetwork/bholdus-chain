@@ -1,7 +1,7 @@
 {
-  "name": "Bholdus-Local Testnet",
-  "id": "local_testnet",
-  "chainType": "Local",
+  "name": "Bholdus Testnet",
+  "id": "bholdus_testnet",
+  "chainType": "Live",
   "bootNodes": [
     "/dns/p2p.0.testnet.bholdus.network/tcp/30333/p2p/12D3KooWA6q36HQ2mxtXRBGoXhSRXM1ZbHUjpUNhQcb8ikGLNFsJ",
     "/dns/p2p.1.testnet.bholdus.network/tcp/30333/p2p/12D3KooWHEHrkgsdSDrdt5YNG6Rn9vZPVWLcZXyJv7xd68hvkak9",
