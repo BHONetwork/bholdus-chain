@@ -6,6 +6,7 @@ members = [
     'rpc',
     'runtime/bholdus',
     'pallets/*',
+    'primitives/*',
 ]
 [profile.release]
 panic = 'unwind'

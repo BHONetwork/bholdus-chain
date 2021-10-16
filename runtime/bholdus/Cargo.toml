@@ -371,7 +371,7 @@ version = '0.9.0'
 [dependencies.bholdus-primitives]
 default-features = false
 version = '3.0.0'
-path = '../../primitives'
+path = '../../primitives/bholdus'
 
 [dependencies.bholdus-tokens]
 default-features = false

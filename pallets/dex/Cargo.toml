@@ -26,7 +26,7 @@ sp-runtime = {default-features = false, version = '3.0.0', git = 'https://github
 sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07' }
 
 # Local dependencies
-bholdus-primitives = {default-features = false, version = '3.0.0', path = '../../primitives'}
+bholdus-primitives = {default-features = false, version = '3.0.0', path = '../../primitives/bholdus'}
 bholdus-support = {default-features = false, version = '3.0.0', path = '../support'}
 
 
