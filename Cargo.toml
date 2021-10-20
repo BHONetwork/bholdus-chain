@@ -5,8 +5,15 @@ members = [
     'node/service',
     'rpc',
     'runtime/bholdus',
-    'pallets/*',
-    'primitives/*',
+    'pallets/chainbridge',
+    'pallets/chainbridge-transfer',
+    'pallets/currencies',
+    'pallets/dex',
+    'pallets/support',
+    'pallets/tokens',
+    'pallets/bridge/bsc',
+    'primitives/bholdus',
+    'primitives/bsc'
 ]
 [profile.release]
 panic = 'unwind'
