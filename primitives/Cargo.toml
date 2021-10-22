@@ -5,7 +5,7 @@ homepage = "https://bholdus.com"
 license = "Apache-2.0"
 name = "bholdus-primitives"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "3.0.0"
+version = "4.0.0-dev"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -15,28 +15,34 @@ default-features = false
 version = '1.0.124'
 optional = true
 
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
 [dependencies.codec]
 default-features = false
-version = '2.2.0'
+features = ['derive', 'max-encoded-len']
 package = 'parity-scale-codec'
+version = '2.2.0'
 
 [dependencies.sp-core]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
 
 [dependencies.sp-runtime]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
 
 [dependencies.sp-std]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
 
 [dependencies.pretty_assertions]
 optional = true
@@ -45,10 +51,16 @@ version = '0.6.1'
 [dev-dependencies.sp-serializer]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
+tag = 'monthly-2021-10'
 version = '3.0.0'
 
 [features]
 default = ["std"]
-std = ["serde", "codec/std","sp-core/std", "sp-runtime/std", "sp-std/std"]
-
+std = [
+    "serde",
+    "scale-info/std",
+    "codec/std",
+    "sp-core/std",
+    "sp-runtime/std",
+    "sp-std/std",
+]
