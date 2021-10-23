@@ -5,6 +5,8 @@ authors = ["Nhi Tran <nhi.tran@hawking.network>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
 
 [dependencies]
 serde = { version = "1.0.124", optional = true }
@@ -24,31 +26,31 @@ version = '1.0'
 [dependencies.sp-runtime]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dependencies.sp-io]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dependencies.sp-std]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dependencies.frame-support]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dependencies.frame-system]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dependencies.bholdus-support]
@@ -58,18 +60,21 @@ package = "bholdus-support"
 path = '../support'
 
 [dev-dependencies.pallet-balances]
+default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dev-dependencies.sp-io]
+default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dev-dependencies.sp-core]
+default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+branch = 'master'
 version = '4.0.0-dev'
 
 [dev-dependencies.bholdus-tokens]

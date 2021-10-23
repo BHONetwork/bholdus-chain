@@ -3,9 +3,7 @@
 use super::*;
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok, traits::Currency};
-use pallet_balances::Error as BalanceError;
 use sp_runtime::traits::BadOrigin;
-use sp_runtime::TokenError;
 
 #[test]
 fn genesis_issuance_should_work() {

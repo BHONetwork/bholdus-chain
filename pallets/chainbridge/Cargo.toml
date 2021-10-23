@@ -7,72 +7,27 @@ version = '4.0.0-dev'
 authors = ['dung.lam@bholdus.com']
 edition = '2018'
 
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
 # third-party dependencies
-[dependencies.codec]
-default-features = false
-features = ['derive', 'max-encoded-len']
-package = 'parity-scale-codec'
-version = '2.2.0'
-
-[dependencies.serde]
-version = "1.0.101"
-optional = true
-
-# primitives
-[dependencies.sp-std]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-
-[dependencies.sp-runtime]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-
-[dependencies.sp-io]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-
-[dependencies.sp-core]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-
-# frame dependencies
-[dependencies.frame-benchmarking]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-optional = true
-
-[dependencies.frame-support]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-
-[dependencies.frame-system]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
-
-[dependencies.scale-info]
-default-features = false
-features = ['derive']
-version = '1.0'
-
-[dependencies.pallet-balances]
-version = "4.0.0-dev"
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-tag = 'monthly-2021-10'
+codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = [
+	"derive",
+	"max-encoded-len",
+] }
+serde = { version = '1.0.101', optional = true }
+scale-info = { version = "1.0", default-features = false, features = [
+	"derive",
+] }
+sp-std = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+sp-runtime = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+sp-io = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+sp-core = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+frame-benchmarking = { version = "4.0.0-dev", default-features = false, optional = true, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+frame-support = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+frame-system = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+pallet-balances = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
 
 
 [features]
@@ -83,8 +38,8 @@ std = [
 	"serde",
 	"sp-std/std",
 	"sp-runtime/std",
-    "sp-io/std",
-    "sp-core/std",
+	"sp-io/std",
+	"sp-core/std",
 	"frame-support/std",
 	"frame-system/std",
 	"pallet-balances/std",

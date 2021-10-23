@@ -1,24 +1,26 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
-#[cfg(feature = "with-bholdus-runtime")]
+// #[cfg(feature = "with-bholdus-runtime")]
 pub use bholdus_runtime;
-#[cfg(feature = "with-bholdus-runtime")]
+// #[cfg(feature = "with-bholdus-runtime")]
 use bholdus_runtime::RuntimeApi;
 
 use bholdus_primitives::Block;
+use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
-use sc_client_api::{ExecutorProvider, RemoteBackend};
+use sc_client_api::{BlockBackend, ExecutorProvider, RemoteBackend};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
-use sc_executor::native_executor_instance;
+pub use sc_executor::NativeElseWasmExecutor;
 use sc_finality_grandpa::{self as grandpa};
 use sc_keystore::LocalKeystore;
 use sc_network::{Event, NetworkService};
 use sc_service::{config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
+use sp_api::ProvideRuntimeApi;
 use sp_consensus::SlotData;
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
-use sp_inherents::InherentDataProvider;
-use sp_runtime::traits::Block as BlockT;
+use sp_core::{Encode, Pair};
+use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
 use std::sync::Arc;
 
 use bholdus_rpc;
@@ -27,20 +29,111 @@ pub mod chain_spec;
 mod client;
 
 // Our native executor instance.
-#[cfg(feature = "with-bholdus-runtime")]
-native_executor_instance!(
-    pub Executor,
-    bholdus_runtime::api::dispatch,
-    bholdus_runtime::native_version,
-    frame_benchmarking::benchmarking::HostFunctions,
-);
+// #[cfg(feature = "with-bholdus-runtime")]
+pub struct ExecutorDispatch;
 
-type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
+// #[cfg(feature = "with-bholdus-runtime")]
+impl sc_executor::NativeExecutionDispatch for ExecutorDispatch {
+    /// Only enable the benchmarking host functions when we actually want to benchmark.
+    #[cfg(feature = "runtime-benchmarks")]
+    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    /// Otherwise we only use the default Substrate host functions.
+    #[cfg(not(feature = "runtime-benchmarks"))]
+    type ExtendHostFunctions = ();
+
+    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+        bholdus_runtime::api::dispatch(method, data)
+    }
+
+    fn native_version() -> sc_executor::NativeVersion {
+        bholdus_runtime::native_version()
+    }
+}
+
+type FullClient =
+    sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<ExecutorDispatch>>;
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
     sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
-type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
+type LightClient =
+    sc_service::TLightClient<Block, RuntimeApi, NativeElseWasmExecutor<ExecutorDispatch>>;
+/// The transaction pool type defintion.
+pub type TransactionPool = sc_transaction_pool::FullPool<Block, FullClient>;
+
+/// Fetch the nonce of the given `account` from the chain state.
+///
+/// Note: Should only be used for tests.
+pub fn fetch_nonce(client: &FullClient, account: sp_core::sr25519::Pair) -> u32 {
+    let best_hash = client.chain_info().best_hash;
+    client
+        .runtime_api()
+        .account_nonce(&generic::BlockId::Hash(best_hash), account.public().into())
+        .expect("Fetching account nonce works; qed")
+}
+
+/// Create a transaction using the given `call`.
+///
+/// The transaction will be signed by `sender`. If `nonce` is `None` it will be fetched from the
+/// state of the best block.
+///
+/// Note: Should only be used for tests.
+pub fn create_extrinsic(
+    client: &FullClient,
+    sender: sp_core::sr25519::Pair,
+    function: impl Into<bholdus_runtime::Call>,
+    nonce: Option<u32>,
+) -> bholdus_runtime::UncheckedExtrinsic {
+    let function = function.into();
+    let genesis_hash = client
+        .block_hash(0)
+        .ok()
+        .flatten()
+        .expect("Genesis block exists; qed");
+    let best_hash = client.chain_info().best_hash;
+    let best_block = client.chain_info().best_number;
+    let nonce = nonce.unwrap_or_else(|| fetch_nonce(client, sender.clone()));
+
+    let period = bholdus_runtime::BlockHashCount::get()
+        .checked_next_power_of_two()
+        .map(|c| c / 2)
+        .unwrap_or(2) as u64;
+    let tip = 0;
+    let extra: bholdus_runtime::SignedExtra = (
+        frame_system::CheckSpecVersion::<bholdus_runtime::Runtime>::new(),
+        frame_system::CheckTxVersion::<bholdus_runtime::Runtime>::new(),
+        frame_system::CheckGenesis::<bholdus_runtime::Runtime>::new(),
+        frame_system::CheckEra::<bholdus_runtime::Runtime>::from(generic::Era::mortal(
+            period,
+            best_block.saturated_into(),
+        )),
+        frame_system::CheckNonce::<bholdus_runtime::Runtime>::from(nonce),
+        frame_system::CheckWeight::<bholdus_runtime::Runtime>::new(),
+        pallet_transaction_payment::ChargeTransactionPayment::<bholdus_runtime::Runtime>::from(tip),
+    );
+
+    let raw_payload = bholdus_runtime::SignedPayload::from_raw(
+        function.clone(),
+        extra.clone(),
+        (
+            bholdus_runtime::VERSION.spec_version,
+            bholdus_runtime::VERSION.transaction_version,
+            genesis_hash,
+            best_hash,
+            (),
+            (),
+            (),
+        ),
+    );
+    let signature = raw_payload.using_encoded(|e| sender.sign(e));
+
+    bholdus_runtime::UncheckedExtrinsic::new_signed(
+        function.clone(),
+        sp_runtime::AccountId32::from(sender.public()).into(),
+        bholdus_runtime::Signature::Sr25519(signature.clone()),
+        extra.clone(),
+    )
+}
 
 pub fn new_partial(
     config: &Configuration,
@@ -49,7 +142,7 @@ pub fn new_partial(
         FullClient,
         FullBackend,
         FullSelectChain,
-        sp_consensus::DefaultImportQueue<Block, FullClient>,
+        sc_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
             sc_finality_grandpa::GrandpaBlockImport<
@@ -75,10 +168,17 @@ pub fn new_partial(
         })
         .transpose()?;
 
+    let executor = NativeElseWasmExecutor::<ExecutorDispatch>::new(
+        config.wasm_method,
+        config.default_heap_pages,
+        config.max_runtime_instances,
+    );
+
     let (client, backend, keystore_container, task_manager) =
-        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
+        sc_service::new_full_parts::<Block, RuntimeApi, _>(
             &config,
             telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+            executor,
         )?;
     let client = Arc::new(client);
 
@@ -187,15 +287,21 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         .extra_sets
         .push(grandpa::grandpa_peers_set_config());
 
-    #[cfg(feature = "cli")]
-    config.network.request_response_protocols.push(
-        sc_finality_grandpa_warp_sync::request_response_config_for_chain(
-            &config,
-            task_manager.spawn_handle(),
-            backend.clone(),
-            import_setup.1.shared_authority_set().clone(),
-        ),
-    );
+    // #[cfg(feature = "cli")]
+    // config.network.request_response_protocols.push(
+    //     sc_finality_grandpa_warp_sync::request_response_config_for_chain(
+    //         &config,
+    //         task_manager.spawn_handle(),
+    //         backend.clone(),
+    //         import_setup.1.shared_authority_set().clone(),
+    //     ),
+    // );
+
+    let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
+        backend.clone(),
+        grandpa_link.shared_authority_set().clone(),
+        Vec::default(),
+    ));
 
     let (network, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {
@@ -206,6 +312,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
             import_queue,
             on_demand: None,
             block_announce_validator_builder: None,
+            warp_sync: Some(warp_sync),
         })?;
 
     if config.offchain_worker.enabled {
@@ -261,7 +368,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
                 },
             };
 
-            bholdus_rpc::create_full(deps)
+            bholdus_rpc::create_full(deps).map_err(Into::into)
         };
 
         (rpc_extensions_builder, rpc_setup)
@@ -436,23 +543,23 @@ pub fn new_light_base(
         .clone()
         .filter(|x| !x.is_empty())
         .map(|endpoints| -> Result<_, sc_telemetry::Error> {
-            #[cfg(feature = "browser")]
-            let transport = Some(sc_telemetry::ExtTransport::new(
-                libp2p_wasm_ext::ffi::websocket_transport(),
-            ));
-            #[cfg(not(feature = "browser"))]
-            let transport = None;
-
-            let worker = TelemetryWorker::with_transport(16, transport)?;
+            let worker = TelemetryWorker::new(16)?;
             let telemetry = worker.handle().new_telemetry(endpoints);
             Ok((worker, telemetry))
         })
         .transpose()?;
 
+    let executor = NativeElseWasmExecutor::<ExecutorDispatch>::new(
+        config.wasm_method,
+        config.default_heap_pages,
+        config.max_runtime_instances,
+    );
+
     let (client, backend, keystore_container, mut task_manager, on_demand) =
-        sc_service::new_light_parts::<Block, RuntimeApi, Executor>(
+        sc_service::new_light_parts::<Block, RuntimeApi, _>(
             &config,
             telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+            executor,
         )?;
 
     let mut telemetry = telemetry.map(|(worker, telemetry)| {
@@ -475,7 +582,7 @@ pub fn new_light_base(
         on_demand.clone(),
     ));
 
-    let (grandpa_block_import, _) = sc_finality_grandpa::block_import(
+    let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
         client.clone(),
         &(client.clone() as Arc<_>),
         select_chain.clone(),
@@ -508,6 +615,12 @@ pub fn new_light_base(
             telemetry: telemetry.as_ref().map(|x| x.handle()),
         })?;
 
+    let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
+        backend.clone(),
+        grandpa_link.shared_authority_set().clone(),
+        Vec::default(),
+    ));
+
     let (network, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &config,
@@ -517,6 +630,7 @@ pub fn new_light_base(
             import_queue,
             on_demand: Some(on_demand.clone()),
             block_announce_validator_builder: None,
+            warp_sync: Some(warp_sync),
         })?;
 
     network_starter.start_network();

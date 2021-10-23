@@ -20,7 +20,7 @@ parameter_types! {
     pub const SS58Prefix: u16 = 2207;
 }
 impl system::Config for Runtime {
-    type BaseCallFilter = ();
+    type BaseCallFilter = frame_support::traits::Everything;
     type BlockWeights = ();
     type BlockLength = ();
     type DbWeight = ();

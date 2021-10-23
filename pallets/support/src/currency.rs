@@ -4,6 +4,7 @@ pub use frame_support::{
     traits::{BalanceStatus, LockIdentifier},
     transactional,
 };
+use scale_info::TypeInfo;
 use sp_runtime::{
     traits::{AtLeast32BitUnsigned, MaybeSerializeDeserialize},
     DispatchError, DispatchResult,
@@ -14,11 +15,16 @@ use sp_std::{
     fmt::Debug,
     result,
 };
-
 /// Abstraction over a fungible multi-currency system.
 pub trait MultiCurrency<AccountId> {
     /// The currency identifier.
-    type CurrencyId: FullCodec + Eq + PartialEq + Copy + MaybeSerializeDeserialize + Debug;
+    type CurrencyId: FullCodec
+        + Eq
+        + PartialEq
+        + Copy
+        + MaybeSerializeDeserialize
+        + Debug
+        + TypeInfo;
 
     /// The balance of an account.
     type Balance: AtLeast32BitUnsigned
@@ -26,7 +32,8 @@ pub trait MultiCurrency<AccountId> {
         + Copy
         + MaybeSerializeDeserialize
         + Debug
-        + Default;
+        + Default
+        + TypeInfo;
 
     // Public immutables
 
