@@ -29,6 +29,7 @@ use rlp::RlpStream;
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 // --- paritytech ---
+use scale_info::TypeInfo;
 use sp_io::hashing;
 use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
@@ -65,7 +66,7 @@ pub const DIFF_NOTURN: U256 = U256([1, 0, 0, 0]);
 pub const SIGNING_DELAY_NOTURN_MS: u64 = 500;
 
 /// Complete header id.
-#[derive(Encode, Decode, Default, RuntimeDebug, PartialEq, Clone, Copy)]
+#[derive(Encode, Decode, Default, RuntimeDebug, PartialEq, Clone, Copy, TypeInfo)]
 pub struct HeaderId {
     /// Header number.
     pub number: u64,
@@ -74,7 +75,7 @@ pub struct HeaderId {
 }
 
 /// An BSC(Binance Smart Chain) header.
-#[derive(Clone, Default, Encode, Decode, PartialEq, RuntimeDebug)]
+#[derive(Clone, Default, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(
     feature = "std",
     derive(Serialize, Deserialize),
@@ -206,7 +207,7 @@ impl BSCHeader {
 }
 
 /// A record of execution for a `LOG` operation.
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 pub struct LogEntry {
     /// The address of the contract executing at the point of the `LOG` operation.
     pub address: Address,

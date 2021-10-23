@@ -1,6 +1,6 @@
 [package]
 name = "bholdus-support"
-version = "3.0.0"
+version = "4.0.0-dev"
 edition = "2018"
 
 [dependencies]
@@ -11,41 +11,48 @@ impl-trait-for-tuples = "0.2.1"
 
 [dependencies.codec]
 default-features = false
+features = ['derive', 'max-encoded-len']
 package = 'parity-scale-codec'
-version = '2.0.0'
+version = '2.2.0'
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
 
 [dependencies.sp-runtime]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sp-io]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sp-std]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.frame-support]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [features]
 default = ["std"]
 std = [
-	"serde",
-	"codec/std",
-	"sp-runtime/std",
-	"sp-io/std",
-	"sp-std/std",
-	"num-traits/std",
-	"frame-support/std",
+	'serde',
+	'codec/std',
+	'scale-info/std',
+	'sp-runtime/std',
+	'sp-io/std',
+	'sp-std/std',
+	'num-traits/std',
+	'frame-support/std',
 ]
