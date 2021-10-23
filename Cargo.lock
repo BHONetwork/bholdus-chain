@@ -491,6 +491,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-bridge-bsc"
+version = "2.6.6"
+dependencies = [
+ "array-bytes",
+ "bsc-primitives",
+ "frame-support",
+ "frame-system",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "scale-info",
+ "serde_json",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "bholdus-chainbridge"
 version = "4.0.0-dev"
 dependencies = [
@@ -1529,24 +1547,6 @@ dependencies = [
  "rand_core 0.5.1",
  "subtle",
  "zeroize",
-]
-
-[[package]]
-name = "darwinia-bridge-bsc"
-version = "2.6.6"
-dependencies = [
- "array-bytes",
- "bsc-primitives",
- "frame-support",
- "frame-system",
- "pallet-timestamp",
- "parity-scale-codec",
- "scale-info",
- "serde_json",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
 ]
 
 [[package]]

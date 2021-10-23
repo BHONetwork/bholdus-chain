@@ -1,12 +1,12 @@
 [package]
-authors = ["Darwinia Network <hello@darwinia.network>"]
+authors = ["Bholdus Network <hello@bholdus.network>"]
 description = "A Substrate Runtime module that is able to verify bsc(Binance Smart Chain) headers and authority set finality."
 edition = "2018"
-homepage = "https://darwinia.network/"
+homepage = "https://bholdus.com/"
 license = "GPL-3.0"
-name = "darwinia-bridge-bsc"
+name = "bholdus-bridge-bsc"
 readme = "README.md"
-repository = "https://github.com/darwinia-network/darwinia-common/"
+repository = "https://github.com/bholdus/bholdus-chain/"
 version = "2.6.6"
 
 [dependencies]
@@ -37,6 +37,7 @@ default = ["std"]
 std = [
 	# crates.io
 	"codec/std",
+	"scale-info/std",
 	# darwinia-network
 	"bsc-primitives/std",
 	# paritytech
