@@ -6,6 +6,7 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+use beefy_primitives::{crypto::AuthorityId as BeefyId, mmr::MmrLeafVersion};
 use codec::{Decode, Encode, MaxEncodedLen};
 pub use frame_support::{
     construct_runtime, parameter_types,
@@ -42,8 +43,8 @@ use sp_core::{
 use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::generic::Era;
 use sp_runtime::traits::{
-    self, BlakeTwo256, Block as BlockT, NumberFor, OpaqueKeys, SaturatedConversion, StaticLookup,
-    Zero,
+    self, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys, SaturatedConversion,
+    StaticLookup, Zero,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
@@ -98,6 +99,7 @@ pub mod opaque {
             pub aura: Aura,
             pub im_online: ImOnline,
             pub authority_discovery: AuthorityDiscovery,
+            pub beefy: Beefy,
         }
     }
 }
@@ -930,13 +932,40 @@ impl pallet_recovery::Config for Runtime {
     type RecoveryDeposit = RecoveryDeposit;
 }
 
+impl pallet_beefy::Config for Runtime {
+    type BeefyId = BeefyId;
+}
+
 impl pallet_mmr::Config for Runtime {
     const INDEXING_PREFIX: &'static [u8] = b"mmr";
-    type Hashing = <Runtime as frame_system::Config>::Hashing;
-    type Hash = <Runtime as frame_system::Config>::Hash;
-    type LeafData = frame_system::Pallet<Self>;
-    type OnNewRoot = ();
+    type Hashing = Keccak256;
+    type Hash = <Keccak256 as traits::Hash>::Output;
+    type OnNewRoot = pallet_beefy_mmr::DepositBeefyDigest<Runtime>;
+    type LeafData = pallet_beefy_mmr::Pallet<Runtime>;
     type WeightInfo = ();
+}
+
+parameter_types! {
+    /// Version of the produced MMR leaf.
+    ///
+    /// The version consists of two parts;
+    /// - `major` (3 bits)
+    /// - `minor` (5 bits)
+    ///
+    /// `major` should be updated only if decoding the previous MMR Leaf format from the payload
+    /// is not possible (i.e. backward incompatible change).
+    /// `minor` should be updated if fields are added to the previous MMR Leaf, which given SCALE
+    /// encoding does not prevent old leafs from being decoded.
+    ///
+    /// Hence we expect `major` to be changed really rarely (think never).
+    /// See [`MmrLeafVersion`] type documentation for more details.
+    pub LeafVersion: MmrLeafVersion = MmrLeafVersion::new(0, 0);
+}
+
+impl pallet_beefy_mmr::Config for Runtime {
+    type LeafVersion = LeafVersion;
+    type BeefyAuthorityToMerkleLeaf = pallet_beefy_mmr::BeefyEcdsaToEthereum;
+    type ParachainHeads = ();
 }
 
 parameter_types! {
@@ -1062,7 +1091,12 @@ construct_runtime!(
         Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>},
         Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>},
         Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>},
+
+        // Bridge support
         Mmr: pallet_mmr::{Pallet, Storage},
+        Beefy: pallet_beefy::{Pallet, Config<T>, Storage},
+        MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
+
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
@@ -1282,6 +1316,12 @@ impl_runtime_apis! {
             len: u32,
         ) -> pallet_transaction_payment::FeeDetails<Balance> {
             TransactionPayment::query_fee_details(uxt, len)
+        }
+    }
+
+    impl beefy_primitives::BeefyApi<Block> for Runtime {
+        fn validator_set() -> beefy_primitives::ValidatorSet<BeefyId> {
+            Beefy::validator_set()
         }
     }
 

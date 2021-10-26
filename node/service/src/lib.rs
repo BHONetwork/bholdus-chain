@@ -145,13 +145,18 @@ pub fn new_partial(
         sc_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
-            sc_finality_grandpa::GrandpaBlockImport<
-                FullBackend,
-                Block,
-                FullClient,
-                FullSelectChain,
-            >,
-            sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
+            impl sc_service::RpcExtensionBuilder,
+            (sc_finality_grandpa::SharedVoterState,),
+            (
+                sc_finality_grandpa::GrandpaBlockImport<
+                    FullBackend,
+                    Block,
+                    FullClient,
+                    FullSelectChain,
+                >,
+                sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
+                beefy_gadget::notification::BeefySignedCommitmentSender<Block>,
+            ),
             Option<Telemetry>,
         ),
     >,
@@ -231,6 +236,57 @@ pub fn new_partial(
             telemetry: telemetry.as_ref().map(|x| x.handle()),
         })?;
 
+    let (beefy_link, beefy_commitment_stream) =
+        beefy_gadget::notification::BeefySignedCommitmentStream::channel();
+
+    let import_setup = (grandpa_block_import.clone(), grandpa_link, beefy_link);
+
+    let (rpc_extensions_builder, rpc_setup) = {
+        let (_, grandpa_link, _) = &import_setup;
+        let justification_stream = grandpa_link.justification_stream();
+        let shared_authority_set = grandpa_link.shared_authority_set().clone();
+        let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
+        let finality_proof_provider = sc_finality_grandpa::FinalityProofProvider::new_for_service(
+            backend.clone(),
+            Some(shared_authority_set.clone()),
+        );
+
+        let rpc_setup = (shared_voter_state.clone(),);
+        let client = client.clone();
+        let pool = transaction_pool.clone();
+        let select_chain = select_chain.clone();
+        let is_authority = config.role.clone().is_authority();
+        let _keystore = keystore_container.sync_keystore();
+        let chain_spec = config.chain_spec.cloned_box();
+
+        let rpc_extensions_builder =
+            move |deny_unsafe, subscription_executor: bholdus_rpc::SubscriptionTaskExecutor| {
+                let deps = bholdus_rpc::FullDeps {
+                    client: client.clone(),
+                    pool: pool.clone(),
+                    select_chain: select_chain.clone(),
+                    deny_unsafe,
+                    chain_spec: chain_spec.cloned_box(),
+                    // Grandpa
+                    grandpa: bholdus_rpc::GrandpaDeps {
+                        shared_voter_state: shared_voter_state.clone(),
+                        shared_authority_set: shared_authority_set.clone(),
+                        justification_stream: justification_stream.clone(),
+                        subscription_executor: subscription_executor.clone(),
+                        finality_provider: finality_proof_provider.clone(),
+                    },
+                    beefy: bholdus_rpc::BeefyDeps {
+                        beefy_commitment_stream: beefy_commitment_stream.clone(),
+                        subscription_executor,
+                    },
+                };
+
+                bholdus_rpc::create_full(deps).map_err(Into::into)
+            };
+
+        (rpc_extensions_builder, rpc_setup)
+    };
+
     Ok(sc_service::PartialComponents {
         client,
         backend,
@@ -239,7 +295,7 @@ pub fn new_partial(
         keystore_container,
         select_chain,
         transaction_pool,
-        other: (grandpa_block_import, grandpa_link, telemetry),
+        other: (rpc_extensions_builder, rpc_setup, import_setup, telemetry),
     })
 }
 
@@ -267,7 +323,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         mut keystore_container,
         select_chain,
         transaction_pool,
-        other: (block_import, grandpa_link, mut telemetry),
+        other: (rpc_extensions_builder, rpc_setup, import_setup, mut telemetry),
     } = new_partial(&config)?;
 
     if let Some(url) = &config.keystore_remote {
@@ -287,15 +343,12 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         .extra_sets
         .push(grandpa::grandpa_peers_set_config());
 
-    // #[cfg(feature = "cli")]
-    // config.network.request_response_protocols.push(
-    //     sc_finality_grandpa_warp_sync::request_response_config_for_chain(
-    //         &config,
-    //         task_manager.spawn_handle(),
-    //         backend.clone(),
-    //         import_setup.1.shared_authority_set().clone(),
-    //     ),
-    // );
+    config
+        .network
+        .extra_sets
+        .push(beefy_gadget::beefy_peers_set_config());
+
+    let (grandpa_block_import, grandpa_link, beefy_signed_commitment_sender) = import_setup;
 
     let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
         backend.clone(),
@@ -330,51 +383,8 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
     let name = config.network.node_name.clone();
     let enable_grandpa = !config.disable_grandpa;
     let prometheus_registry = config.prometheus_registry().cloned();
-    let chain_spec = config.chain_spec.cloned_box();
 
-    let (rpc_extensions_builder, rpc_setup) = {
-        let justification_stream = grandpa_link.justification_stream();
-        let shared_authority_set = grandpa_link.shared_authority_set().clone();
-        let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
-        let finality_proof_provider = sc_finality_grandpa::FinalityProofProvider::new_for_service(
-            backend.clone(),
-            Some(shared_authority_set.clone()),
-        );
-
-        let rpc_setup = (shared_voter_state.clone(), finality_proof_provider.clone());
-        let client = client.clone();
-        let pool = transaction_pool.clone();
-        let select_chain = select_chain.clone();
-        let network = network.clone();
-        let is_authority = config.role.clone().is_authority();
-        let _keystore = keystore_container.sync_keystore();
-        let subscription_executor =
-            sc_rpc::SubscriptionTaskExecutor::new(task_manager.spawn_handle());
-
-        let rpc_extensions_builder = move |deny_unsafe, _| {
-            let deps = bholdus_rpc::FullDeps {
-                client: client.clone(),
-                pool: pool.clone(),
-                select_chain: select_chain.clone(),
-                deny_unsafe,
-                chain_spec: chain_spec.cloned_box(),
-                // Grandpa
-                grandpa: bholdus_rpc::GrandpaDeps {
-                    shared_voter_state: shared_voter_state.clone(),
-                    shared_authority_set: shared_authority_set.clone(),
-                    justification_stream: justification_stream.clone(),
-                    subscription_executor: subscription_executor.clone(),
-                    finality_provider: finality_proof_provider.clone(),
-                },
-            };
-
-            bholdus_rpc::create_full(deps).map_err(Into::into)
-        };
-
-        (rpc_extensions_builder, rpc_setup)
-    };
-
-    let (shared_voter_state, _finality_proof_provider) = rpc_setup;
+    let (shared_voter_state,) = rpc_setup;
 
     let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         config,
@@ -410,7 +420,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
                 slot_duration,
                 client: client.clone(),
                 select_chain,
-                block_import,
+                block_import: grandpa_block_import.clone(),
                 proposer_factory,
                 create_inherent_data_providers: move |_, ()| async move {
                     let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
@@ -475,6 +485,22 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         None
     };
 
+    let beefy_params = beefy_gadget::BeefyParams {
+        client: client.clone(),
+        backend,
+        key_store: keystore.clone(),
+        network: network.clone(),
+        signed_commitment_sender: beefy_signed_commitment_sender,
+        min_block_delta: 4,
+        prometheus_registry: prometheus_registry.clone(),
+    };
+
+    // Start BEEFY bridge gadget
+    task_manager.spawn_essential_handle().spawn_blocking(
+        "beefy-gadget",
+        beefy_gadget::start_beefy_gadget::<_, _, _, _>(beefy_params),
+    );
+
     let config = grandpa::Config {
         // FIXME #1578 make this available through chainspec
         gossip_duration: std::time::Duration::from_millis(333),
@@ -513,7 +539,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
     network_starter.start_network();
     Ok(NewFullBase {
         task_manager,
-        client,
+        client: client.clone(),
         network,
         transaction_pool,
     })

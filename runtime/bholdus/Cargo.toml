@@ -62,6 +62,7 @@ pallet-identity = { version = '4.0.0-dev', git = 'https://github.com/bholdus/sub
 pallet-recovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 pallet-bags-list = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 pallet-multisig = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
+beefy-primitives = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 pallet-beefy = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 pallet-beefy-mmr = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 

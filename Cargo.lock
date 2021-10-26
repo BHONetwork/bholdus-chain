@@ -431,6 +431,54 @@ dependencies = [
 ]
 
 [[package]]
+name = "beefy-gadget"
+version = "4.0.0-dev"
+source = "git+https://github.com/bholdus/substrate.git?branch=master#d48f4928ef833bf76cb6179839b0338e48052d24"
+dependencies = [
+ "beefy-primitives",
+ "fnv",
+ "futures 0.3.17",
+ "log",
+ "parity-scale-codec",
+ "parking_lot",
+ "sc-client-api",
+ "sc-keystore",
+ "sc-network",
+ "sc-network-gossip",
+ "sc-utils",
+ "sp-api",
+ "sp-application-crypto",
+ "sp-arithmetic",
+ "sp-blockchain",
+ "sp-core",
+ "sp-keystore",
+ "sp-runtime",
+ "substrate-prometheus-endpoint",
+ "thiserror",
+ "wasm-timer",
+]
+
+[[package]]
+name = "beefy-gadget-rpc"
+version = "4.0.0-dev"
+source = "git+https://github.com/bholdus/substrate.git?branch=master#d48f4928ef833bf76cb6179839b0338e48052d24"
+dependencies = [
+ "beefy-gadget",
+ "beefy-primitives",
+ "futures 0.3.17",
+ "jsonrpc-core 18.0.0",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "jsonrpc-pubsub",
+ "log",
+ "parity-scale-codec",
+ "sc-rpc",
+ "serde",
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
 name = "beefy-merkle-tree"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=master#d48f4928ef833bf76cb6179839b0338e48052d24"
@@ -647,6 +695,8 @@ dependencies = [
 name = "bholdus-rpc"
 version = "4.0.0-dev"
 dependencies = [
+ "beefy-gadget",
+ "beefy-gadget-rpc",
  "bholdus-primitives",
  "jsonrpc-core 18.0.0",
  "pallet-contracts",
@@ -658,11 +708,8 @@ dependencies = [
  "sc-chain-spec",
  "sc-client-api",
  "sc-consensus",
- "sc-consensus-babe",
- "sc-consensus-babe-rpc",
  "sc-consensus-epochs",
  "sc-consensus-uncles",
- "sc-executor",
  "sc-finality-grandpa",
  "sc-finality-grandpa-rpc",
  "sc-keystore",
@@ -674,7 +721,6 @@ dependencies = [
  "sp-block-builder",
  "sp-blockchain",
  "sp-consensus",
- "sp-consensus-babe",
  "sp-keystore",
  "sp-runtime",
  "substrate-frame-rpc-system",
@@ -684,6 +730,7 @@ dependencies = [
 name = "bholdus-runtime"
 version = "1.2.1"
 dependencies = [
+ "beefy-primitives",
  "bholdus-chainbridge",
  "bholdus-chainbridge-transfer",
  "bholdus-currencies",
@@ -761,6 +808,9 @@ name = "bholdus-service"
 version = "4.0.0-dev"
 dependencies = [
  "async-trait",
+ "beefy-gadget",
+ "beefy-gadget-rpc",
+ "beefy-primitives",
  "bholdus-primitives",
  "bholdus-rpc",
  "bholdus-runtime",
