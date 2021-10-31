@@ -1,8 +1,9 @@
+use beefy_primitives::crypto::AuthorityId as BeefyId;
 use bholdus_primitives::{
     AccountId, Balance, CurrencyId, Signature, TokenInfo, TokenSymbol, TradingPair,
 };
 use bholdus_runtime::{
-    opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig,
+    opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
     ChainBridgeTransferConfig, CouncilConfig, DexConfig, GenesisConfig, GrandpaConfig,
     ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig,
     SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
@@ -81,12 +82,14 @@ fn session_keys(
     aura: AuraId,
     im_online: ImOnlineId,
     authority_discovery: AuthorityDiscoveryId,
+    beefy: BeefyId,
 ) -> SessionKeys {
     SessionKeys {
         grandpa,
         aura,
         im_online,
         authority_discovery,
+        beefy,
     }
 }
 
@@ -110,6 +113,7 @@ pub fn authority_keys_from_seed(
     AuraId,
     ImOnlineId,
     AuthorityDiscoveryId,
+    BeefyId,
 ) {
     (
         get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
@@ -118,6 +122,7 @@ pub fn authority_keys_from_seed(
         get_from_seed::<AuraId>(seed),
         get_from_seed::<ImOnlineId>(seed),
         get_from_seed::<AuthorityDiscoveryId>(seed),
+        get_from_seed::<BeefyId>(seed),
     )
 }
 
@@ -260,6 +265,7 @@ fn testnet_genesis(
         AuraId,
         ImOnlineId,
         AuthorityDiscoveryId,
+        BeefyId,
     )>,
     initial_nominators: Vec<AccountId>,
     root_key: AccountId,
@@ -319,7 +325,13 @@ fn testnet_genesis(
                     (
                         x.0.clone(),
                         x.0.clone(),
-                        session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
+                        session_keys(
+                            x.2.clone(),
+                            x.3.clone(),
+                            x.4.clone(),
+                            x.5.clone(),
+                            x.6.clone(),
+                        ),
                     )
                 })
                 .collect::<Vec<_>>(),
@@ -345,11 +357,10 @@ fn testnet_genesis(
         grandpa: GrandpaConfig {
             authorities: vec![],
         },
+        beefy: BeefyConfig {
+            authorities: vec![],
+        },
         treasury: Default::default(),
-        // contracts: ContractsConfig {
-        // println should only be enabled on development chains
-        // current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
-        // },
         chain_bridge_transfer: ChainBridgeTransferConfig {},
         tokens: TokensConfig {
             balances: endowed_accounts

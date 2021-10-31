@@ -277,7 +277,7 @@ path = 'service'
 
 [dependencies.bholdus-primitives]
 version = '4.0.0-dev'
-path = '../primitives'
+path = '../primitives/bholdus'
 
 [features]
 default = []

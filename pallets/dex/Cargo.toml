@@ -66,7 +66,7 @@ branch = 'master'
 [dependencies.bholdus-primitives]
 default-features = false
 version = '4.0.0-dev'
-path = '../../primitives'
+path = '../../primitives/bholdus'
 
 [dependencies.bholdus-support]
 default-features = false

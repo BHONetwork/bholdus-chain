@@ -9,21 +9,18 @@ use std::sync::Arc;
 
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use sc_client_api::AuxStore;
-use sc_consensus_babe::{Config, Epoch};
-use sc_consensus_babe_rpc::BabeRpcHandler;
 use sc_consensus_epochs::SharedEpochChanges;
 use sc_finality_grandpa::{
     FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
-use sc_rpc::SubscriptionTaskExecutor;
+pub use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
 use sc_transaction_pool_api::TransactionPool;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
-use sp_consensus_babe::BabeApi;
 use sp_keystore::SyncCryptoStorePtr;
 
 /// Light client extra dependencies.
@@ -52,6 +49,14 @@ pub struct GrandpaDeps<B> {
     pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
 }
 
+/// Extra dependencies for BEEFY
+pub struct BeefyDeps {
+    /// Receives notifications about signed commitment events from BEEFY.
+    pub beefy_commitment_stream: beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
+    /// Executor to drive the subscription manager in the BEEFY RPC handler.
+    pub subscription_executor: sc_rpc::SubscriptionTaskExecutor,
+}
+
 /// Full client dependencies.
 pub struct FullDeps<C, P, SC, B> {
     /// The client instance to use.
@@ -66,6 +71,8 @@ pub struct FullDeps<C, P, SC, B> {
     pub deny_unsafe: DenyUnsafe,
     /// GRANDPA specific dependencies.
     pub grandpa: GrandpaDeps<B>,
+    /// BEEFY specific dependencies
+    pub beefy: BeefyDeps,
 }
 
 /// A IO handler that uses all Full RPC extensions.
@@ -106,6 +113,7 @@ where
         chain_spec,
         deny_unsafe,
         grandpa,
+        beefy,
     } = deps;
 
     let GrandpaDeps {
@@ -138,6 +146,13 @@ where
             justification_stream,
             subscription_executor,
             finality_provider,
+        ),
+    ));
+
+    io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(
+        beefy_gadget_rpc::BeefyRpcHandler::new(
+            beefy.beefy_commitment_stream,
+            beefy.subscription_executor,
         ),
     ));
 

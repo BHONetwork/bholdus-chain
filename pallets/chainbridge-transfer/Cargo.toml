@@ -78,7 +78,7 @@ path = '../support'
 [dependencies.bholdus-primitives]
 version = "4.0.0-dev"
 default-features = false
-path = '../../primitives'
+path = '../../primitives/bholdus'
 
 [dev-dependencies.serde]
 version = '1.0.119'
