@@ -92,6 +92,8 @@ bholdus-currencies = { version = '4.0.0-dev', path = '../../pallets/currencies',
 bholdus-chainbridge = { version = '4.0.0-dev', path = '../../pallets/chainbridge', default-features = false }
 bholdus-chainbridge-transfer = { version = '4.0.0-dev', path = '../../pallets/chainbridge-transfer', default-features = false }
 bholdus-dex = { version = '4.0.0-dev', path = '../../pallets/dex', default-features = false }
+bholdus-bridge-bsc = { version = '4.0.0-dev', path = '../../pallets/bridge/bsc', default-features = false }
+
 pallet-template = { version = '4.0.0-dev', path = '../../pallets/template', default-features = false }
 
 [features]
@@ -167,6 +169,7 @@ std = [
 	'bholdus-dex/std',
 	'bholdus-chainbridge-transfer/std',
 	'bholdus-primitives/std',
+	'bholdus-bridge-bsc/std',
 	'sp-api/std',
 	'sp-block-builder/std',
 	'sp-core/std',
