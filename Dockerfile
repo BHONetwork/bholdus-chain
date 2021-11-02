@@ -16,4 +16,4 @@ FROM rust:1.55.0 as runner
 
 COPY --from=builder /usr/local/bin/bholdus /usr/local/bin/bholdus
 
-RUN  apt-get update && apt-get install python jq -y
+RUN  apt-get update && apt-get install python -y
