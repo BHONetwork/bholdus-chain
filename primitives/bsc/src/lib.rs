@@ -18,14 +18,20 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+extern crate alloc;
+
 pub use primitive_types::{H160 as Address, H256 as Hash};
 
 // --- crates.io ---
+#[cfg(feature = "std")]
+use array_bytes::TryFromHex;
 use codec::{Decode, Encode};
 use ethbloom::{Bloom, Input};
 use hash_db::Hasher;
 use primitive_types::U256;
 use rlp::RlpStream;
+#[cfg(feature = "std")]
+use serde::de::{Deserializer, Error};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 // --- paritytech ---
@@ -92,6 +98,34 @@ where
     serializer.serialize_str(hex.as_str())
 }
 
+#[cfg(feature = "std")]
+pub fn de_hex2num<'de, D, T>(hex: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: TryFromHex,
+{
+    let hex = <String>::deserialize(hex)?;
+
+    T::try_from_hex(hex.clone())
+        .map_err(|_| D::Error::custom(alloc::format!("Invalid hex str `{}`", hex)))
+}
+
+#[cfg(feature = "std")]
+pub fn de_hex2bytes<'de, D>(hex: D) -> Result<Bytes, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let hex = <String>::deserialize(hex)?;
+    let trim_hex: String = if hex.starts_with("0x") {
+        hex.clone().split_off(2)
+    } else {
+        hex.clone()
+    };
+
+    hex::decode(trim_hex.clone())
+        .map_err(|_| D::Error::custom(alloc::format!("Invalid hex str `{}`", hex)))
+}
+
 /// An BSC(Binance Smart Chain) header.
 #[derive(Clone, Default, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(
@@ -122,10 +156,7 @@ pub struct BSCHeader {
     /// Block number.
     #[cfg_attr(
         feature = "std",
-        serde(
-            deserialize_with = "array_bytes::de_hex2num",
-            serialize_with = "se_num2hex"
-        )
+        serde(deserialize_with = "de_hex2num", serialize_with = "se_num2hex")
     )]
     pub number: u64,
     /// Block gas limit.
@@ -135,19 +166,13 @@ pub struct BSCHeader {
     /// Block timestamp.
     #[cfg_attr(
         feature = "std",
-        serde(
-            deserialize_with = "array_bytes::de_hex2num",
-            serialize_with = "se_num2hex"
-        )
+        serde(deserialize_with = "de_hex2num", serialize_with = "se_num2hex")
     )]
     pub timestamp: u64,
     /// Block extra data.
     #[cfg_attr(
         feature = "std",
-        serde(
-            deserialize_with = "array_bytes::de_hex2bytes",
-            serialize_with = "se_bytes2hex"
-        )
+        serde(deserialize_with = "de_hex2bytes", serialize_with = "se_bytes2hex")
     )]
     pub extra_data: Bytes,
     /// MixDigest
@@ -156,10 +181,7 @@ pub struct BSCHeader {
     /// Nonce(64 bit in ethereum)
     #[cfg_attr(
         feature = "std",
-        serde(
-            deserialize_with = "array_bytes::de_hex2bytes",
-            serialize_with = "se_bytes2hex"
-        )
+        serde(deserialize_with = "de_hex2bytes", serialize_with = "se_bytes2hex")
     )]
     pub nonce: Bytes,
 }
