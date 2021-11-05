@@ -384,11 +384,6 @@ default-features = false
 version = '3.0.0'
 path = '../../pallets/tokens'
 
-[dependencies.bholdus-support]
-default-features = false
-version = '3.0.0'
-path = '../../pallets/support'
-
 [dependencies.bholdus-currencies]
 default-features = false
 version = '3.0.0'
@@ -419,10 +414,16 @@ default-features = false
 version = '3.0.0'
 path = '../../pallets/non-fungible-token'
 
-[dependencies.bholdus-lib-nft]
+[dependencies.bholdus-support-nft]
+default-features = false
+package = 'support-nft'
+version = '3.0.0'
+path = '../../pallets/support/nft'
+
+[dependencies.bholdus-support]
 default-features = false
 version = '3.0.0'
-path = '../../bholdus-libs/nft'
+path = '../../pallets/support'
 
 [features]
 default = ['std']
@@ -498,7 +499,7 @@ runtime-benchmarks = [
 		'bholdus-nft/std',
 		'bholdus-primitives/std',
 # Bholdus Lib
-		'bholdus-lib-nft/std',
+		'bholdus-support-nft/std',
 		'sp-api/std',
 		'sp-block-builder/std',
 		'sp-core/std',

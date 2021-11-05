@@ -89,7 +89,7 @@ parameter_types! {
     pub const MaxTokenMetadata: u32 = 1024;
 }
 
-impl bholdus_lib_nft::Config for Runtime {
+impl bholdus_support_nft::Config for Runtime {
     type ClassId = u32;
     type TokenId = u64;
     type ClassData = ClassData;
@@ -111,7 +111,7 @@ construct_runtime!(
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         NFTModule: nft::{Pallet, Call, Event<T>},
-        BNFT: bholdus_lib_nft::{Pallet, Storage},
+        BNFT: bholdus_support_nft::{Pallet, Storage},
         // Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         Utility: pallet_utility::{Pallet, Call, Event},
     }
@@ -119,10 +119,10 @@ construct_runtime!(
 
 pub const ALICE: AccountId = AccountId::new([1u8; 32]);
 pub const BOB: AccountId = AccountId::new([2u8; 32]);
-pub const CLASS_ID: <Runtime as bholdus_lib_nft::Config>::ClassId = 0;
-pub const CLASS_ID_NOT_EXIST: <Runtime as bholdus_lib_nft::Config>::ClassId = 1;
-pub const TOKEN_ID: <Runtime as bholdus_lib_nft::Config>::TokenId = 0;
-pub const TOKEN_ID_NOT_EXIST: <Runtime as bholdus_lib_nft::Config>::TokenId = 1;
+pub const CLASS_ID: <Runtime as bholdus_support_nft::Config>::ClassId = 0;
+pub const CLASS_ID_NOT_EXIST: <Runtime as bholdus_support_nft::Config>::ClassId = 1;
+pub const TOKEN_ID: <Runtime as bholdus_support_nft::Config>::TokenId = 0;
+pub const TOKEN_ID_NOT_EXIST: <Runtime as bholdus_support_nft::Config>::TokenId = 1;
 
 pub struct ExtBuilder;
 impl Default for ExtBuilder {

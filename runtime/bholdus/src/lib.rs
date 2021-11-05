@@ -342,7 +342,7 @@ parameter_types! {
     pub MaxTokenMetadata: u32 = 1024;
 }
 
-impl bholdus_lib_nft::Config for Runtime {
+impl bholdus_support_nft::Config for Runtime {
     type ClassId = u32;
     type TokenId = u64;
     type ClassData = bholdus_nft::ClassData;
@@ -993,7 +993,7 @@ construct_runtime!(
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
 
         // Bholdus Libs
-        BholdusLibNFT: bholdus_lib_nft::{Pallet, Call, Storage},
+        BholdusLibNFT: bholdus_support_nft::{Pallet, Call, Storage},
     }
 );
 

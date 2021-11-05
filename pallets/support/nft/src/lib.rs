@@ -37,18 +37,22 @@ pub use pallet::*;
 
 /// Class info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug)]
-pub struct ClassInfo<TokenId, AccountId, ClassMetadataOf> {
-    /// Class metadata
-    pub metadata: ClassMetadataOf,
+pub struct ClassInfo<TokenId, AccountId, Data> {
+    // /// Class metadata
+    // pub metadata: ClassMetadataOf,
     /// Total issuance for the class
     pub total_issuance: TokenId,
     /// Class owner
     pub owner: AccountId,
+    /// Class Properties
+    pub data: Data,
 }
 
 /// Token info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug)]
-pub struct TokenInfo<AccountId, Data> {
+pub struct TokenInfo<AccountId, Data, TokenMetadataOf> {
+    /// Token metadata
+    pub metadata: TokenMetadataOf,
     /// Token owner
     pub owner: AccountId,
     /// Token Properties
@@ -80,10 +84,13 @@ pub mod pallet {
     pub type ClassInfoOf<T> = ClassInfo<
         <T as Config>::TokenId,
         <T as frame_system::Config>::AccountId,
-        ClassMetadataOf<T>,
+        <T as Config>::ClassData,
     >;
-    pub type TokenInfoOf<T> =
-        TokenInfo<<T as frame_system::Config>::AccountId, <T as Config>::TokenData>;
+    pub type TokenInfoOf<T> = TokenInfo<
+        <T as frame_system::Config>::AccountId,
+        <T as Config>::TokenData,
+        TokenMetadataOf<T>,
+    >;
 
     pub type GenesisTokenData<T> = (
         <T as frame_system::Config>::AccountId, // Token owner
@@ -169,11 +176,12 @@ impl<T: Config> Pallet<T> {
     /// Create NFT(non fungible token) class
     pub fn create_class(
         owner: &T::AccountId,
-        metadata: Vec<u8>,
+        // metadata: Vec<u8>,
+        data: T::ClassData,
     ) -> Result<T::ClassId, DispatchError> {
-        let bounded_metadata: BoundedVec<u8, T::MaxClassMetadata> = metadata
-            .try_into()
-            .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
+        // let bounded_metadata: BoundedVec<u8, T::MaxClassMetadata> = metadata
+        //     .try_into()
+        //     .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
 
         let class_id = NextClassId::<T>::try_mutate(|id| -> Result<T::ClassId, DispatchError> {
             let current_id = *id;
@@ -184,9 +192,10 @@ impl<T: Config> Pallet<T> {
         })?;
 
         let info = ClassInfo {
-            metadata: bounded_metadata,
+            // metadata: bounded_metadata,
             total_issuance: Default::default(),
             owner: owner.clone(),
+            data,
         };
         Classes::<T>::insert(class_id, info);
 
@@ -217,9 +226,13 @@ impl<T: Config> Pallet<T> {
     pub fn mint(
         owner: &T::AccountId,
         class_id: T::ClassId,
+        metadata: Vec<u8>,
         data: T::TokenData,
     ) -> Result<T::TokenId, DispatchError> {
         NextTokenId::<T>::try_mutate(class_id, |id| -> Result<T::TokenId, DispatchError> {
+            let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> = metadata
+                .try_into()
+                .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
             let token_id = *id;
             *id = id
                 .checked_add(&One::one())
@@ -234,6 +247,7 @@ impl<T: Config> Pallet<T> {
             })?;
 
             let token_info = TokenInfo {
+                metadata: bounded_metadata,
                 owner: owner.clone(),
                 data,
             };

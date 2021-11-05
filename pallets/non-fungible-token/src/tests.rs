@@ -5,8 +5,8 @@ use frame_support::traits::Currency;
 use frame_support::{assert_noop, assert_ok};
 use mock::{Event, *};
 
-use bholdus_lib_nft::TokenInfo;
 use bholdus_primitives::Balance;
+use bholdus_support_nft::TokenInfo;
 use sp_runtime::{traits::BlakeTwo256, ArithmeticError};
 use sp_std::convert::TryInto;
 
@@ -26,10 +26,7 @@ fn create_class_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         let metadata = vec![1];
 
-        assert_ok!(NFTModule::create_class(
-            Origin::signed(ALICE),
-            metadata.clone(),
-        ));
+        assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1)));
 
         System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
             class_id_account(),
@@ -37,10 +34,12 @@ fn create_class_should_work() {
         )));
 
         assert_eq!(
-            bholdus_lib_nft::Pallet::<Runtime>::classes(0)
+            bholdus_support_nft::Pallet::<Runtime>::classes(0)
                 .unwrap()
-                .metadata,
-            metadata
+                .data,
+            ClassData {
+                attributes: test_attr(1),
+            }
         )
     });
 }
@@ -50,10 +49,7 @@ fn mint_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         let metadata = vec![1];
         let metadata_2 = vec![2, 3];
-        assert_ok!(NFTModule::create_class(
-            Origin::signed(ALICE),
-            metadata.clone(),
-        ));
+        assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1),));
         System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
             class_id_account(),
             CLASS_ID,
@@ -63,6 +59,7 @@ fn mint_should_work() {
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata_2.clone(),
             test_attr(2),
             2
         ));
@@ -75,7 +72,7 @@ fn mint_should_work() {
         )));
 
         assert_eq!(
-            bholdus_lib_nft::TokensByOwner::<Runtime>::iter_prefix((BOB,)).collect::<Vec<_>>(),
+            bholdus_support_nft::TokensByOwner::<Runtime>::iter_prefix((BOB,)).collect::<Vec<_>>(),
             vec![((0, 1), ()), ((0, 0), ())]
         );
     });
@@ -87,7 +84,7 @@ fn mint_should_fail() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
 
         assert_noop!(
@@ -95,6 +92,7 @@ fn mint_should_fail() {
                 Origin::signed(ALICE),
                 BOB,
                 CLASS_ID_NOT_EXIST,
+                metadata.clone(),
                 Default::default(),
                 2
             ),
@@ -102,27 +100,42 @@ fn mint_should_fail() {
         );
 
         assert_noop!(
-            NFTModule::mint(Origin::signed(BOB), BOB, CLASS_ID, Default::default(), 0),
+            NFTModule::mint(
+                Origin::signed(BOB),
+                BOB,
+                CLASS_ID,
+                metadata.clone(),
+                Default::default(),
+                0
+            ),
             Error::<Runtime>::InvalidQuantity
         );
 
         assert_noop!(
-            NFTModule::mint(Origin::signed(BOB), BOB, CLASS_ID, Default::default(), 2),
+            NFTModule::mint(
+                Origin::signed(BOB),
+                BOB,
+                CLASS_ID,
+                metadata.clone(),
+                Default::default(),
+                2
+            ),
             Error::<Runtime>::NoPermission
         );
 
-        bholdus_lib_nft::NextTokenId::<Runtime>::mutate(CLASS_ID, |id| {
-            *id = <Runtime as bholdus_lib_nft::Config>::TokenId::max_value()
+        bholdus_support_nft::NextTokenId::<Runtime>::mutate(CLASS_ID, |id| {
+            *id = <Runtime as bholdus_support_nft::Config>::TokenId::max_value()
         });
         assert_noop!(
             NFTModule::mint(
                 Origin::signed(class_id_account()),
                 BOB,
                 CLASS_ID,
+                metadata.clone(),
                 Default::default(),
                 2
             ),
-            bholdus_lib_nft::Error::<Runtime>::NoAvailableTokenId
+            bholdus_support_nft::Error::<Runtime>::NoAvailableTokenId
         );
     });
 }
@@ -133,7 +146,7 @@ fn mint_should_fail_without_mintable() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
     });
 }
@@ -144,13 +157,14 @@ fn transfer_should_work() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
 
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata.clone(),
             Default::default(),
             2
         ));
@@ -181,12 +195,13 @@ fn transfer_should_fail() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata,
             Default::default(),
             1
         ));
@@ -203,7 +218,7 @@ fn transfer_should_fail() {
 
         assert_noop!(
             NFTModule::transfer(Origin::signed(ALICE), BOB, (CLASS_ID, TOKEN_ID)),
-            bholdus_lib_nft::Error::<Runtime>::NoPermission
+            bholdus_support_nft::Error::<Runtime>::NoPermission
         );
     });
 
@@ -211,7 +226,7 @@ fn transfer_should_fail() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
     })
 }
@@ -222,13 +237,14 @@ fn burn_should_work() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
 
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata.clone(),
             Default::default(),
             1
         ));
@@ -245,12 +261,13 @@ fn burn_should_fail() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata,
             Default::default(),
             1
         ));
@@ -265,7 +282,7 @@ fn burn_should_fail() {
             Error::<Runtime>::NoPermission
         );
 
-        bholdus_lib_nft::Classes::<Runtime>::mutate(CLASS_ID, |class_info| {
+        bholdus_support_nft::Classes::<Runtime>::mutate(CLASS_ID, |class_info| {
             class_info.as_mut().unwrap().total_issuance = 0;
         });
         assert_noop!(
@@ -281,12 +298,13 @@ fn destroy_class_should_work() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            Default::default(),
         ));
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata,
             Default::default(),
             1
         ));
@@ -309,13 +327,15 @@ fn destroy_class_should_fail() {
         let metadata = vec![1];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
-            metadata.clone(),
+            // metadata.clone(),
+            Default::default(),
         ));
 
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
             BOB,
             CLASS_ID,
+            metadata,
             Default::default(),
             1
         ));

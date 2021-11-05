@@ -11,7 +11,7 @@ toolchain:
 	./scripts/init.sh
 
 .PHONY: build
-build: githooks
+build:
 	SKIP_WASM_BUILD= cargo build --features with-bholdus-runtime
 
 .PHONY: check-debug

@@ -36,7 +36,7 @@ use sp_runtime::{
 };
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
-pub mod benchmarking;
+// pub mod benchmarking;
 mod mock;
 mod tests;
 pub mod weights;
@@ -47,8 +47,8 @@ pub use weights::WeightInfo;
 pub type CID = Vec<u8>;
 pub type Attributes = BTreeMap<Vec<u8>, Vec<u8>>;
 
-pub type TokenIdOf<T> = <T as bholdus_lib_nft::Config>::TokenId;
-pub type ClassIdOf<T> = <T as bholdus_lib_nft::Config>::ClassId;
+pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
+pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
 
 #[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
@@ -70,7 +70,8 @@ pub mod pallet {
 
     #[pallet::config]
     pub trait Config:
-        frame_system::Config + bholdus_lib_nft::Config<ClassData = ClassData, TokenData = TokenData>
+        frame_system::Config
+        + bholdus_support_nft::Config<ClassData = ClassData, TokenData = TokenData>
     {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
@@ -128,11 +129,15 @@ pub mod pallet {
         /// - `metadata`: external metadata
         #[pallet::weight(<T as Config>::WeightInfo::create_class())]
         #[transactional]
-        pub fn create_class(origin: OriginFor<T>, metadata: CID) -> DispatchResultWithPostInfo {
+        pub fn create_class(
+            origin: OriginFor<T>,
+            attributes: Attributes,
+        ) -> DispatchResultWithPostInfo {
             let who = ensure_signed(origin)?;
-            let next_id = bholdus_lib_nft::Pallet::<T>::next_class_id();
+            let next_id = bholdus_support_nft::Pallet::<T>::next_class_id();
             let owner: T::AccountId = T::PalletId::get().into_sub_account(next_id);
-            bholdus_lib_nft::Pallet::<T>::create_class(&owner, metadata)?;
+            let data = ClassData { attributes };
+            bholdus_support_nft::Pallet::<T>::create_class(&owner, data)?;
             Self::deposit_event(Event::CreatedClass(owner, next_id));
             Ok(().into())
         }
@@ -149,13 +154,18 @@ pub mod pallet {
             origin: OriginFor<T>,
             to: <T::Lookup as StaticLookup>::Source,
             class_id: ClassIdOf<T>,
+            metadata: CID,
             attributes: Attributes,
             quantity: u32,
         ) -> DispatchResult {
             let who = ensure_signed(origin)?;
             let to = T::Lookup::lookup(to)?;
-            Self::do_mint(who, to, class_id, attributes, quantity)
+            Self::do_mint(who, to, class_id, metadata, attributes, quantity)
         }
+
+        /// Transfer NFT to another account
+        /// - `to` the token owner's account
+        /// - `token`: (class_id, token_id)
 
         #[pallet::weight(<T as Config>::WeightInfo::transfer())]
         #[transactional]
@@ -189,14 +199,14 @@ pub mod pallet {
             class_id: ClassIdOf<T>,
         ) -> DispatchResultWithPostInfo {
             let who = ensure_signed(origin)?;
-            let class_info = bholdus_lib_nft::Pallet::<T>::classes(class_id)
+            let class_info = bholdus_support_nft::Pallet::<T>::classes(class_id)
                 .ok_or(Error::<T>::ClassIdNotFound)?;
             ensure!(who == class_info.owner, Error::<T>::NoPermission);
             ensure!(
                 class_info.total_issuance == Zero::zero(),
                 Error::<T>::CannotDestroyClass
             );
-            bholdus_lib_nft::Pallet::<T>::destroy_class(&who, class_id)?;
+            bholdus_support_nft::Pallet::<T>::destroy_class(&who, class_id)?;
 
             Self::deposit_event(Event::DestroyedClass(who, class_id));
             Ok(().into())
@@ -211,11 +221,11 @@ impl<T: Config> Pallet<T> {
         to: &T::AccountId,
         token: (ClassIdOf<T>, TokenIdOf<T>),
     ) -> DispatchResult {
-        let class_info =
-            bholdus_lib_nft::Pallet::<T>::classes(token.0).ok_or(Error::<T>::ClassIdNotFound)?;
-        let token_info = bholdus_lib_nft::Pallet::<T>::tokens(token.0, token.1)
+        let class_info = bholdus_support_nft::Pallet::<T>::classes(token.0)
+            .ok_or(Error::<T>::ClassIdNotFound)?;
+        let token_info = bholdus_support_nft::Pallet::<T>::tokens(token.0, token.1)
             .ok_or(Error::<T>::TokenIdNotFound)?;
-        bholdus_lib_nft::Pallet::<T>::transfer(from, to, token)?;
+        bholdus_support_nft::Pallet::<T>::transfer(from, to, token)?;
 
         Self::deposit_event(Event::TransferredToken(
             from.clone(),
@@ -230,18 +240,19 @@ impl<T: Config> Pallet<T> {
         who: T::AccountId,
         to: T::AccountId,
         class_id: ClassIdOf<T>,
+        metadata: CID,
         attributes: Attributes,
         quantity: u32,
     ) -> DispatchResult {
         ensure!(quantity >= 1, Error::<T>::InvalidQuantity);
-        let class_info =
-            bholdus_lib_nft::Pallet::<T>::classes(class_id).ok_or(Error::<T>::ClassIdNotFound)?;
+        let class_info = bholdus_support_nft::Pallet::<T>::classes(class_id)
+            .ok_or(Error::<T>::ClassIdNotFound)?;
         ensure!(who == class_info.owner, Error::<T>::NoPermission);
 
         let data = TokenData { attributes };
 
         for _ in 0..quantity {
-            bholdus_lib_nft::Pallet::<T>::mint(&to, class_id, data.clone())?;
+            bholdus_support_nft::Pallet::<T>::mint(&to, class_id, metadata.clone(), data.clone())?;
         }
 
         Self::deposit_event(Event::MintedToken(who, to, class_id, quantity));
@@ -249,14 +260,14 @@ impl<T: Config> Pallet<T> {
     }
 
     fn do_burn(who: T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
-        let class_info =
-            bholdus_lib_nft::Pallet::<T>::classes(token.0).ok_or(Error::<T>::ClassIdNotFound)?;
+        let class_info = bholdus_support_nft::Pallet::<T>::classes(token.0)
+            .ok_or(Error::<T>::ClassIdNotFound)?;
 
-        let token_info = bholdus_lib_nft::Pallet::<T>::tokens(token.0, token.1)
+        let token_info = bholdus_support_nft::Pallet::<T>::tokens(token.0, token.1)
             .ok_or(Error::<T>::TokenIdNotFound)?;
         ensure!(who == token_info.owner, Error::<T>::NoPermission);
 
-        bholdus_lib_nft::Pallet::<T>::burn(&who, token)?;
+        bholdus_support_nft::Pallet::<T>::burn(&who, token)?;
 
         Self::deposit_event(Event::BurnedToken(who, token.0, token.1));
         Ok(())
@@ -281,11 +292,11 @@ impl<T: Config> NFT<T::AccountId> for Pallet<T> {
     type Balance = NFTBalance;
 
     fn balance(who: &T::AccountId) -> Self::Balance {
-        bholdus_lib_nft::TokensByOwner::<T>::iter_prefix((who,)).count() as u128
+        bholdus_support_nft::TokensByOwner::<T>::iter_prefix((who,)).count() as u128
     }
 
     fn owner(token: (Self::ClassId, Self::TokenId)) -> Option<T::AccountId> {
-        bholdus_lib_nft::Pallet::<T>::tokens(token.0, token.1).map(|t| t.owner)
+        bholdus_support_nft::Pallet::<T>::tokens(token.0, token.1).map(|t| t.owner)
     }
 
     fn transfer(

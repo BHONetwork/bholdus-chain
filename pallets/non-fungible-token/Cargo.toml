@@ -69,15 +69,16 @@ path = '../../primitives'
 
 ## Bholdus libs
 
-[dependencies.bholdus-lib-nft]
-default-features = false
-version = '3.0.0'
-path = '../../bholdus-libs/nft'
-
 [dependencies.bholdus-support]
 default-features = false
 version = '3.0.0'
 path = '../../pallets/support'
+
+[dependencies.bholdus-support-nft]
+default-features = false
+package = 'support-nft'
+version = '3.0.0'
+path = '../../pallets/support/nft'
 
 [dev-dependencies.sp-core]
 git = 'https://github.com/bholdus/substrate.git'
@@ -112,7 +113,7 @@ std = [
 #"pallet-proxy/std",
 	"bholdus-primitives/std",
 	"bholdus-support/std",
-	"bholdus-lib-nft/std",
+	"bholdus-support-nft/std",
 	"enumflags2/serde",
 ]
 runtime-benchmarks = [
