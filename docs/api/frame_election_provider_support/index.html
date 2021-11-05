@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Primitive traits for providing election functionality."><meta name="keywords" content="rust, rustlang, rust-lang, frame_election_provider_support"><title>frame_election_provider_support - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../frame_election_provider_support/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate frame_election_provider_support</p><div class="block version"><p>Version 3.0.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all frame_election_provider_support's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="frame_election_provider_support" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">frame_election_provider_support</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/frame_election_provider_support/lib.rs.html#18-276" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Primitive traits for providing election functionality.</p>
+<p>This crate provides two traits that could interact to enable extensible election functionality
+within FRAME pallets.</p>
+<p>Something that will provide the functionality of election will implement <a href="../frame_election_provider_support/trait.ElectionProvider.html" title="ElectionProvider"><code>ElectionProvider</code></a>,
+whilst needing an associated <a href="../frame_election_provider_support/trait.ElectionProvider.html#associatedtype.DataProvider" title="ElectionProvider::DataProvider"><code>ElectionProvider::DataProvider</code></a>, which needs to be fulfilled by
+an entity implementing <a href="../frame_election_provider_support/trait.ElectionDataProvider.html" title="ElectionDataProvider"><code>ElectionDataProvider</code></a>. Most often, <em>the data provider is</em> the receiver
+of the election, resulting in a diagram as below:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+                                        <span class="ident">ElectionDataProvider</span>
+                         <span class="op">&lt;</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span>
+                         <span class="op">|</span>                                          <span class="op">|</span>
+                         <span class="ident">v</span>                                          <span class="op">|</span>
+                   <span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span>                              <span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span>
+                   <span class="op">|</span>          <span class="op">|</span>                              <span class="op">|</span>          <span class="op">|</span>
+<span class="ident">pallet</span><span class="op">-</span><span class="kw">do</span><span class="op">-</span><span class="ident">election</span> <span class="op">|</span>          <span class="op">|</span>                              <span class="op">|</span>          <span class="op">|</span> <span class="ident">pallet</span><span class="op">-</span><span class="ident">needs</span><span class="op">-</span><span class="ident">election</span>
+                   <span class="op">|</span>          <span class="op">|</span>                              <span class="op">|</span>          <span class="op">|</span>
+                   <span class="op">|</span>          <span class="op">|</span>                              <span class="op">|</span>          <span class="op">|</span>
+                   <span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span>                              <span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span>
+                         <span class="op">|</span>                                          <span class="op">^</span>
+                         <span class="op">|</span>                                          <span class="op">|</span>
+                         <span class="op">+</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">-</span><span class="op">+</span>
+                                        <span class="ident">ElectionProvider</span></pre></div>
+<blockquote>
+<p>It could also be possible that a third party pallet (C), provides the data of election to an
+election provider (B), which then passes the election result to another pallet (A).</p>
+</blockquote>
+<h2 id="election-types" class="section-header"><a href="#election-types">Election Types</a></h2>
+<p>Typically, two types of elections exist:</p>
+<ol>
+<li><strong>Stateless</strong>: Election data is provided, and the election result is immediately ready.</li>
+<li><strong>Stateful</strong>: Election data is is queried ahead of time, and the election result might be
+ready some number of blocks in the future.</li>
+</ol>
+<p>To accommodate both type of elections in one trait, the traits lean toward <strong>stateful
+election</strong>, as it is more general than the stateless. This is why <a href="../frame_election_provider_support/trait.ElectionProvider.html#tymethod.elect" title="ElectionProvider::elect"><code>ElectionProvider::elect</code></a>
+has no parameters. All value and type parameter must be provided by the <a href="../frame_election_provider_support/trait.ElectionDataProvider.html" title="ElectionDataProvider"><code>ElectionDataProvider</code></a>
+trait, even if the election happens immediately.</p>
+<h2 id="election-data" class="section-header"><a href="#election-data">Election Data</a></h2>
+<p>The data associated with an election, essentially what the <a href="../frame_election_provider_support/trait.ElectionDataProvider.html" title="ElectionDataProvider"><code>ElectionDataProvider</code></a> must convey
+is as follows:</p>
+<ol>
+<li>A list of voters, with their stake.</li>
+<li>A list of targets (i.e. <em>candidates</em>).</li>
+<li>A number of desired targets to be elected (i.e. <em>winners</em>)</li>
+</ol>
+<p>In addition to that, the <a href="../frame_election_provider_support/trait.ElectionDataProvider.html" title="ElectionDataProvider"><code>ElectionDataProvider</code></a> must also hint <a href="../frame_election_provider_support/trait.ElectionProvider.html" title="ElectionProvider"><code>ElectionProvider</code></a> at when
+the next election might happen (<a href="../frame_election_provider_support/trait.ElectionDataProvider.html#tymethod.next_election_prediction" title="ElectionDataProvider::next_election_prediction"><code>ElectionDataProvider::next_election_prediction</code></a>). A stateless
+election provider would probably ignore this. A stateful election provider can use this to
+prepare the election result in advance.</p>
+<p>Nonetheless, an <a href="../frame_election_provider_support/trait.ElectionProvider.html" title="ElectionProvider"><code>ElectionProvider</code></a> shan’t rely on this and should preferably provide some
+means of fallback election as well, in case the <code>elect</code> was called immaturely early.</p>
+<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+
+<span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">u64</span>;
+<span class="kw">type</span> <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">u64</span>;
+<span class="kw">type</span> <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">u32</span>;
+
+<span class="kw">mod</span> <span class="ident">data_provider_mod</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Config</span>: <span class="ident">Sized</span> {
+        <span class="kw">type</span> <span class="ident">ElectionProvider</span>: <span class="ident">ElectionProvider</span><span class="op">&lt;</span>
+            <span class="ident">AccountId</span>,
+            <span class="ident">BlockNumber</span>,
+            <span class="ident">DataProvider</span> <span class="op">=</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
+        <span class="op">&gt;</span>;
+    }
+
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span>(<span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">ElectionDataProvider</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">const</span> <span class="ident">MAXIMUM_VOTES_PER_VOTER</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">fn</span> <span class="ident">desired_targets</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">data_provider</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">Weight</span>)<span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>((<span class="number">1</span>, <span class="number">0</span>))
+        }
+        <span class="kw">fn</span> <span class="ident">voters</span>(<span class="ident">maybe_max_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>)
+        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">data_provider</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">AccountId</span>, <span class="ident">VoteWeight</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, <span class="ident">Weight</span>)<span class="op">&gt;</span>
+        {
+            <span class="prelude-val">Ok</span>((<span class="ident">Default</span>::<span class="ident">default</span>(), <span class="number">0</span>))
+        }
+        <span class="kw">fn</span> <span class="ident">targets</span>(<span class="ident">maybe_max_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">data_provider</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>, <span class="ident">Weight</span>)<span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>((<span class="macro">vec</span><span class="macro">!</span>[<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>], <span class="number">0</span>))
+        }
+        <span class="kw">fn</span> <span class="ident">next_election_prediction</span>(<span class="ident">now</span>: <span class="ident">BlockNumber</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockNumber</span> {
+            <span class="number">0</span>
+        }
+    }
+}
+
+
+<span class="kw">mod</span> <span class="ident">generic_election_provider</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GenericElectionProvider</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span>(<span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+
+    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Config</span> {
+        <span class="kw">type</span> <span class="ident">DataProvider</span>: <span class="ident">ElectionDataProvider</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span>;
+    }
+
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">ElectionProvider</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GenericElectionProvider</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+        <span class="kw">type</span> <span class="ident">DataProvider</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">DataProvider</span>;
+
+        <span class="kw">fn</span> <span class="ident">elect</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Supports</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>, <span class="ident">Weight</span>), <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="self">Self</span>::<span class="ident">DataProvider</span>::<span class="ident">targets</span>(<span class="prelude-val">None</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;failed to elect&quot;</span>)
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">t</span>, <span class="ident">weight</span>)<span class="op">|</span> {
+						(<span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">t</span>[<span class="number">0</span>], <span class="ident">Support</span>::<span class="ident">default</span>())], <span class="ident">weight</span>)
+				})
+        }
+    }
+}
+
+<span class="kw">mod</span> <span class="ident">runtime</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">generic_election_provider</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">data_provider_mod</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">AccountId</span>;
+
+    <span class="kw">struct</span> <span class="ident">Runtime</span>;
+    <span class="kw">impl</span> <span class="ident">generic_election_provider</span>::<span class="ident">Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+        <span class="kw">type</span> <span class="ident">DataProvider</span> <span class="op">=</span> <span class="ident">data_provider_mod</span>::<span class="ident">Module</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+    }
+
+    <span class="kw">impl</span> <span class="ident">data_provider_mod</span>::<span class="ident">Config</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+        <span class="kw">type</span> <span class="ident">ElectionProvider</span> <span class="op">=</span> <span class="ident">generic_election_provider</span>::<span class="ident">GenericElectionProvider</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>;
+    }
+
+}
+</pre></div>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="data_provider/index.html" title="frame_election_provider_support::data_provider mod">data_provider</a></td><td class="docblock-short"><p>Types that are used by the data provider trait.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="onchain/index.html" title="frame_election_provider_support::onchain mod">onchain</a></td><td class="docblock-short"><p>An implementation of <a href="../frame_election_provider_support/trait.ElectionProvider.html" title="ElectionProvider"><code>ElectionProvider</code></a> that does an on-chain sequential phragmen.</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Assignment.html" title="frame_election_provider_support::Assignment struct">Assignment</a></td><td class="docblock-short"><p>A voter’s stake assignment among a set of targets, represented as ratios.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Support.html" title="frame_election_provider_support::Support struct">Support</a></td><td class="docblock-short"><p>A structure to demonstrate the election result from the perspective of the candidate, i.e. how
+much support each candidate is receiving.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.ElectionDataProvider.html" title="frame_election_provider_support::ElectionDataProvider trait">ElectionDataProvider</a></td><td class="docblock-short"><p>Something that can provide the data to an <a href="../frame_election_provider_support/trait.ElectionProvider.html" title="ElectionProvider"><code>ElectionProvider</code></a>.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.ElectionProvider.html" title="frame_election_provider_support::ElectionProvider trait">ElectionProvider</a></td><td class="docblock-short"><p>Something that can compute the result of an election and pass it back to the caller.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.PerThing.html" title="frame_election_provider_support::PerThing trait">PerThing</a></td><td class="docblock-short"><p>Re-export some type as they are used in the interface.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.PerThing128.html" title="frame_election_provider_support::PerThing128 trait">PerThing128</a></td><td class="docblock-short"><p>Aggregator trait for a PerThing that can be multiplied by u128 (ExtendedBalance).</p>
+</td></tr></table><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<table><tr class="module-item"><td><a class="type" href="type.ExtendedBalance.html" title="frame_election_provider_support::ExtendedBalance type">ExtendedBalance</a></td><td class="docblock-short"><p>A type in which performing operations on vote weights are safe.</p>
+</td></tr><tr class="module-item"><td><a class="type" href="type.Supports.html" title="frame_election_provider_support::Supports type">Supports</a></td><td class="docblock-short"><p>A target-major representation of the the election outcome.</p>
+</td></tr><tr class="module-item"><td><a class="type" href="type.VoteWeight.html" title="frame_election_provider_support::VoteWeight type">VoteWeight</a></td><td class="docblock-short"><p>A type which is used in the API of this crate as a numeric weight of a vote, most often the
+stake of the voter. It is always converted to <a href="../frame_election_provider_support/type.ExtendedBalance.html" title="ExtendedBalance"><code>ExtendedBalance</code></a> for computation.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="frame_election_provider_support" data-search-js="../search-index.js"></div>
+    <script src="../main.js"></script></body></html>

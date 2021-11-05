@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Tokens Module"><meta name="keywords" content="rust, rustlang, rust-lang, bholdus_tokens"><title>bholdus_tokens - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../bholdus_tokens/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate bholdus_tokens</p><div class="block version"><p>Version 3.0.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all bholdus_tokens's items</p></a><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="bholdus_tokens" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">bholdus_tokens</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/bholdus_tokens/lib.rs.html#1-1844" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Tokens Module</p>
+<p>A simple, secure module for dealing with fungible tokens.</p>
+<h2 id="overview" class="section-header"><a href="#overview">Overview</a></h2>
+<p>The Tokens module provides functionality for token managenment of fungible token classes
+with a fixed supply, including:</p>
+<ul>
+<li>Token Issuance (Minting)</li>
+<li>Token Transferal</li>
+<li>Token Freezing</li>
+</ul>
+<p>To use it in your runtime, you need to implement the tokens <a href="../bholdus_tokens/pallet/trait.Config.html" title="Config"><code>Config</code></a>.</p>
+<p>The supported dispatchable functions are documented in the <a href="../bholdus_tokens/pallet/enum.Call.html" title="Call"><code>Call</code></a> enum.</p>
+<h3 id="terminology" class="section-header"><a href="#terminology">Terminology</a></h3>
+<ul>
+<li>
+<p><strong>Admin</strong>: An account ID uniquely privileged to be able to unfreeze (thaw) an account and
+it’s assets</p>
+</li>
+<li>
+<p><strong>Token issuance/minting</strong>: The creation of a new token, whose total supply will belong to
+the account that issues the asset. This is a privileged operation.</p>
+</li>
+<li>
+<p><strong>Fungible token</strong>: An token whose units are interchangeable.</p>
+</li>
+<li>
+<p><strong>Issuer</strong>: An account ID uniquely privileged to be able to mint a particular class of
+assets.</p>
+</li>
+<li>
+<p><strong>Freezer</strong>: An account ID uniquely privileged to be able to freeze an account from
+transferring a particular class of tokens.</p>
+</li>
+<li>
+<p><strong>Freezing</strong>: Removing the possibility of an unpermissioned transfer of an token from a
+particular account.</p>
+</li>
+<li>
+<p><strong>Non-fungible token</strong>: An token for which each unit has unique characteristics.</p>
+</li>
+<li>
+<p><strong>Owner</strong>: An account ID uniquely privileged to be able to destroy a particular token class,
+or to set the Issuer, Freezer or Admin of that token class.</p>
+</li>
+<li>
+<p><strong>Approval</strong>: The act of allowing an account the permission to transfer some balance of token
+from approving account into some third-party destination account.</p>
+</li>
+<li>
+<p><strong>Sufficiency</strong>: The idea of a minimum-balance of an token being sufficient to allow the
+account’s existence on the system without requiring any other existential-deposit.</p>
+</li>
+</ul>
+<h2 id="interface" class="section-header"><a href="#interface">Interface</a></h2><h2 id="permissionless-functions" class="section-header"><a href="#permissionless-functions">Permissionless Functions</a></h2>
+<ul>
+<li><code>create</code>: Creates a new asset class, taking the required deposit.</li>
+<li><code>transfer</code>: Transfer sender’s assets to another account.</li>
+<li><code>set_metadata</code>: Set the metadata of an asset class.</li>
+<li><code>clear_metadata</code>: Remove the metadata of an asset class.</li>
+<li><code>set_identity</code>: Set the associated identity of an asset; a small deposit is reserved if not
+already taken.</li>
+<li><code>clear_identity</code>: Remove an asset’s associated identity; the deposit is returned.</li>
+</ul>
+<h3 id="permissioned-functions" class="section-header"><a href="#permissioned-functions">Permissioned Functions</a></h3>
+<ul>
+<li><code>verify_asset</code>: Verify the associated identity of an asset.</li>
+</ul>
+<h2 id="privileged-functions" class="section-header"><a href="#privileged-functions">Privileged Functions</a></h2>
+<ul>
+<li><code>destroy</code>: Destroys an entire asset class; called by the asset class’s Owner.</li>
+<li><code>mint</code>: Increases the asset balance of an account; called by the asset class’s Issuer.</li>
+<li><code>freeze</code>: Disallows further <code>transfer</code>’s from an accounts; called by the asset class’s Admin.</li>
+<li><code>thaw</code>: Allows further <code>transfer</code>s from an account; called by the asset class’s Owner.</li>
+</ul>
+<h3 id="public-functions" class="section-header"><a href="#public-functions">Public Functions</a></h3>
+<ul>
+<li><code>balance</code> - Get the asset <code>id</code> balance of <code>who</code>.</li>
+<li><code>total_supply</code> - Get the total supply of an asset <code>id</code>.</li>
+</ul>
+<h2 id="related-modules" class="section-header"><a href="#related-modules">Related Modules</a></h2>
+<ul>
+<li><a href="../frame_system/index.html"><code>System</code></a></li>
+<li><a href="../frame_support/index.html"><code>Support</code></a></li>
+</ul>
+</div><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
+<table><tr><td><code>pub use <a class="mod" href="../bholdus_tokens/pallet/index.html" title="mod bholdus_tokens::pallet">pallet</a>::*;</code></td></tr><tr><td><code>pub use weights::<a class="trait" href="../bholdus_tokens/weights/trait.WeightInfo.html" title="trait bholdus_tokens::weights::WeightInfo">WeightInfo</a>;</code></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="pallet/index.html" title="bholdus_tokens::pallet mod">pallet</a></td><td class="docblock-short"><p>The module that hosts all the
+<a href="https://substrate.dev/docs/en/knowledgebase/runtime/frame">FRAME</a>
+types needed to add this pallet to a
+<a href="https://substrate.dev/docs/en/knowledgebase/runtime/">runtime</a>.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="weights/index.html" title="bholdus_tokens::weights mod">weights</a></td><td class="docblock-short"><p>Autogenerated weights for pallet_assets</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Approval.html" title="bholdus_tokens::Approval struct">Approval</a></td><td class="docblock-short"><p>Data concering an approval.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.AssetBalance.html" title="bholdus_tokens::AssetBalance struct">AssetBalance</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.AssetDetails.html" title="bholdus_tokens::AssetDetails struct">AssetDetails</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.AssetIdentity.html" title="bholdus_tokens::AssetIdentity struct">AssetIdentity</a></td><td class="docblock-short"><p>Information concerning the identity of the controller of an account.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.AssetMetadata.html" title="bholdus_tokens::AssetMetadata struct">AssetMetadata</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.AssetProfile.html" title="bholdus_tokens::AssetProfile struct">AssetProfile</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.BasicInformation.html" title="bholdus_tokens::BasicInformation struct">BasicInformation</a></td><td class="docblock-short"><p>NOTE: This should be stored at the end of the storage item to facilitate the addition of extra
+fields in a backwards compatible way through a specialized <code>Decod</code> impl.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.CurrencyAdapter.html" title="bholdus_tokens::CurrencyAdapter struct">CurrencyAdapter</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.DestroyWitness.html" title="bholdus_tokens::DestroyWitness struct">DestroyWitness</a></td><td class="docblock-short"><p>Witness data for the destroy transactions.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ExtraMutator.html" title="bholdus_tokens::ExtraMutator struct">ExtraMutator</a></td><td class="docblock-short"><p>A mutator type allowing inspection and possible modification of the extra “sidecare” data.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.NegativeImbalance.html" title="bholdus_tokens::NegativeImbalance struct">NegativeImbalance</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.PositiveImbalance.html" title="bholdus_tokens::PositiveImbalance struct">PositiveImbalance</a></td><td class="docblock-short"><p>Opaque, move-only struct with private fields that serves as a token
+denoting that funds have been created without any equal and opposite
+accounting.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Registration.html" title="bholdus_tokens::Registration struct">Registration</a></td><td class="docblock-short"><p>Information concerning the identity of the controller of an account.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.SocialProfile.html" title="bholdus_tokens::SocialProfile struct">SocialProfile</a></td><td class="docblock-short"><p>NOTE: Social Profile</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Data.html" title="bholdus_tokens::Data enum">Data</a></td><td class="docblock-short"></td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.FrozenBalance.html" title="bholdus_tokens::FrozenBalance trait">FrozenBalance</a></td><td class="docblock-short"><p>Trait for allowing a minimum balance on the account to be specified, beyond the
+<code>minimum_balance</code> of the asset. This is additive - the <code>minimum_balance</code> of the asset must be
+met <em>and then</em> anything here in addition.</p>
+</td></tr></table><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<table><tr class="module-item"><td><a class="type" href="type.BalanceOf.html" title="bholdus_tokens::BalanceOf type">BalanceOf</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="type" href="type.NegativeImbalanceOf.html" title="bholdus_tokens::NegativeImbalanceOf type">NegativeImbalanceOf</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="bholdus_tokens" data-search-js="../search-index.js"></div>
+    <script src="../main.js"></script></body></html>

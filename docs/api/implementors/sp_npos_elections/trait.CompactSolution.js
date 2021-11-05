@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["bholdus_runtime"] = [{"text":"impl <a class=\"trait\" href=\"sp_npos_elections/trait.CompactSolution.html\" title=\"trait sp_npos_elections::CompactSolution\">CompactSolution</a> for <a class=\"struct\" href=\"bholdus_runtime/struct.NposCompactSolution16.html\" title=\"struct bholdus_runtime::NposCompactSolution16\">NposCompactSolution16</a>","synthetic":false,"types":["bholdus_runtime::NposCompactSolution16"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

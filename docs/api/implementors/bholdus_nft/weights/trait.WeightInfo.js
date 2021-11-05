@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["bholdus_nft"] = [];
+implementors["bholdus_runtime"] = [{"text":"impl&lt;T:&nbsp;<a class=\"trait\" href=\"frame_system/pallet/trait.Config.html\" title=\"trait frame_system::pallet::Config\">Config</a>&gt; <a class=\"trait\" href=\"bholdus_nft/weights/trait.WeightInfo.html\" title=\"trait bholdus_nft::weights::WeightInfo\">WeightInfo</a> for <a class=\"struct\" href=\"bholdus_runtime/weights/bholdus_nft/struct.WeightInfo.html\" title=\"struct bholdus_runtime::weights::bholdus_nft::WeightInfo\">WeightInfo</a>&lt;T&gt;","synthetic":false,"types":["bholdus_runtime::weights::bholdus_nft::WeightInfo"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

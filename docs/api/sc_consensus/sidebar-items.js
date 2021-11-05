@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["shared_data","Provides a generic wrapper around shared data. See [`SharedData`] for more information."]],"struct":[["LongestChain","Implement Longest Chain Select implementation where ‘longest’ is defined as the highest number of blocks"]]});

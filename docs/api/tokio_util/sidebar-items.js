@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["codec","Utilities for encoding and decoding frames."],["compat","Compatibility between the `tokio::io` and `futures-io` versions of the `AsyncRead` and `AsyncWrite` traits."]]});

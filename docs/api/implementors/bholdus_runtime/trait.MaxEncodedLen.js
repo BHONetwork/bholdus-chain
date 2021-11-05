@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["bholdus_runtime"] = [{"text":"impl <a class=\"trait\" href=\"bholdus_runtime/trait.MaxEncodedLen.html\" title=\"trait bholdus_runtime::MaxEncodedLen\">MaxEncodedLen</a> for <a class=\"enum\" href=\"bholdus_runtime/enum.ProxyType.html\" title=\"enum bholdus_runtime::ProxyType\">ProxyType</a>","synthetic":false,"types":["bholdus_runtime::ProxyType"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["pallet_bounties"] = [{"text":"impl&lt;T:&nbsp;<a class=\"trait\" href=\"pallet_bounties/trait.Config.html\" title=\"trait pallet_bounties::Config\">Config</a>&gt; <a class=\"trait\" href=\"pallet_treasury/trait.SpendFunds.html\" title=\"trait pallet_treasury::SpendFunds\">SpendFunds</a>&lt;T, <a class=\"struct\" href=\"pallet_treasury/struct.DefaultInstance.html\" title=\"struct pallet_treasury::DefaultInstance\">DefaultInstance</a>&gt; for <a class=\"struct\" href=\"pallet_bounties/struct.Module.html\" title=\"struct pallet_bounties::Module\">Module</a>&lt;T&gt;","synthetic":false,"types":["pallet_bounties::Module"]}];
+implementors["pallet_treasury"] = [];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

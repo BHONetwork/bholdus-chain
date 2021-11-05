@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["bholdus_cli"] = [{"text":"impl <a class=\"trait\" href=\"sc_cli/trait.SubstrateCli.html\" title=\"trait sc_cli::SubstrateCli\">SubstrateCli</a> for <a class=\"struct\" href=\"bholdus_cli/struct.Cli.html\" title=\"struct bholdus_cli::Cli\">Cli</a>","synthetic":false,"types":["bholdus_cli::cli::Cli"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

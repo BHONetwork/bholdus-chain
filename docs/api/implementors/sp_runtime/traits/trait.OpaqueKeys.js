@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["bholdus_runtime"] = [{"text":"impl <a class=\"trait\" href=\"sp_runtime/traits/trait.OpaqueKeys.html\" title=\"trait sp_runtime::traits::OpaqueKeys\">OpaqueKeys</a> for <a class=\"struct\" href=\"bholdus_runtime/opaque/struct.SessionKeys.html\" title=\"struct bholdus_runtime::opaque::SessionKeys\">SessionKeys</a>","synthetic":false,"types":["bholdus_runtime::opaque::SessionKeys"]}];
+implementors["sp_runtime"] = [];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

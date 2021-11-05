@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["bholdus_runtime"] = [{"text":"impl <a class=\"trait\" href=\"pallet_grandpa/pallet/trait.Config.html\" title=\"trait pallet_grandpa::pallet::Config\">Config</a> for <a class=\"struct\" href=\"bholdus_runtime/struct.Runtime.html\" title=\"struct bholdus_runtime::Runtime\">Runtime</a>","synthetic":false,"types":["bholdus_runtime::Runtime"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
