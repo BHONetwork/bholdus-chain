@@ -6,7 +6,7 @@ use crate as nft;
 use codec::{Decode, Encode};
 use frame_support::{
     construct_runtime, parameter_types,
-    traits::{Filter, InstanceFilter},
+    traits::{Everything, Filter, InstanceFilter},
     RuntimeDebug,
 };
 
@@ -25,7 +25,7 @@ parameter_types! {
 pub type AccountId = AccountId32;
 
 impl frame_system::Config for Runtime {
-    type BaseCallFilter = ();
+    type BaseCallFilter = Everything;
     type Origin = Origin;
     type Index = u64;
     type BlockNumber = u64;
