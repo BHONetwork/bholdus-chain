@@ -14,6 +14,7 @@ mod benchmarking;
 
 use codec::{Decode, Encode, EncodeLike};
 use frame_support::PalletId;
+use scale_info::TypeInfo;
 use sp_runtime::{traits::AccountIdConversion, RuntimeDebug};
 use sp_std::prelude::*;
 
@@ -36,14 +37,14 @@ pub fn derive_resource_id(chain: u8, id: &[u8]) -> ResourceId {
     return r_id;
 }
 
-#[derive(PartialEq, Eq, Clone, Encode, Decode, RuntimeDebug)]
+#[derive(PartialEq, Eq, Clone, Encode, Decode, RuntimeDebug, TypeInfo)]
 pub enum ProposalStatus {
     Initiated,
     Approved,
     Rejected,
 }
 
-#[derive(PartialEq, Eq, Clone, Encode, Decode, RuntimeDebug)]
+#[derive(PartialEq, Eq, Clone, Encode, Decode, RuntimeDebug, TypeInfo)]
 pub struct ProposalVotes<AccountId, BlockNumber> {
     pub votes_for: Vec<AccountId>,
     pub votes_against: Vec<AccountId>,
@@ -135,7 +136,6 @@ pub mod pallet {
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
     #[pallet::event]
-    #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Vote threshold has changed (new_threshold)

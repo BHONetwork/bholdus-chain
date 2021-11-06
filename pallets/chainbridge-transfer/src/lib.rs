@@ -79,7 +79,6 @@ pub mod pallet {
     // Pallets use events to inform users when important changes are made.
     // https://substrate.dev/docs/en/knowledgebase/runtime/events
     #[pallet::event]
-    #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Resource id is registered successfully. [resource_id, currency_id]

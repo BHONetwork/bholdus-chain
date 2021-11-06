@@ -7,43 +7,109 @@ license = 'Unlicense'
 name = 'bholdus-chainbridge-transfer'
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '3.0.0'
+version = '4.0.0-dev'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
-[dependencies]
 # external dependencies
-codec = {default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0'}
+
+[dependencies.codec]
+default-features = false
+features = ['derive', 'max-encoded-len']
+package = 'parity-scale-codec'
+version = '2.2.0'
 
 # Substrate dependencies
-frame-benchmarking = {default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-frame-support = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-frame-system = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-sp-core = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-sp-runtime = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-sp-std = {default-features = false, version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07' }
+[dependencies.frame-benchmarking]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+optional = true
 
-bholdus-chainbridge = {default-features = false, version = '3.0.0', path = '../chainbridge'}
-bholdus-support = {default-features = false, version = '3.0.0', path = '../support'}
-bholdus-primitives ={default-features = false, version = '3.0.0', path = '../../primitives'}
+[dependencies.frame-support]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
 
+[dependencies.frame-system]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
+[dependencies.sp-core]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+
+[dependencies.sp-runtime]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+
+[dependencies.sp-std]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
 
 # local dependencies
 
-[dev-dependencies]
-serde = '1.0.119'
-sp-io = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-hex-literal = '0.3.3'
-pallet-balances = {version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-07'}
-bholdus-tokens = {version = '3.0.0', path = '../tokens'}
-bholdus-currencies = {version = '3.0.0', path = '../currencies'}
+[dependencies.bholdus-chainbridge]
+version = "4.0.0-dev"
+default-features = false
+path = '../chainbridge'
+
+[dependencies.bholdus-support]
+version = "4.0.0-dev"
+default-features = false
+path = '../support'
+
+[dependencies.bholdus-primitives]
+version = "4.0.0-dev"
+default-features = false
+path = '../../primitives/bholdus'
+
+[dev-dependencies.serde]
+version = '1.0.119'
+
+[dev-dependencies.sp-io]
+version = '4.0.0-dev'
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+
+[dev-dependencies.hex-literal]
+version = '0.3.3'
+
+[dev-dependencies.pallet-balances]
+version = '4.0.0-dev'
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+
+[dev-dependencies.bholdus-tokens]
+version = '4.0.0-dev'
+path = '../tokens'
+
+[dev-dependencies.bholdus-currencies]
+version = '4.0.0-dev'
+path = '../currencies'
 
 [features]
 default = ['std']
 runtime-benchmarks = ['frame-benchmarking']
 std = [
 	'codec/std',
+	'scale-info/std',
 	'frame-support/std',
 	'frame-system/std',
 	'frame-benchmarking/std',

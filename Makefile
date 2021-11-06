@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	cargo run --features with-bholdus-runtime -- --dev --tmp -lruntime=debug
+	cargo +nightly run --features with-bholdus-runtime -- --dev --tmp -lruntime=debug
 
 .PHONY: run-benchmark
 run-benchmark:

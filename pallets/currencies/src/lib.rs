@@ -34,11 +34,11 @@ mod mock;
 mod tests;
 mod weights;
 
-pub use module::*;
+pub use pallet::*;
 pub use weights::WeightInfo;
 
 #[frame_support::pallet]
-pub mod module {
+pub mod pallet {
     use super::*;
 
     pub(crate) type BalanceOf<T> = <<T as Config>::MultiCurrency as MultiCurrency<
@@ -83,8 +83,7 @@ pub mod module {
     }
 
     #[pallet::event]
-    #[pallet::generate_deposit(pub(crate) fn deposit_event)]
-    #[pallet::metadata(CurrencyIdOf<T> = "CurrencyId", T::AccountId = "AccountId", BalanceOf<T> = "Balance", AmountOf<T> = "Amount")]
+    #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Currency transfer success. \[currency_id, from, to, amount\]
         Transferred(CurrencyIdOf<T>, T::AccountId, T::AccountId, BalanceOf<T>),
@@ -97,6 +96,7 @@ pub mod module {
     }
 
     #[pallet::pallet]
+    #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T>(_);
 
     #[pallet::hooks]

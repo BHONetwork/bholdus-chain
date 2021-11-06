@@ -5,7 +5,7 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus-cli'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '1.0.0'
+version = '4.0.0-dev'
 
 
 # [build-dependencies]
@@ -13,7 +13,7 @@ version = '1.0.0'
 
 [build-dependencies.substrate-build-script-utils]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
+branch = 'master'
 version = '3.0.0'
 
 [dependencies]
@@ -22,84 +22,86 @@ structopt = "0.3.8"
 
 [dependencies.frame-benchmarking]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.1.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.frame-benchmarking-cli]
 optional = true
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.try-runtime-cli]
 optional = true
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '0.9.0'
+branch = 'master'
+version = '0.10.0-dev'
 
 [dependencies.pallet-transaction-payment-rpc]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sc-cli]
 optional = true
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '0.9.0'
+branch = 'master'
+version = '0.10.0-dev'
 
 [dependencies.sc-client-api]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sc-service]
 optional = true
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '0.9.0'
+branch = 'master'
+version = '0.10.0-dev'
 
 [dependencies.sc-telemetry]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sc-tracing]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sp-runtime]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
 
 [dependencies.sp-core]
 optional = true
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
+branch = 'master'
+version = '4.0.0-dev'
+
+[dependencies.node-inspect]
+optional = true
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '0.9.0-dev'
 
 #local dependencies
 [dependencies.service]
 package = "bholdus-service"
 optional = true
-version = '1.0.0'
+version = '4.0.0-dev'
 path = '../service'
 
 [dependencies.bholdus-runtime]
-version = '1.0.1'
+version = '1.2.1'
 path = '../../runtime/bholdus'
-
-# [dependencies.bholdus-primitives]
-# version = '1.0.0'
-# path = '../../primitives'
-
 
 [features]
 default = ["cli"]
 cli = [
 	"service",
+	"node-inspect",
 	"sp-core",
 	"sc-cli",
 	"sc-service",
@@ -107,13 +109,6 @@ cli = [
 	"try-runtime-cli",
 ]
 runtime-benchmarks = ['service/runtime-benchmarks']
-try-runtime = [
-	"try-runtime-cli",
-	"service/try-runtime",
-]
+try-runtime = ["try-runtime-cli", "service/try-runtime"]
 
-with-bholdus-runtime = [
-    "service/with-bholdus-runtime",
-]
-
-
+with-bholdus-runtime = ["service/with-bholdus-runtime"]
