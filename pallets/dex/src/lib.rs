@@ -8,6 +8,7 @@ use frame_support::{
 };
 use frame_system::pallet_prelude::*;
 pub use pallet::*;
+use scale_info::TypeInfo;
 use sp_core::U256;
 use sp_runtime::{
     traits::{AccountIdConversion, One, Zero},
@@ -24,14 +25,14 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, RuntimeDebug)]
+#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, RuntimeDebug, TypeInfo)]
 pub struct ProvisioningParameters<Balance> {
     pub min_contribution: (Balance, Balance),
     pub target_contribution: (Balance, Balance),
     pub accumulated_contribution: (Balance, Balance),
 }
 
-#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, TypeInfo)]
 pub enum TradingPairStatus<Balance> {
     Disabled,
     Provisioning(ProvisioningParameters<Balance>),
@@ -171,7 +172,6 @@ pub mod pallet {
     }
 
     #[pallet::event]
-    #[pallet::metadata(T::AccountId = "AccountId")]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Swap is successful. \[who, trading_path, supply_amount, target_amount\]

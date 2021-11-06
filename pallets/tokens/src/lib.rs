@@ -95,8 +95,7 @@ pub use types::*;
 use sp_runtime::{
     traits::{
         AccountIdConversion, AppendZerosInput, AtLeast32BitUnsigned, Bounded, CheckedAdd,
-        CheckedSub, MaybeSerializeDeserialize, Member, Saturating, StaticLookup, StoredMapError,
-        Zero,
+        CheckedSub, MaybeSerializeDeserialize, Member, Saturating, StaticLookup, Zero,
     },
     ArithmeticError, DispatchError, DispatchResult, RuntimeDebug, TokenError,
 };
@@ -121,9 +120,8 @@ use frame_support::{
         BalanceStatus as Status,
         BalanceStatus::Reserved,
         Currency as PalletCurrency, ExistenceRequirement, Get, Imbalance,
-        LockableCurrency as PalletLockableCurrency, MaxEncodedLen,
-        ReservableCurrency as PalletReservableCurrency, SignedImbalance, StoredMap,
-        WithdrawReasons,
+        LockableCurrency as PalletLockableCurrency, ReservableCurrency as PalletReservableCurrency,
+        SignedImbalance, StoredMap, WithdrawReasons,
     },
     transactional, BoundedVec, PalletId,
 };
@@ -360,11 +358,6 @@ pub mod pallet {
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
-    #[pallet::metadata(
-        T::AccountId = "AccountId",
-        T::Balance = "Balance",
-        T::AssetId = "AssetId"
-    )]
     pub enum Event<T: Config<I>, I: 'static = ()> {
         /// A name was set or reset (which will remove all judgements). \[asset_id]\
         IdentitySet(T::AssetId),

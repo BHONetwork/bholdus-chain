@@ -2,6 +2,7 @@
 
 use super::*;
 use frame_support::pallet_prelude::*;
+use scale_info::TypeInfo;
 
 pub(super) type DepositBalanceOf<T, I = ()> =
     <<T as Config<I>>::Currency as PalletCurrency<<T as SystemConfig>::AccountId>>::Balance;
@@ -12,7 +13,7 @@ pub type NegativeImbalanceOf<T, I = ()> = <<T as Config<I>>::Currency as PalletC
     <T as frame_system::Config>::AccountId,
 >>::NegativeImbalance;
 
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, MaxEncodedLen, TypeInfo)]
 pub struct AssetDetails<Balance, AccountId, DepositBalance> {
     /// Can change `owner`, issuer, `freezer` and `admin` accounts.
     pub(super) owner: AccountId,
@@ -52,7 +53,7 @@ impl<Balance, AccountId, DepositBalance> AssetDetails<Balance, AccountId, Deposi
 }
 
 /// Data concering an approval.
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default, MaxEncodedLen, TypeInfo)]
 pub struct Approval<Balance, DepositBalance> {
     /// The amount ow funds approved for the balance transfer from the owner to some delegated
     /// target.
@@ -88,7 +89,7 @@ impl<AssetId, AccountId, Balance> FrozenBalance<AssetId, AccountId, Balance> for
     fn died(_: AssetId, _: &AccountId) {}
 }
 
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, TypeInfo)]
 pub(super) struct TransferFlags {
     /// The debited account must stay alive at the end of the operation; an error is returned if
     /// this cannot be achieved legally.
@@ -102,7 +103,7 @@ pub(super) struct TransferFlags {
     pub(super) burn_dust: bool,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, TypeInfo)]
 pub(super) struct DebitFlags {
     /// The debited account must stay alive at the end of the operation; an error is returned if
     /// this cannot be achieved legally.
@@ -113,7 +114,7 @@ pub(super) struct DebitFlags {
     pub(super) best_effort: bool,
 }
 
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default, TypeInfo)]
 pub struct AssetBalance<Balance, Extra> {
     /// This is the only balance that maters in terms of most operations on tokens
     pub free: Balance,
@@ -128,7 +129,7 @@ pub struct AssetBalance<Balance, Extra> {
     pub(super) extra: Extra,
 }
 
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default, TypeInfo)]
 pub struct AssetMetadata<DepositBalance, BoundedString> {
     /// The balance deposited for this metadata.
     ///
@@ -145,7 +146,7 @@ pub struct AssetMetadata<DepositBalance, BoundedString> {
 }
 
 /// Witness data for the destroy transactions.
-#[derive(Copy, Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug)]
+#[derive(Copy, Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub struct DestroyWitness {
     /// The number of accounts holding the asset.
     #[codec(compact)]
@@ -158,7 +159,7 @@ pub struct DestroyWitness {
     pub(super) approvals: u32,
 }
 
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub struct AssetProfile<DepositBalance, BoundedString> {
     /// The balance deposited for this metadata.
     ///
@@ -185,7 +186,7 @@ impl From<TransferFlags> for DebitFlags {
 //
 // Can also be `None`.
 
-#[derive(Clone, Eq, PartialEq, RuntimeDebug)]
+#[derive(Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub enum Data {
     /// No data here.
     None,
@@ -253,7 +254,7 @@ impl Default for Data {
 ///
 /// NOTE: This is should be stored at the end of the storage item to facilitate the addition of
 /// extra fields in a backwards compatible way through a specialized `Decode` impl.
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(test, derive(Default))]
 pub struct AssetIdentity {
     /// Additional fields of the identity that are not catered for with the struct's explicit
@@ -289,7 +290,7 @@ pub struct AssetIdentity {
 }
 /// NOTE: This should be stored at the end of the storage item to facilitate the addition of extra
 /// fields in a backwards compatible way through a specialized `Decod` impl.
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(test, derive(Default))]
 pub struct BasicInformation {
     /// Stored as UTF-8.
@@ -313,7 +314,7 @@ pub struct BasicInformation {
 }
 
 /// NOTE: Social Profile
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug)]
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(test, derive(Default))]
 pub struct SocialProfile {
     /// Wnitepaper
@@ -345,7 +346,7 @@ pub struct SocialProfile {
 ///
 /// NOTE: This is stored separately primarily to facilitate the addition of extra fields in a
 /// backwards compatible way through a specialized `Decode` impl.
-#[derive(Clone, Encode, Eq, PartialEq, RuntimeDebug)]
+#[derive(Clone, Encode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub struct Registration<Balance: Encode + Decode + Copy + Clone + Debug + Eq + PartialEq> {
     /// Judgements from the registrars on this identity. Stored ordered by `RegistrarIndex`. There
     /// may be only a single judgement from each registrar.
