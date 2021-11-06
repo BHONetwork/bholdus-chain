@@ -1144,7 +1144,7 @@ construct_runtime!(
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
         // Bholdus Support
-        BholdusLibNFT: bholdus_support_nft::{Pallet, Call, Storage},
+        BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
         ChainBridgeTransfer: bholdus_chainbridge_transfer::{Pallet, Call, Storage, Config, Event<T>},

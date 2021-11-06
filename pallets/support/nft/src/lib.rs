@@ -97,7 +97,6 @@ pub mod pallet {
     );
     pub type GenesisTokens<T> = (
         <T as frame_system::Config>::AccountId, // Token class owner
-        Vec<u8>,
         <T as Config>::ClassData,
         Vec<GenesisTokenData<T>>, // Vector of tokens belonging to this class
     );
@@ -161,6 +160,37 @@ pub mod pallet {
         (),
         ValueQuery,
     >;
+
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config> {
+        pub tokens: Vec<GenesisTokens<T>>,
+    }
+
+    #[cfg(feature = "std")]
+    impl<T: Config> Default for GenesisConfig<T> {
+        fn default() -> Self {
+            GenesisConfig { tokens: vec![] }
+        }
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+        fn build(&self) {
+            self.tokens.iter().for_each(|token_class| {
+                let class_id = Pallet::<T>::create_class(&token_class.0, token_class.1.clone())
+                    .expect("Create class cannot fail while building genesis");
+                for (account_id, token_metadata, token_data) in &token_class.2 {
+                    Pallet::<T>::mint(
+                        account_id,
+                        class_id,
+                        token_metadata.to_vec(),
+                        token_data.clone(),
+                    )
+                    .expect("Token mint cannot fail during genesis");
+                }
+            })
+        }
+    }
 
     #[pallet::pallet]
     pub struct Pallet<T>(_);
