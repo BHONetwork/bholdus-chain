@@ -65,12 +65,6 @@ pallet-multisig = { version = '4.0.0-dev', git = 'https://github.com/bholdus/sub
 beefy-primitives = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 pallet-beefy = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
 pallet-beefy-mmr = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-[dependencies.pallet-babe]
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-07'
-version = '3.0.0'
-
 
 # Substrate primitives
 sp-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
@@ -102,22 +96,6 @@ bholdus-bridge-bsc = { version = '4.0.0-dev', path = '../../pallets/bridge/bsc',
 
 pallet-template = { version = '4.0.0-dev', path = '../../pallets/template', default-features = false }
 
-[dependencies.bholdus-nft]
-default-features = false
-version = '3.0.0'
-path = '../../pallets/non-fungible-token'
-
-[dependencies.bholdus-support-nft]
-default-features = false
-package = 'support-nft'
-version = '3.0.0'
-path = '../../pallets/support/nft'
-
-[dependencies.bholdus-support]
-default-features = false
-version = '3.0.0'
-path = '../../pallets/support'
-
 [features]
 default = ['std']
 runtime-benchmarks = [
@@ -145,7 +123,6 @@ runtime-benchmarks = [
 	'pallet-proxy/runtime-benchmarks',
 	'pallet-identity/runtime-benchmarks',
 	'bholdus-chainbridge/runtime-benchmarks',
-	'bholdus-nft/runtime-benchmarks',
 	'sp-runtime/runtime-benchmarks',
 ]
 std = [
@@ -165,7 +142,6 @@ std = [
 	'pallet-transaction-payment/std',
 	'pallet-staking/std',
 	'pallet-aura/std',
-		'pallet-babe/std',
 	'pallet-session/std',
 	'pallet-im-online/std',
 	'pallet-authority-discovery/std',
@@ -192,11 +168,8 @@ std = [
 	'bholdus-currencies/std',
 	'bholdus-dex/std',
 	'bholdus-chainbridge-transfer/std',
-		'bholdus-nft/std',
 	'bholdus-primitives/std',
-# Bholdus Lib
 	'bholdus-bridge-bsc/std',
-		'bholdus-support-nft/std',
 	'sp-api/std',
 	'sp-block-builder/std',
 	'sp-core/std',

@@ -23,6 +23,8 @@ use frame_support::{
     transactional, PalletId,
 };
 
+use scale_info::TypeInfo;
+
 use frame_system::pallet_prelude::*;
 
 use bholdus_primitives::NFTBalance;
@@ -50,14 +52,14 @@ pub type Attributes = BTreeMap<Vec<u8>, Vec<u8>>;
 pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
 
-#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq)]
+#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct ClassData {
     /// Class attributes
     pub attributes: Attributes,
 }
 
-#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq)]
+#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct TokenData {
     /// Token attributes
@@ -104,7 +106,7 @@ pub mod pallet {
     }
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
-    #[pallet::metadata(T::AccountId = "AccountId", ClassIdOf<T> = "ClassId", TokenIdOf<T> = "TokenId", T::Hash = "Hash")]
+    //#[pallet::metadata(T::AccountId = "AccountId", ClassIdOf<T> = "ClassId", TokenIdOf<T> = "TokenId", T::Hash = "Hash")]
     pub enum Event<T: Config> {
         /// Created NFT class: \[owner, class_id\]
         CreatedClass(T::AccountId, ClassIdOf<T>),

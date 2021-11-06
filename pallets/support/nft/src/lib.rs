@@ -13,13 +13,11 @@
 
 use codec::{Decode, Encode};
 use frame_support::{
-    ensure,
-    pallet_prelude::*,
-    require_transactional,
-    traits::{Get, MaxEncodedLen},
-    transactional, BoundedVec, Parameter,
+    ensure, pallet_prelude::*, require_transactional, traits::Get, transactional, BoundedVec,
+    Parameter,
 };
 use frame_system::pallet_prelude::*;
+use scale_info::TypeInfo;
 
 use sp_runtime::{
     traits::{
@@ -36,7 +34,7 @@ mod tests;
 pub use pallet::*;
 
 /// Class info
-#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug)]
+#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
 pub struct ClassInfo<TokenId, AccountId, Data> {
     // /// Class metadata
     // pub metadata: ClassMetadataOf,
@@ -49,7 +47,7 @@ pub struct ClassInfo<TokenId, AccountId, Data> {
 }
 
 /// Token info
-#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug)]
+#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
 pub struct TokenInfo<AccountId, Data, TokenMetadataOf> {
     /// Token metadata
     pub metadata: TokenMetadataOf,

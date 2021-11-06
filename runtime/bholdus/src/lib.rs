@@ -117,7 +117,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_002_003,
+    spec_version: 1_002_001,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -445,31 +445,6 @@ impl pallet_authorship::Config for Runtime {
 }
 
 parameter_types! {
-    pub MaxAttributesBytes: u32 = 2048;
-}
-
-impl bholdus_nft::Config for Runtime {
-    type Event = Event;
-    type PalletId = NftPalletId;
-    type MaxAttributesBytes = MaxAttributesBytes;
-    type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
-}
-
-parameter_types! {
-    pub MaxClassMetadata: u32 = 1024;
-    pub MaxTokenMetadata: u32 = 1024;
-}
-
-impl bholdus_support_nft::Config for Runtime {
-    type ClassId = u32;
-    type TokenId = u64;
-    type ClassData = bholdus_nft::ClassData;
-    type TokenData = bholdus_nft::TokenData;
-    type MaxClassMetadata = MaxClassMetadata;
-    type MaxTokenMetadata = MaxTokenMetadata;
-}
-
-parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
     pub const Period: BlockNumber = 1 * HOURS;
     pub const Offset: BlockNumber = 0;
@@ -712,7 +687,6 @@ parameter_types! {
     pub const BountyDepositBase: Balance = 1 * DOLLARS;
     pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
-    pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
     pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
     pub const MaximumReasonLength: u32 = 16384;
     pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
@@ -1115,7 +1089,6 @@ construct_runtime!(
         Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
-        NFT: bholdus_nft::{Pallet, Call, Event<T>},
         ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned},
         Staking: pallet_staking::{Pallet, Call, Config<T>, Storage, Event<T>},
         Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>},
@@ -1150,9 +1123,6 @@ construct_runtime!(
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
-
-        // Bholdus Libs
-        BholdusLibNFT: bholdus_support_nft::{Pallet, Call, Storage},
     }
 );
 
