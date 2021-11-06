@@ -687,6 +687,7 @@ parameter_types! {
     pub const BountyDepositBase: Balance = 1 * DOLLARS;
     pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
+    pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
     pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
     pub const MaximumReasonLength: u32 = 16384;
     pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
@@ -1019,6 +1020,31 @@ impl bholdus_tokens::Config for Runtime {
 }
 
 parameter_types! {
+    pub MaxAttributesBytes: u32 = 2048;
+}
+
+impl bholdus_nft::Config for Runtime {
+    type Event = Event;
+    type PalletId = NftPalletId;
+    type MaxAttributesBytes = MaxAttributesBytes;
+    type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
+}
+
+parameter_types! {
+    pub MaxClassMetadata: u32 = 1024;
+    pub MaxTokenMetadata: u32 = 1024;
+}
+
+impl bholdus_support_nft::Config for Runtime {
+    type ClassId = u32;
+    type TokenId = u64;
+    type ClassData = bholdus_nft::ClassData;
+    type TokenData = bholdus_nft::TokenData;
+    type MaxClassMetadata = MaxClassMetadata;
+    type MaxTokenMetadata = MaxTokenMetadata;
+}
+
+parameter_types! {
     // Proposal expired after 10 minutes
     pub const BridgeProposalLifetime: u32 = 100;
     pub const ChainId: u8 = 0;
@@ -1116,6 +1142,9 @@ construct_runtime!(
         BSC: bholdus_bridge_bsc::{Pallet, Call, Storage, Config},
 
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
+        NFT: bholdus_nft::{Pallet, Call, Event<T>},
+        // Bholdus Support
+        BholdusLibNFT: bholdus_support_nft::{Pallet, Call, Storage},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         ChainBridge: bholdus_chainbridge::{Pallet, Call, Storage, Event<T>},
         ChainBridgeTransfer: bholdus_chainbridge_transfer::{Pallet, Call, Storage, Config, Event<T>},
