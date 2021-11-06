@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["bholdus_runtime"] = [{"text":"impl <a class=\"trait\" href=\"frame_support/traits/metadata/trait.GetCallMetadata.html\" title=\"trait frame_support::traits::metadata::GetCallMetadata\">GetCallMetadata</a> for <a class=\"enum\" href=\"bholdus_runtime/enum.Call.html\" title=\"enum bholdus_runtime::Call\">Call</a>","synthetic":false,"types":["bholdus_runtime::Call"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

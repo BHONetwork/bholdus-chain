@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["BHO",""],["CENTS",""],["DOLLARS",""],["MILLICENTS",""],["TOKEN_DECIMALS",""],["TOKEN_SYMBOL",""],["UNITS",""]],"fn":[["deposit",""]]});

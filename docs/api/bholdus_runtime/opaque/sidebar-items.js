@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SessionKeys",""]],"type":[["Block","Block type."],["BlockId","Block ID."],["Header","Header type."]]});

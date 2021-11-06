@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["MdnsEvent","Event that can be produced by the `Mdns` behaviour."]],"struct":[["Mdns","A `NetworkBehaviour` for mDNS. Automatically discovers peers on the local network and adds them to the topology."],["MdnsConfig","Configuration for mDNS."]]});

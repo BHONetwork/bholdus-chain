@@ -1,1 +1,0 @@
-initSidebarItems({"macro":[["rpc_client_api","Wraps around one or more API definitions and generates an enum."]]});

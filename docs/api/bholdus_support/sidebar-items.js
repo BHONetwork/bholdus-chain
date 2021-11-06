@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["BalanceStatus","Status of funds."]],"macro":[["parameter_type_with_key","Create new implementations of the `GetByKey` trait."]],"mod":[["arithmetic",""],["currency",""],["get_by_key",""],["nft",""]],"type":[["LockIdentifier","An identifier for a lock. Used for disambiguating different locks so that they can be individually replaced or removed."]]});

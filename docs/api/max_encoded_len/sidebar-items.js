@@ -1,1 +1,0 @@
-initSidebarItems({"derive":[["MaxEncodedLen","Derive macro for `MaxEncodedLen`."]],"trait":[["MaxEncodedLen","Items implementing `MaxEncodedLen` have a statically known maximum encoded size."]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["gen_client","The generated client module."]],"struct":[["SyncStateRpcHandler","The handler for sync state RPC calls."]],"trait":[["SyncStateRpcApi","An api for sync state RPC calls."]]});

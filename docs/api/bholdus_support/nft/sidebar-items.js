@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["NFT","Abstraction over a non-funigble token system."]]});

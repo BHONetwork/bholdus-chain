@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["NFTWeight",""]],"trait":[["WeightInfo","Weight functions needed for module_nft."]]});

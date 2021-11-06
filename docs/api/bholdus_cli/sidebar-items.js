@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Error","Error type for the CLI."],["Subcommand",""]],"fn":[["run","Parse and run command line arguments"]],"struct":[["Cli",""]],"type":[["Result","Result type alias for the CLI."]]});

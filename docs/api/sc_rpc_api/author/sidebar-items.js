@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["error","Authoring RPC module errors."],["gen_client","The generated client module."],["hash","Extrinsic helpers for author RPC module."]],"struct":[["AuthorClient","The Client."]],"trait":[["AuthorApi","Substrate authoring RPC API"]]});
