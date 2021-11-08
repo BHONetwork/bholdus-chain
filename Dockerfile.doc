@@ -1,0 +1,14 @@
+FROM rust:1.55.0 as builder
+
+RUN apt-get update && apt-get install -y git libclang-dev unzip curl
+
+WORKDIR /bholdus
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip \
+    && unzip awscliv2.zip && ./aws/install
+
+COPY . .
+
+RUN ./scripts/init.sh
+
+CMD bash /bholdus/deploy-doc.sh
