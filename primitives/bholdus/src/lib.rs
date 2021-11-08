@@ -59,3 +59,5 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 pub type BlockId = generic::BlockId<Block>;
 
 pub type Ratio = FixedU128;
+
+pub type NFTBalance = u128;

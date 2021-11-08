@@ -87,6 +87,8 @@ sp-io = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git
 # local dependencies
 bholdus-primitives = { version = '4.0.0-dev', path = '../../primitives/bholdus', default-features = false }
 bholdus-tokens = { version = '4.0.0-dev', path = '../../pallets/tokens', default-features = false }
+bholdus-nft = { version = '4.0.0-dev', path = '../../pallets/non-fungible-token', default-features = false }
+bholdus-support-nft = { package = 'support-nft', version = '4.0.0-dev', path = '../../pallets/support/nft', default-features = false }
 bholdus-support = { version = '4.0.0-dev', path = '../../pallets/support', default-features = false }
 bholdus-currencies = { version = '4.0.0-dev', path = '../../pallets/currencies', default-features = false }
 bholdus-chainbridge = { version = '4.0.0-dev', path = '../../pallets/chainbridge', default-features = false }
@@ -164,6 +166,8 @@ std = [
 	'pallet-beefy-mmr/std',
 	'bholdus-chainbridge/std',
 	'bholdus-tokens/std',
+	'bholdus-nft/std',
+	'bholdus-support-nft/std',
 	'bholdus-support/std',
 	'bholdus-currencies/std',
 	'bholdus-dex/std',
