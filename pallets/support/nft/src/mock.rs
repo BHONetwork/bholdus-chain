@@ -49,6 +49,7 @@ parameter_types! {
 
 impl Config for Runtime {
     type ClassId = u64;
+    type GroupId = u64;
     type TokenId = u64;
     type ClassData = ();
     type TokenData = ();
@@ -73,6 +74,7 @@ construct_runtime!(
 pub const ALICE: AccountId = 1;
 pub const BOB: AccountId = 2;
 pub const CLASS_ID: <Runtime as Config>::ClassId = 0;
+pub const GROUP_ID: <Runtime as Config>::GroupId = 0;
 pub const CLASS_ID_NOT_EXIST: <Runtime as Config>::ClassId = 100;
 pub const TOKEN_ID: <Runtime as Config>::TokenId = 0;
 pub const TOKEN_ID_NOT_EXIST: <Runtime as Config>::TokenId = 100;

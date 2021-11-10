@@ -25,6 +25,13 @@ fn create_class_should_fail() {
 }
 
 #[test]
+fn create_group_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(BholdusNFT::create_group());
+    })
+}
+
+#[test]
 fn mint_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         let next_class_id = BholdusNFT::next_class_id();
@@ -46,6 +53,71 @@ fn mint_should_work() {
         assert_eq!(BholdusNFT::next_token_id(next_class_id), 1);
 
         assert_eq!(BholdusNFT::next_token_id(CLASS_ID), 2);
+    });
+}
+
+#[test]
+fn mint_to_group_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        let next_class_id = BholdusNFT::next_class_id();
+        println!("NEXT CLASS ID {}", next_class_id);
+        assert_eq!(next_class_id, CLASS_ID);
+
+        // Create class
+        assert_ok!(BholdusNFT::create_class(&ALICE, ()));
+
+        let next_group_id = BholdusNFT::next_group_id();
+        println!("NEXT GROUP ID 1-1 {}", next_group_id);
+        assert_eq!(next_group_id, GROUP_ID);
+
+        let next_group_id_1_2 = BholdusNFT::create_group();
+        println!("NEXT GROUP ID 1-2 {}", next_group_id_1_2.unwrap());
+        assert_eq!(next_group_id_1_2.unwrap(), GROUP_ID);
+
+        let next_group_id_2_1 = BholdusNFT::next_group_id();
+        println!("NEXT GROUP ID 2-1 {}", next_group_id_2_1);
+        assert_eq!(next_group_id_2_1, 1);
+
+        let next_group_id_2_2 = BholdusNFT::create_group();
+        println!("NEXT GROUP ID 2-2 {}", next_group_id_2_2.unwrap());
+        assert_eq!(next_group_id_2_2.unwrap(), 1);
+
+        assert_ok!(BholdusNFT::mint_to_group(
+            &ALICE,
+            CLASS_ID,
+            GROUP_ID,
+            vec![1],
+            ()
+        ));
+
+        assert_ok!(BholdusNFT::mint_to_group(
+            &ALICE,
+            CLASS_ID,
+            GROUP_ID,
+            vec![1],
+            ()
+        ));
+
+        assert_ok!(BholdusNFT::mint_to_group(
+            &ALICE,
+            CLASS_ID,
+            GROUP_ID,
+            vec![1],
+            ()
+        ));
+
+        assert_eq!(
+            TokensByGroup::<Runtime>::contains_key((GROUP_ID, CLASS_ID, TOKEN_ID)),
+            true
+        );
+
+        // let tokens_by_group = TokensByGroup::<Runtime>::get((GROUP_ID, CLASS_ID, TOKEN_ID));
+        // println!("tokens-by-group{:#?}", tokens_by_group);
+
+        let tokens_by_group =
+            TokensByGroup::<Runtime>::iter_prefix((GROUP_ID,)).collect::<Vec<_>>();
+        println!("tokens-by-group{:#?}", tokens_by_group);
+        vec![((0, 2), ()), ((0, 1), ()), ((0, 0), ())]
     });
 }
 
@@ -75,11 +147,15 @@ fn mint_should_fail() {
 fn transfer_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         assert_ok!(BholdusNFT::create_class(&ALICE, ()));
+
         assert_ok!(BholdusNFT::mint(&BOB, CLASS_ID, vec![1], ()));
         assert_ok!(BholdusNFT::transfer(&BOB, &BOB, (CLASS_ID, TOKEN_ID)));
         assert_ok!(BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)));
         assert_ok!(BholdusNFT::transfer(&ALICE, &BOB, (CLASS_ID, TOKEN_ID)));
         assert!(BholdusNFT::is_owner(&BOB, (CLASS_ID, TOKEN_ID)));
+
+        let token_owner = TokensByOwner::<Runtime>::get((ALICE, CLASS_ID, TOKEN_ID));
+        println!("tokens-owner {:#?}", token_owner);
     });
 }
 
