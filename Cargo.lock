@@ -696,6 +696,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-nft"
+version = "4.0.0-dev"
+dependencies = [
+ "bholdus-primitives",
+ "bholdus-support",
+ "enumflags2",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "pallet-utility",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "support-nft",
+]
+
+[[package]]
 name = "bholdus-primitives"
 version = "4.0.0-dev"
 dependencies = [
@@ -754,6 +776,7 @@ dependencies = [
  "bholdus-chainbridge-transfer",
  "bholdus-currencies",
  "bholdus-dex",
+ "bholdus-nft",
  "bholdus-primitives",
  "bholdus-support",
  "bholdus-tokens",
@@ -820,6 +843,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
+ "support-nft",
 ]
 
 [[package]]
@@ -1836,6 +1860,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "83c8d82922337cd23a15f88b70d8e4ef5f11da38dd7cdb55e84dd5de99695da0"
 dependencies = [
  "enumflags2_derive",
+ "serde",
 ]
 
 [[package]]
@@ -8417,6 +8442,21 @@ name = "subtle"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
+
+[[package]]
+name = "support-nft"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
 
 [[package]]
 name = "syn"
