@@ -122,6 +122,7 @@ construct_runtime!(
 
 pub const ALICE: AccountId = AccountId::new([1u8; 32]);
 pub const BOB: AccountId = AccountId::new([2u8; 32]);
+pub const DAVE: AccountId = AccountId::new([3u8; 32]);
 pub const CLASS_ID: <Runtime as bholdus_support_nft::Config>::ClassId = 0;
 pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
 pub const CLASS_ID_NOT_EXIST: <Runtime as bholdus_support_nft::Config>::ClassId = 1;

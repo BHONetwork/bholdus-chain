@@ -41,6 +41,8 @@ fn create_class_should_work() {
                 attributes: test_attr(1),
             }
         )
+        // let class_info = bholdus_support_nft::Classes::<Runtime>::get(CLASS_ID);
+        // println!("create_class_should_work {:?}", class_info);
     });
 }
 
@@ -49,7 +51,9 @@ fn mint_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         let metadata = vec![1];
         let metadata_2 = vec![2, 3];
+
         assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1),));
+
         System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
             class_id_account(),
             CLASS_ID,
@@ -71,10 +75,20 @@ fn mint_should_work() {
             3,
         )));
 
-        let tokens_by_owner =
-            bholdus_support_nft::TokensByOwner::<Runtime>::iter_prefix((BOB,)).collect::<Vec<_>>();
-        println!("tokens-by-owner {:#?}", tokens_by_owner);
+        // Test TokensByOwner
 
+        assert_eq!(
+            bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![(BOB, 1), (BOB, 0), (BOB, 2)]
+        );
+
+        // println!(
+        //     "transfer_should_work: tokens_by_owner {:#?}",
+        //     bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>()
+        // );
+
+        // Test TokensByGroup
+        //
         assert_eq!(
             bholdus_support_nft::TokensByGroup::<Runtime>::contains_key((
                 GROUP_ID, CLASS_ID, TOKEN_ID
@@ -82,10 +96,28 @@ fn mint_should_work() {
             true
         );
 
-        let tokens_by_group =
-            bholdus_support_nft::TokensByGroup::<Runtime>::iter_prefix((GROUP_ID,))
-                .collect::<Vec<_>>();
-        println!("tokens-by-group{:#?}", tokens_by_group);
+        // println!(
+        //     "mint_should_work: tokens_by_group{:#?}",
+        //     bholdus_support_nft::TokensByGroup::<Runtime>::iter_values().collect::<Vec<_>>()
+        // );
+
+        assert_eq!(
+            bholdus_support_nft::TokensByGroup::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![(BOB, 1), (BOB, 0), (BOB, 2)]
+        );
+
+        // Test OwnedTokens
+
+        assert_eq!(
+            bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![(BOB, 1), (BOB, 0), (BOB, 2)]
+        )
+
+        // println!(
+        //     "mint_should_work: owned_tokens {:#?}",
+        //     bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>()
+        // );
+        //
     });
 }
 
@@ -118,6 +150,18 @@ fn mint_should_fail() {
                 metadata.clone(),
                 Default::default(),
                 0
+            ),
+            Error::<Runtime>::InvalidQuantity
+        );
+
+        assert_noop!(
+            NFTModule::mint(
+                Origin::signed(BOB),
+                BOB,
+                CLASS_ID,
+                metadata.clone(),
+                Default::default(),
+                101
             ),
             Error::<Runtime>::InvalidQuantity
         );
@@ -165,20 +209,11 @@ fn mint_should_fail_without_mintable() {
 #[test]
 fn transfer_should_work() {
     ExtBuilder::default().build().execute_with(|| {
-        let metadata = vec![1];
+        let metadata = vec![1, 2, 3];
         assert_ok!(NFTModule::create_class(
             Origin::signed(ALICE),
             Default::default(),
         ));
-
-        let class_info = bholdus_support_nft::Classes::<Runtime>::get(CLASS_ID);
-        println!("class_info {:?}", class_info);
-
-        let tokens_2 = bholdus_support_nft::Tokens::<Runtime>::iter_values().collect::<Vec<_>>();
-        println!("tokens-timeline {:#?}", tokens_2);
-
-        let token_owner = bholdus_support_nft::Tokens::<Runtime>::get(CLASS_ID, TOKEN_ID);
-        println!("tokens-owner {:#?}", token_owner);
 
         assert_ok!(NFTModule::mint(
             Origin::signed(class_id_account()),
@@ -186,7 +221,7 @@ fn transfer_should_work() {
             CLASS_ID,
             metadata.clone(),
             Default::default(),
-            2
+            1
         ));
 
         assert_ok!(NFTModule::transfer(
@@ -194,18 +229,30 @@ fn transfer_should_work() {
             ALICE,
             (CLASS_ID, TOKEN_ID)
         ));
+
         System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken(
             BOB, ALICE, CLASS_ID, TOKEN_ID,
         )));
 
         assert_ok!(NFTModule::transfer(
             Origin::signed(ALICE),
-            BOB,
+            DAVE,
             (CLASS_ID, TOKEN_ID)
         ));
+
         System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken(
-            ALICE, BOB, CLASS_ID, TOKEN_ID,
+            ALICE, DAVE, CLASS_ID, TOKEN_ID,
         )));
+
+        assert_eq!(
+            bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![(DAVE, 0)]
+        );
+
+        assert_eq!(
+            bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![(DAVE, 0), (ALICE, 0), (BOB, 0)]
+        )
     });
 }
 
@@ -268,10 +315,22 @@ fn burn_should_work() {
             Default::default(),
             1
         ));
+
         assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
+
         System::assert_last_event(Event::NFTModule(crate::Event::BurnedToken(
             BOB, CLASS_ID, TOKEN_ID,
         )));
+
+        assert_eq!(
+            bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![]
+        );
+
+        assert_eq!(
+            bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
+            vec![(BOB, 0)]
+        )
     })
 }
 
