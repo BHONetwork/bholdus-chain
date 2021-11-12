@@ -656,8 +656,7 @@ pub mod pallet {
             let origin = ensure_signed(origin)?;
             let beneficiary = T::Lookup::lookup(beneficiary)?;
 
-            Self::do_mint(id, &beneficiary, amount, Some(origin));
-            Self::deposit_event(Event::Issued(id, beneficiary, amount));
+            Self::do_mint(id, &beneficiary, amount, Some(origin))?;
             Ok(())
         }
 
