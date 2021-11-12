@@ -10,7 +10,9 @@ members = [
     'pallets/currencies',
     'pallets/dex',
     'pallets/support',
+    'pallets/support/nft',
     'pallets/tokens',
+    'pallets/non-fungible-token',
     'pallets/bridge/bsc',
     'primitives/bholdus',
     'primitives/bsc'

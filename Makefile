@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	cargo run --features with-bholdus-runtime -- --dev --tmp -lruntime=debug
+	cargo +nightly run --features with-bholdus-runtime -- --dev --tmp -lruntime=debug
 
 .PHONY: run-benchmark
 run-benchmark:
@@ -11,7 +11,7 @@ toolchain:
 	./scripts/init.sh
 
 .PHONY: build
-build: githooks
+build:
 	SKIP_WASM_BUILD= cargo build --features with-bholdus-runtime
 
 .PHONY: check-debug

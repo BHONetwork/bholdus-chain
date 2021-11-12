@@ -1,0 +1,80 @@
+[package]
+authors = ['Bholdus <https://github.com/bholdus>']
+description = 'Pallet NFT'
+edition = '2018'
+homepage = 'https://bholdus.com'
+name = 'support-nft'
+license = "Apache-2.0"
+readme = 'README.md'
+repository = 'https://github.com/bholdus/bholdus-chain'
+version = '4.0.0-dev'
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
+[dependencies.serde]
+optional = true
+version = '1.0.124'
+
+# [dependencies.max-encoded-len]
+# default-features = false
+# git = 'https://github.com/bholdus/substrate.git'
+# branch = 'master'
+# version = '4.0.0-dev'
+
+[dependencies.codec]
+default-features = false
+features = ['derive', 'max-encoded-len']
+package = 'parity-scale-codec'
+version = '2.0.0'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '4.0.0-dev'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '4.0.0-dev'
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '4.0.0-dev'
+
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '4.0.0-dev'
+
+[dev-dependencies.sp-io]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '4.0.0-dev'
+
+[dev-dependencies.sp-core]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'master'
+version = '4.0.0-dev'
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	'scale-info/std',
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+]
+try-runtime = ["frame-support/try-runtime"]
