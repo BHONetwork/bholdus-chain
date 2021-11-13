@@ -9,7 +9,6 @@ use std::sync::Arc;
 
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use sc_client_api::AuxStore;
-use sc_consensus_epochs::SharedEpochChanges;
 use sc_finality_grandpa::{
     FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -21,7 +20,6 @@ use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
-use sp_keystore::SyncCryptoStorePtr;
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {

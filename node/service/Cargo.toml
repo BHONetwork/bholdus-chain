@@ -19,248 +19,248 @@ serde_json = "1.0.68"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 jsonrpc-core = "15.1.0"
 
-beefy-gadget = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = "master" }
-beefy-gadget-rpc = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = "master" }
-beefy-primitives = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = "master" }
+beefy-gadget = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
+beefy-gadget-rpc = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
+beefy-primitives = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
 
 [dependencies.frame-benchmarking]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.frame-system]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.pallet-transaction-payment]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.substrate-frame-rpc-system]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.pallet-transaction-payment-rpc]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.pallet-transaction-payment-rpc-runtime-api]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.pallet-im-online]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sc-basic-authorship]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-cli]
 features = ['wasmtime']
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-client-api]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sc-consensus]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-executor]
 features = ['wasmtime']
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-consensus-aura]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-consensus-uncles]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-consensus-epochs]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-consensus-slots]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-finality-grandpa]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-finality-grandpa-rpc]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-keystore]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sc-rpc]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sc-rpc-api]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-service]
 features = ['wasmtime']
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-telemetry]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sc-transaction-pool]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sc-network]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-authority-discovery]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-sync-state-rpc]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sc-chain-spec]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 # Substrate primitives
 [dependencies.sp-api]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-trie]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-block-builder]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.frame-system-rpc-runtime-api]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-blockchain]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-consensus]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sp-consensus-aura]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sp-core]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-finality-grandpa]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-inherents]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-runtime]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-timestamp]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-authorship]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-transaction-pool]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-authority-discovery]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-keystore]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '0.10.0-dev'
 
 [dependencies.sp-offchain]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-session]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-storage]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 # local dependencies

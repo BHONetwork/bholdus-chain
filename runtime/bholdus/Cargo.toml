@@ -11,77 +11,82 @@ targets = ['x86_64-unknown-linux-gnu']
 
 [build-dependencies.substrate-wasm-builder]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '5.0.0-dev'
 
 [dependencies]
-codec = { version = '2.2.0', package = 'parity-scale-codec', default-features = false, features = ['derive', 'max-encoded-len'] }
-scale-info = { version = '1.0', default-features = false, features = ['derive'] }
-hex-literal = { version = '0.3.1', optional = true}
+codec = { version = '2.2.0', package = 'parity-scale-codec', default-features = false, features = [
+	'derive',
+	'max-encoded-len',
+] }
+scale-info = { version = '1.0', default-features = false, features = [
+	'derive',
+] }
+hex-literal = { version = '0.3.1', optional = true }
 log = { version = '0.4', default-features = false }
 
 # FRAME dependencies
-frame-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'master' }
-frame-executive = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-frame-support = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-frame-system = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-frame-system-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'master' }
-frame-system-rpc-runtime-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-frame-election-provider-support = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
+frame-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'bholdus-monthly-2021-11' }
+frame-executive = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+frame-support = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+frame-system = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+frame-system-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'bholdus-monthly-2021-11' }
+frame-system-rpc-runtime-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+frame-election-provider-support = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
 
-pallet-balances = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-grandpa = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-randomness-collective-flip = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-sudo = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-timestamp = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-transaction-payment = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-transaction-payment-rpc-runtime-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-staking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-staking-reward-curve = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-aura = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-session = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-session-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'master' }
-pallet-im-online = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-authority-discovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-offences = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-offences-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'master' }
-pallet-treasury = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-utility = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-collective= { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-election-provider-multi-phase = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-indices = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-bounties = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-authorship = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-contracts = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-contracts-rpc-runtime-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-contracts-primitives = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-mmr = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-scheduler = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-proxy = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-identity = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-recovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-bags-list = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-multisig = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-beefy-primitives = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-beefy = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-pallet-beefy-mmr = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
+pallet-balances = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-grandpa = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-randomness-collective-flip = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-sudo = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-timestamp = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-transaction-payment = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-transaction-payment-rpc-runtime-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-staking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-staking-reward-curve = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-aura = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-session = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-session-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'bholdus-monthly-2021-11' }
+pallet-im-online = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-authority-discovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-offences = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-offences-benchmarking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, optional = true, branch = 'bholdus-monthly-2021-11' }
+pallet-treasury = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-utility = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-collective = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-election-provider-multi-phase = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-indices = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-bounties = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-authorship = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-contracts = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-contracts-rpc-runtime-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-contracts-primitives = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-mmr = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-scheduler = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-proxy = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-identity = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-recovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-bags-list = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-multisig = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+beefy-primitives = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-beefy = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+pallet-beefy-mmr = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
 
 # Substrate primitives
-sp-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-block-builder = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-core = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-inherents = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-runtime = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-offchain = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-session = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-std = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-transaction-pool = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-version = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-staking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-authority-discovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-npos-elections = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-consensus-aura = { version = '0.10.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
-sp-io = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'master' }
+sp-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-block-builder = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-core = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-inherents = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-runtime = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-offchain = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-session = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-std = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-transaction-pool = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-version = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-staking = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-authority-discovery = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-npos-elections = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-consensus-aura = { version = '0.10.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
+sp-io = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', default-features = false, branch = 'bholdus-monthly-2021-11' }
 
 
 # local dependencies

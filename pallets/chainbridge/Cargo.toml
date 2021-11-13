@@ -20,14 +20,14 @@ serde = { version = '1.0.101', optional = true }
 scale-info = { version = "1.0", default-features = false, features = [
 	"derive",
 ] }
-sp-std = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-sp-runtime = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-sp-io = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-sp-core = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-frame-benchmarking = { version = "4.0.0-dev", default-features = false, optional = true, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-frame-support = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-frame-system = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
-pallet-balances = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+sp-std = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+sp-runtime = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+sp-io = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+sp-core = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+frame-benchmarking = { version = "4.0.0-dev", default-features = false, optional = true, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+frame-support = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+frame-system = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+pallet-balances = { version = "4.0.0-dev", default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 
 
 [features]

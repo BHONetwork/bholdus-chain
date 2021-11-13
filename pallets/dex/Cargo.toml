@@ -24,20 +24,20 @@ version = '2.2.0'
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 optional = true
 
 [dependencies.frame-support]
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 [dependencies.frame-system]
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 [dependencies.scale-info]
 default-features = false
@@ -48,19 +48,19 @@ version = '1.0'
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 [dependencies.sp-runtime]
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 [dependencies.sp-std]
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 # Local dependencies
 [dependencies.bholdus-primitives]
@@ -79,12 +79,12 @@ version = '1.0.119'
 [dev-dependencies.sp-io]
 version = "4.0.0-dev"
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 [dev-dependencies.pallet-balances]
 version = '4.0.0-dev'
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 
 [dev-dependencies.bholdus-tokens]
 version = '4.0.0-dev'
