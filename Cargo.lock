@@ -126,9 +126,9 @@ dependencies = [
 
 [[package]]
 name = "array-bytes"
-version = "1.4.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8fb297b55a15d4b1ca38e1d8f6f0063d318e60981560298a503e5ae3ebed20c"
+checksum = "9ad284aeb45c13f2fb4f084de4a420ebf447423bdf9386c0540ce33cb3ef4b8c"
 dependencies = [
  "serde",
 ]
