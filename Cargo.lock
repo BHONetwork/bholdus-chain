@@ -520,57 +520,13 @@ name = "bholdus"
 version = "4.0.0-dev"
 dependencies = [
  "bholdus-cli",
- "bholdus-primitives",
- "bholdus-runtime",
  "bholdus-service",
- "frame-benchmarking",
- "frame-benchmarking-cli",
+ "cygnus-runtime",
  "futures 0.3.17",
  "hex",
- "jsonrpc-core 15.1.0",
- "pallet-contracts",
- "pallet-contracts-rpc",
- "pallet-im-online",
- "pallet-mmr-rpc",
- "pallet-transaction-payment-rpc",
- "rand 0.8.4",
- "sc-authority-discovery",
- "sc-basic-authorship",
- "sc-chain-spec",
- "sc-cli",
- "sc-client-api",
- "sc-consensus-babe",
- "sc-consensus-babe-rpc",
- "sc-consensus-epochs",
- "sc-consensus-slots",
- "sc-consensus-uncles",
- "sc-executor",
- "sc-finality-grandpa",
- "sc-finality-grandpa-rpc",
- "sc-keystore",
- "sc-network",
- "sc-rpc",
- "sc-rpc-api",
- "sc-service",
- "sc-sync-state-rpc",
- "sc-telemetry",
- "sc-transaction-pool",
- "sp-api",
- "sp-authority-discovery",
- "sp-authorship",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-consensus-babe",
- "sp-core",
- "sp-finality-grandpa",
- "sp-inherents",
- "sp-keystore",
- "sp-runtime",
- "sp-transaction-pool",
- "structopt",
+ "phoenix-runtime",
  "substrate-build-script-utils",
- "substrate-frame-rpc-system",
+ "ulas-runtime",
 ]
 
 [[package]]
@@ -592,50 +548,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "bholdus-chainbridge"
-version = "4.0.0-dev"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-balances",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "bholdus-chainbridge-transfer"
-version = "4.0.0-dev"
-dependencies = [
- "bholdus-chainbridge",
- "bholdus-currencies",
- "bholdus-primitives",
- "bholdus-support",
- "bholdus-tokens",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "hex-literal",
- "pallet-balances",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "bholdus-cli"
 version = "4.0.0-dev"
 dependencies = [
- "bholdus-runtime",
  "bholdus-service",
  "frame-benchmarking",
  "frame-benchmarking-cli",
@@ -646,7 +561,6 @@ dependencies = [
  "sc-client-api",
  "sc-service",
  "sc-telemetry",
- "sc-tracing",
  "sp-core",
  "sp-runtime",
  "structopt",
@@ -765,86 +679,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bholdus-runtime"
-version = "1.2.1"
-dependencies = [
- "beefy-primitives",
- "bholdus-bridge-bsc",
- "bholdus-chainbridge",
- "bholdus-chainbridge-transfer",
- "bholdus-currencies",
- "bholdus-dex",
- "bholdus-nft",
- "bholdus-primitives",
- "bholdus-support",
- "bholdus-tokens",
- "frame-benchmarking",
- "frame-election-provider-support",
- "frame-executive",
- "frame-support",
- "frame-system",
- "frame-system-benchmarking",
- "frame-system-rpc-runtime-api",
- "hex-literal",
- "log",
- "pallet-aura",
- "pallet-authority-discovery",
- "pallet-authorship",
- "pallet-bags-list",
- "pallet-balances",
- "pallet-beefy",
- "pallet-beefy-mmr",
- "pallet-bounties",
- "pallet-collective",
- "pallet-contracts",
- "pallet-contracts-primitives",
- "pallet-contracts-rpc-runtime-api",
- "pallet-election-provider-multi-phase",
- "pallet-grandpa",
- "pallet-identity",
- "pallet-im-online",
- "pallet-indices",
- "pallet-mmr",
- "pallet-multisig",
- "pallet-offences",
- "pallet-offences-benchmarking",
- "pallet-proxy",
- "pallet-randomness-collective-flip",
- "pallet-recovery",
- "pallet-scheduler",
- "pallet-session",
- "pallet-session-benchmarking",
- "pallet-staking",
- "pallet-staking-reward-curve",
- "pallet-sudo",
- "pallet-template",
- "pallet-timestamp",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "pallet-treasury",
- "pallet-utility",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-authority-discovery",
- "sp-block-builder",
- "sp-consensus-aura",
- "sp-core",
- "sp-inherents",
- "sp-io",
- "sp-npos-elections",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-staking",
- "sp-std",
- "sp-transaction-pool",
- "sp-version",
- "substrate-wasm-builder",
- "support-nft",
-]
-
-[[package]]
 name = "bholdus-service"
 version = "4.0.0-dev"
 dependencies = [
@@ -854,7 +688,7 @@ dependencies = [
  "beefy-primitives",
  "bholdus-primitives",
  "bholdus-rpc",
- "bholdus-runtime",
+ "cygnus-runtime",
  "frame-benchmarking",
  "frame-system",
  "frame-system-rpc-runtime-api",
@@ -866,6 +700,7 @@ dependencies = [
  "pallet-transaction-payment-rpc",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
+ "phoenix-runtime",
  "rand 0.8.4",
  "sc-authority-discovery",
  "sc-basic-authorship",
@@ -910,6 +745,7 @@ dependencies = [
  "sp-trie",
  "structopt",
  "substrate-frame-rpc-system",
+ "ulas-runtime",
 ]
 
 [[package]]
@@ -1664,6 +1500,85 @@ dependencies = [
 ]
 
 [[package]]
+name = "cygnus-runtime"
+version = "1.0.0"
+dependencies = [
+ "beefy-primitives",
+ "bholdus-bridge-bsc",
+ "bholdus-currencies",
+ "bholdus-dex",
+ "bholdus-nft",
+ "bholdus-primitives",
+ "bholdus-support",
+ "bholdus-tokens",
+ "frame-benchmarking",
+ "frame-election-provider-support",
+ "frame-executive",
+ "frame-support",
+ "frame-system",
+ "frame-system-benchmarking",
+ "frame-system-rpc-runtime-api",
+ "frame-try-runtime",
+ "hex-literal",
+ "log",
+ "pallet-aura",
+ "pallet-authority-discovery",
+ "pallet-authorship",
+ "pallet-bags-list",
+ "pallet-balances",
+ "pallet-beefy",
+ "pallet-beefy-mmr",
+ "pallet-bounties",
+ "pallet-collective",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "pallet-election-provider-multi-phase",
+ "pallet-grandpa",
+ "pallet-identity",
+ "pallet-im-online",
+ "pallet-indices",
+ "pallet-mmr",
+ "pallet-multisig",
+ "pallet-offences",
+ "pallet-offences-benchmarking",
+ "pallet-proxy",
+ "pallet-randomness-collective-flip",
+ "pallet-recovery",
+ "pallet-scheduler",
+ "pallet-session",
+ "pallet-session-benchmarking",
+ "pallet-staking",
+ "pallet-staking-reward-curve",
+ "pallet-sudo",
+ "pallet-template",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-treasury",
+ "pallet-utility",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-api",
+ "sp-authority-discovery",
+ "sp-block-builder",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-npos-elections",
+ "sp-offchain",
+ "sp-runtime",
+ "sp-session",
+ "sp-staking",
+ "sp-std",
+ "sp-transaction-pool",
+ "sp-version",
+ "substrate-wasm-builder",
+ "support-nft",
+]
+
+[[package]]
 name = "data-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2255,6 +2170,17 @@ source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-20
 dependencies = [
  "parity-scale-codec",
  "sp-api",
+]
+
+[[package]]
+name = "frame-try-runtime"
+version = "0.10.0-dev"
+source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
+dependencies = [
+ "frame-support",
+ "sp-api",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5414,6 +5340,85 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-runtime"
+version = "1.0.0"
+dependencies = [
+ "beefy-primitives",
+ "bholdus-bridge-bsc",
+ "bholdus-currencies",
+ "bholdus-dex",
+ "bholdus-nft",
+ "bholdus-primitives",
+ "bholdus-support",
+ "bholdus-tokens",
+ "frame-benchmarking",
+ "frame-election-provider-support",
+ "frame-executive",
+ "frame-support",
+ "frame-system",
+ "frame-system-benchmarking",
+ "frame-system-rpc-runtime-api",
+ "frame-try-runtime",
+ "hex-literal",
+ "log",
+ "pallet-aura",
+ "pallet-authority-discovery",
+ "pallet-authorship",
+ "pallet-bags-list",
+ "pallet-balances",
+ "pallet-beefy",
+ "pallet-beefy-mmr",
+ "pallet-bounties",
+ "pallet-collective",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "pallet-election-provider-multi-phase",
+ "pallet-grandpa",
+ "pallet-identity",
+ "pallet-im-online",
+ "pallet-indices",
+ "pallet-mmr",
+ "pallet-multisig",
+ "pallet-offences",
+ "pallet-offences-benchmarking",
+ "pallet-proxy",
+ "pallet-randomness-collective-flip",
+ "pallet-recovery",
+ "pallet-scheduler",
+ "pallet-session",
+ "pallet-session-benchmarking",
+ "pallet-staking",
+ "pallet-staking-reward-curve",
+ "pallet-sudo",
+ "pallet-template",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-treasury",
+ "pallet-utility",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-api",
+ "sp-authority-discovery",
+ "sp-block-builder",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-npos-elections",
+ "sp-offchain",
+ "sp-runtime",
+ "sp-session",
+ "sp-staking",
+ "sp-std",
+ "sp-transaction-pool",
+ "sp-version",
+ "substrate-wasm-builder",
+ "support-nft",
+]
+
+[[package]]
 name = "pin-project"
 version = "0.4.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6481,30 +6486,6 @@ dependencies = [
  "sp-runtime",
  "sp-version",
  "substrate-prometheus-endpoint",
-]
-
-[[package]]
-name = "sc-consensus-babe-rpc"
-version = "0.10.0-dev"
-source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
-dependencies = [
- "derive_more",
- "futures 0.3.17",
- "jsonrpc-core 18.0.0",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "sc-consensus-babe",
- "sc-consensus-epochs",
- "sc-rpc-api",
- "serde",
- "sp-api",
- "sp-application-crypto",
- "sp-blockchain",
- "sp-consensus",
- "sp-consensus-babe",
- "sp-core",
- "sp-keystore",
- "sp-runtime",
 ]
 
 [[package]]
@@ -8219,8 +8200,8 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "ss58-registry"
-version = "1.2.0"
-source = "git+https://github.com/Bholdus/ss58-registry.git?branch=main#bf0e5a6e6eb958186ac058db3bdd4a589456d85b"
+version = "1.5.0"
+source = "git+https://github.com/Bholdus/ss58-registry.git?branch=main#c4af3fc5533909039844af2afa1aa36965eea62a"
 dependencies = [
  "Inflector",
  "proc-macro2",
@@ -8899,6 +8880,85 @@ dependencies = [
  "crunchy",
  "hex",
  "static_assertions",
+]
+
+[[package]]
+name = "ulas-runtime"
+version = "1.0.0"
+dependencies = [
+ "beefy-primitives",
+ "bholdus-bridge-bsc",
+ "bholdus-currencies",
+ "bholdus-dex",
+ "bholdus-nft",
+ "bholdus-primitives",
+ "bholdus-support",
+ "bholdus-tokens",
+ "frame-benchmarking",
+ "frame-election-provider-support",
+ "frame-executive",
+ "frame-support",
+ "frame-system",
+ "frame-system-benchmarking",
+ "frame-system-rpc-runtime-api",
+ "frame-try-runtime",
+ "hex-literal",
+ "log",
+ "pallet-aura",
+ "pallet-authority-discovery",
+ "pallet-authorship",
+ "pallet-bags-list",
+ "pallet-balances",
+ "pallet-beefy",
+ "pallet-beefy-mmr",
+ "pallet-bounties",
+ "pallet-collective",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "pallet-election-provider-multi-phase",
+ "pallet-grandpa",
+ "pallet-identity",
+ "pallet-im-online",
+ "pallet-indices",
+ "pallet-mmr",
+ "pallet-multisig",
+ "pallet-offences",
+ "pallet-offences-benchmarking",
+ "pallet-proxy",
+ "pallet-randomness-collective-flip",
+ "pallet-recovery",
+ "pallet-scheduler",
+ "pallet-session",
+ "pallet-session-benchmarking",
+ "pallet-staking",
+ "pallet-staking-reward-curve",
+ "pallet-sudo",
+ "pallet-template",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-treasury",
+ "pallet-utility",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-api",
+ "sp-authority-discovery",
+ "sp-block-builder",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-npos-elections",
+ "sp-offchain",
+ "sp-runtime",
+ "sp-session",
+ "sp-staking",
+ "sp-std",
+ "sp-transaction-pool",
+ "sp-version",
+ "substrate-wasm-builder",
+ "support-nft",
 ]
 
 [[package]]

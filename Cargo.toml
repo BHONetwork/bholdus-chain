@@ -4,9 +4,9 @@ members = [
     'node/cli',
     'node/service',
     'rpc',
-    'runtime/bholdus',
-    'pallets/chainbridge',
-    'pallets/chainbridge-transfer',
+    'runtime/ulas',
+    'runtime/cygnus',
+    'runtime/phoenix',
     'pallets/currencies',
     'pallets/dex',
     'pallets/support',
@@ -15,7 +15,7 @@ members = [
     'pallets/non-fungible-token',
     'pallets/bridge/bsc',
     'primitives/bholdus',
-    'primitives/bsc'
+    'primitives/bsc',
 ]
 [profile.release]
 panic = 'unwind'

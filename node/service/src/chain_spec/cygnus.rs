@@ -1,12 +1,13 @@
+use crate::chain_spec::{authority_keys_from_seed, get_account_id_from_seed, get_from_seed};
 use beefy_primitives::crypto::AuthorityId as BeefyId;
 use bholdus_primitives::{
     AccountId, Balance, CurrencyId, Signature, TokenInfo, TokenSymbol, TradingPair,
 };
-use bholdus_runtime::{
-    opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BSCConfig, BalancesConfig,
-    BeefyConfig, ChainBridgeTransferConfig, CouncilConfig, DexConfig, GenesisConfig, GrandpaConfig,
+use cygnus_runtime::{
+    opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
+    BholdusSupportNFTConfig, CouncilConfig, DexConfig, GenesisConfig, GrandpaConfig,
     ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig,
-    SystemConfig, TokensConfig, BholdusSupportNFTConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -56,20 +57,12 @@ impl Constants {
         }
     }
 }
-
-/// Generate a crypto pair from seed.
-pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
-    TPublic::Pair::from_string(&format!("//{}", seed), None)
-        .expect("static values are valid; qed")
-        .public()
-}
-
 pub fn get_properties() -> Properties {
     let mut properties = Properties::new();
 
     properties.insert(
         "ss58Format".into(),
-        bholdus_runtime::SS58Prefix::get().into(),
+        cygnus_runtime::SS58Prefix::get().into(),
     );
     properties.insert("tokenDecimals".into(), TOKEN_DECIMALS.into());
     properties.insert("tokenSymbol".into(), TOKEN_SYMBOL.into());
@@ -93,48 +86,15 @@ fn session_keys(
     }
 }
 
-type AccountPublic = <Signature as Verify>::Signer;
-
-/// Generate an account ID from seed.
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-where
-    AccountPublic: From<<TPublic::Pair as Pair>::Public>,
-{
-    AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
-}
-
-/// Helper function to generate stash, controller and session key from seed
-pub fn authority_keys_from_seed(
-    seed: &str,
-) -> (
-    AccountId,
-    AccountId,
-    GrandpaId,
-    AuraId,
-    ImOnlineId,
-    AuthorityDiscoveryId,
-    BeefyId,
-) {
-    (
-        get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
-        get_account_id_from_seed::<sr25519::Public>(seed),
-        get_from_seed::<GrandpaId>(seed),
-        get_from_seed::<AuraId>(seed),
-        get_from_seed::<ImOnlineId>(seed),
-        get_from_seed::<AuthorityDiscoveryId>(seed),
-        get_from_seed::<BeefyId>(seed),
-    )
-}
-
 pub fn development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
     let constants = Constants::new();
 
     Ok(ChainSpec::from_genesis(
         // Name
-        "Bholdus-Development",
+        "Cygnus Development",
         // ID
-        "dev",
+        "cygnus-dev",
         ChainType::Development,
         move || {
             testnet_genesis(
@@ -201,10 +161,70 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 
     Ok(ChainSpec::from_genesis(
         // Name
-        "Bholdus-Local Testnet",
+        "Cygnus Local",
         // ID
-        "local_testnet",
+        "cygnus-local",
         ChainType::Local,
+        move || {
+            testnet_genesis(
+                wasm_binary,
+                // Initial PoA authorities
+                vec![
+                    authority_keys_from_seed("Alice"),
+                    authority_keys_from_seed("Bob"),
+                ],
+                vec![],
+                // Sudo account
+                get_account_id_from_seed::<sr25519::Public>("Alice"),
+                // Pre-funded accounts
+                vec![
+                    (
+                        constants.BHO_CURRENCY,
+                        get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+                        10_000_000_000 * BHO,
+                        true,
+                    ),
+                    (
+                        constants.BHO_CURRENCY,
+                        get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+                        10_000_000 * BHO,
+                        true,
+                    ),
+                ],
+                vec![],
+                1000 * BHO,
+                true,
+            )
+        },
+        // Bootnodes
+        vec![],
+        // Telemetry
+        Some(
+            TelemetryEndpoints::new(vec![(
+                String::from("wss://telemetry.polkadot.io/submit/"),
+                0,
+            )])
+            .unwrap(),
+        ),
+        // Protocol ID
+        Some(DEFAULT_PROTOCOL_ID),
+        // Properties
+        Some(get_properties()),
+        // Extensions
+        None,
+    ))
+}
+
+pub fn production_sample_config() -> Result<ChainSpec, String> {
+    let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
+    let constants = Constants::new();
+
+    Ok(ChainSpec::from_genesis(
+        // Name
+        "Cygnus Production",
+        // ID
+        "cygnus-prod",
+        ChainType::Live,
         move || {
             testnet_genesis(
                 wasm_binary,
@@ -361,7 +381,6 @@ fn testnet_genesis(
             authorities: vec![],
         },
         treasury: Default::default(),
-        chain_bridge_transfer: ChainBridgeTransferConfig {},
         tokens: TokensConfig {
             balances: endowed_accounts
                 .iter()
@@ -375,9 +394,7 @@ fn testnet_genesis(
                 })
                 .collect::<Vec<_>>(),
         },
-        bholdus_support_nft: BholdusSupportNFTConfig {
-            tokens: vec![]
-        },
+        bholdus_support_nft: BholdusSupportNFTConfig { tokens: vec![] },
         dex: DexConfig {
             initial_provisioning_trading_pairs: vec![],
             initial_enabled_trading_pairs: initial_dex_liquidity_pairs
@@ -404,7 +421,7 @@ fn testnet_genesis(
                 )
                 .collect(),
         },
-        bsc: BSCConfig {
+        /* bsc: BSCConfig {
             genesis_header: serde_json::from_str(r#"{
                 "difficulty": "0x2",
                 "extraData": "0xd883010100846765746888676f312e31352e35856c696e7578000000fc3ca6b72465176c461afb316ebc773c61faee85a6515daa295e26495cef6f69dfa69911d9d8e4f3bbadb89b29a97c6effb8a411dabc6adeefaa84f5067c8bbe2d4c407bbe49438ed859fe965b140dcf1aab71a93f349bbafec1551819b8be1efea2fc46ca749aa14430b3230294d12c6ab2aac5c2cd68e80b16b581685b1ded8013785d6623cc18d214320b6bb6475970f657164e5b75689b64b7fd1fa275f334f28e1872b61c6014342d914470ec7ac2975be345796c2b7ae2f5b9e386cd1b50a4550696d957cb4900f03a8b6c8fd93d6f4cea42bbb345dbc6f0dfdb5bec739bb832254baf4e8b4cc26bd2b52b31389b56e98b9f8ccdafcc39f3c7d6ebf637c9151673cbc36b88a6f79b60359f141df90a0c745125b131caaffd12b8f7166496996a7da21cf1f1b04d9b3e26a3d077be807dddb074639cd9fa61b47676c064fc50d62cce2fd7544e0b2cc94692d4a704debef7bcb61328e2d3a739effcd3a99387d015e260eefac72ebea1e9ae3261a475a27bb1028f140bc2a7c843318afdea0a6e3c511bbd10f4519ece37dc24887e11b55dee226379db83cffc681495730c11fdde79ba4c0c0670403d7dfc4c816a313885fe04b850f96f27b2e9fd88b147c882ad7caf9b964abfe6543625fcca73b56fe29d3046831574b0681d52bf5383d6f2187b6276c100",
@@ -422,6 +439,6 @@ fn testnet_genesis(
                 "timestamp": "0x60ac7137",
                 "transactionsRoot": "0x657f5876113ac9abe5cf0460aa8d6b3b53abfc336cea4ab3ee594586f8b584ca"
             }"#).unwrap()
-        },
+        }, */
     }
 }
