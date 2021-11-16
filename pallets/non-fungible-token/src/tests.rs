@@ -72,6 +72,7 @@ fn mint_should_work() {
             class_id_account(),
             BOB,
             CLASS_ID,
+            GROUP_ID,
             3,
         )));
 
@@ -89,10 +90,14 @@ fn mint_should_work() {
 
         // Test TokensByGroup
         //
+        // assert_eq!(
+        //     bholdus_support_nft::TokensByGroup::<Runtime>::contains_key((
+        //         GROUP_ID, CLASS_ID, TOKEN_ID
+        //     )),
+        //     true
+        // );
         assert_eq!(
-            bholdus_support_nft::TokensByGroup::<Runtime>::contains_key((
-                GROUP_ID, CLASS_ID, TOKEN_ID
-            )),
+            bholdus_support_nft::TokensByGroup::<Runtime>::contains_key(GROUP_ID, CLASS_ID),
             true
         );
 
