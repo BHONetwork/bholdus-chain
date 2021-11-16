@@ -47,6 +47,7 @@ version = '4.0.0-dev'
 [dev-dependencies]
 serde = '1.0.119'
 pallet-balances = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'master' }
+hex = "0.4.3"
 
 [dev-dependencies.sp-core]
 default-features = false

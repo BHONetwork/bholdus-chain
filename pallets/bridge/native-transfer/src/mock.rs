@@ -10,8 +10,8 @@ use system::EnsureRoot;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>;
 type Block = frame_system::mocking::MockBlock<Runtime>;
-type Balance = u128;
-type AccountId = u32;
+pub type Balance = u128;
+pub type AccountId = u32;
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
@@ -80,6 +80,7 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
 
 pub const ALICE: AccountId = 1;
 pub const BOB: AccountId = 2;
+pub const CHARLIE: AccountId = 3;
 
 pub struct ExtBuilder {
     balances: Vec<(AccountId, Balance)>,

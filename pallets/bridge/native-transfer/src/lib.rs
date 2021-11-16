@@ -90,10 +90,10 @@ pub mod pallet {
 
     #[pallet::extra_constants]
     impl<T: Config> Pallet<T> {
-        fn pallet_id() -> PalletId {
+        pub fn pallet_id() -> PalletId {
             PalletId(*b"xnatrans")
         }
-        fn pallet_accound_id() -> T::AccountId {
+        pub fn pallet_account_id() -> T::AccountId {
             Self::pallet_id().into_account()
         }
     }
@@ -236,7 +236,7 @@ pub mod pallet {
             // Lock user tokens
             T::Currency::transfer(
                 &who,
-                &Self::pallet_accound_id(),
+                &Self::pallet_account_id(),
                 total_charge,
                 ExistenceRequirement::KeepAlive,
             )?;
@@ -299,11 +299,17 @@ pub mod pallet {
                 .ok_or(Error::<T>::OutboundTransferNotFound)?;
 
             T::Currency::transfer(
-                &Self::pallet_accound_id(),
+                &Self::pallet_account_id(),
                 &who,
                 outbound_transfer_info.service_fee,
-                ExistenceRequirement::KeepAlive,
+                ExistenceRequirement::AllowDeath,
             )?;
+
+            let next_confirm_outbound_transfer_id = Self::next_confirm_outbound_transfer_id()
+                .checked_add(1)
+                .ok_or(ArithmeticError::Overflow)?;
+
+            NextConfirmOutboundTransferId::<T>::put(next_confirm_outbound_transfer_id);
 
             Ok(())
         }
@@ -334,10 +340,10 @@ pub mod pallet {
             );
 
             T::Currency::transfer(
-                &Self::pallet_accound_id(),
+                &Self::pallet_account_id(),
                 &to,
                 amount,
-                ExistenceRequirement::KeepAlive,
+                ExistenceRequirement::AllowDeath,
             )?;
 
             let next_inbound_transfer_id = Self::next_inbound_transfer_id()
@@ -377,17 +383,48 @@ pub mod pallet {
         }
 
         #[pallet::weight(0)]
-        pub fn force_widthdraw(origin: OriginFor<T>) -> DispatchResult {
+        pub fn force_register_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin)?;
+
+            RegisteredChains::<T>::insert(chain, true);
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        pub fn force_unregister_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin)?;
+
+            RegisteredChains::<T>::insert(chain, false);
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        pub fn force_set_service_fee(
+            origin: OriginFor<T>,
+            service_fee_rate: FeeRate,
+        ) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin)?;
+
+            FixedU128::checked_from_rational(service_fee_rate.0, service_fee_rate.1)
+                .ok_or(ArithmeticError::Overflow)?;
+
+            ServiceFeeRate::<T>::put(service_fee_rate);
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        pub fn force_withdraw(origin: OriginFor<T>, to: T::AccountId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin.clone())?;
 
-            let who = ensure_signed(origin)?;
-
-            let locked_tokens = T::Currency::total_balance(&who);
+            let locked_tokens = T::Currency::total_balance(&Self::pallet_account_id());
             T::Currency::transfer(
-                &Self::pallet_accound_id(),
-                &who,
+                &Self::pallet_account_id(),
+                &to,
                 locked_tokens,
-                ExistenceRequirement::KeepAlive,
+                ExistenceRequirement::AllowDeath,
             )?;
 
             Ok(())
