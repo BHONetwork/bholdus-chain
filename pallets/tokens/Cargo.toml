@@ -28,37 +28,37 @@ version = '1.0'
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
 optional = true
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.frame-support]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.frame-system]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-runtime]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-std]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-core]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.bholdus-support]
@@ -70,20 +70,20 @@ path = '../support'
 [dev-dependencies.sp-io]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dev-dependencies.sp-std]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 
 [dev-dependencies.pallet-balances]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [features]

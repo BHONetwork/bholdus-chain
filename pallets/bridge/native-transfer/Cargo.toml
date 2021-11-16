@@ -1,12 +1,12 @@
 [package]
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-description = 'FRAME pallet template for defining custom runtime logic.'
+authors = ['Bholdus']
+description = 'Bholdus pallet to crosschain transfer native'
 edition = '2018'
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
-name = 'pallet-template'
+name = 'bholdus-bridge-native-transfer'
 readme = 'README.md'
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+repository = 'https://github.com/bholdus/bholdus-chain.git'
 version = '4.0.0-dev'
 
 [package.metadata.docs.rs]
@@ -25,11 +25,17 @@ frame-benchmarking = { default-features = false, git = 'https://github.com/bhold
 frame-support = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 frame-system = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 
+sp-std = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+sp-runtime = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+
+bholdus-primitives = { version = '4.0.0-dev', default-features = false, path = '../../../primitives/bholdus' }
+
 [dev-dependencies]
-serde = '1.0.119'
+serde = "1.0.119"
+hex = "0.4.3"
 sp-core = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 sp-io = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
-sp-runtime = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+pallet-balances = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 
 [features]
 default = ['std']
@@ -40,5 +46,8 @@ std = [
 	'frame-support/std',
 	'frame-system/std',
 	'frame-benchmarking/std',
+	'sp-std/std',
+	'sp-runtime/std',
+	'bholdus-primitives/std',
 ]
 try-runtime = ['frame-support/try-runtime']

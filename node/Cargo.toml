@@ -10,280 +10,35 @@ version = '4.0.0-dev'
 
 [[bin]]
 name = 'bholdus'
+path = "src/main.rs"
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
-# [build-dependencies]
-# substrate-build-script-utils = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'monthly-2021-05-update' }
-
 [build-dependencies.substrate-build-script-utils]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '3.0.0'
 
 [dependencies]
-jsonrpc-core = '15.1.0'
-structopt = '0.3.8'
-rand = "0.8.4"
 futures = { version = "0.3.9", features = ["compat"] }
 hex = '0.4.3'
 
-# FRAME dependencies
-[dependencies.frame-benchmarking]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.frame-benchmarking-cli]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.pallet-transaction-payment-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.pallet-im-online]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.pallet-contracts]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.pallet-contracts-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.pallet-mmr-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '3.0.0'
-
-
-## Substrate client dependencies
-
-[dependencies.sc-basic-authorship]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-cli]
-features = ['wasmtime']
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-client-api]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sc-consensus]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-executor]
-features = ['wasmtime']
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-consensus-babe]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-consensus-uncles]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-consensus-babe-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-consensus-epochs]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-consensus-slots]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-finality-grandpa]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-finality-grandpa-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-keystore]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sc-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sc-rpc-api]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-service]
-features = ['wasmtime']
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-telemetry]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sc-transaction-pool]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sc-network]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-authority-discovery]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-sync-state-rpc]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sc-chain-spec]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-
-
-# Substrate primitives
-[dependencies.sp-api]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-block-builder]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-blockchain]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-consensus]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sp-consensus-babe]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.sp-core]
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-# branch = 'master'
-# path = '../sub-primitives/core'
-
-[dependencies.sp-finality-grandpa]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-inherents]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-runtime]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-timestamp]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-authorship]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-transaction-pool]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-authority-discovery]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-[dependencies.sp-keystore]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '0.10.0-dev'
-
-[dependencies.substrate-frame-rpc-system]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
-version = '4.0.0-dev'
-
-# local dependencies
-[dependencies.bholdus-runtime]
-version = '1.2.1'
-path = '../runtime/bholdus'
-
-[dependencies.bholdus-cli]
-version = '4.0.0-dev'
-path = 'cli'
-
-[dependencies.bholdus-service]
-version = '4.0.0-dev'
-path = 'service'
-
-[dependencies.bholdus-primitives]
-version = '4.0.0-dev'
-path = '../primitives/bholdus'
+bholdus-cli = { version = '4.0.0-dev', path = 'cli' }
+bholdus-service = { version = '4.0.0-dev', path = 'service' }
 
 [features]
 default = []
-runtime-benchmarks = ['bholdus-runtime/runtime-benchmarks']
-
-with-bholdus-runtime = [
-    "bholdus-service/with-bholdus-runtime",
-    "bholdus-cli/with-bholdus-runtime",
+runtime-benchmarks = ["bholdus-cli/runtime-benchmarks"]
+with-ulas-runtime = [
+    "bholdus-service/with-ulas-runtime",
+    "bholdus-cli/with-ulas-runtime",
+]
+with-cygnus-runtime = [
+    "bholdus-service/with-cygnus-runtime",
+    "bholdus-cli/with-cygnus-runtime",
+]
+with-phoenix-runtime = [
+    "bholdus-service/with-phoenix-runtime",
+    "bholdus-cli/with-phoenix-runtime",
 ]

@@ -1,0 +1,229 @@
+[package]
+authors = ["Bholdus <https://github.com/bholdus>"]
+edition = "2018"
+homepage = "https://bholdus.com"
+name = "ulas-runtime"
+repository = "https://github.com/bholdus/bholdus-chain/"
+version = "1.0.0"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[build-dependencies.substrate-wasm-builder]
+git = "https://github.com/bholdus/substrate.git"
+branch = "bholdus-monthly-2021-11"
+version = "5.0.0-dev"
+
+[dependencies]
+codec = { version = "2.2.0", package = "parity-scale-codec", default-features = false, features = [
+	"derive",
+	"max-encoded-len",
+] }
+scale-info = { version = "1.0", default-features = false, features = [
+	"derive",
+] }
+hex-literal = { version = "0.3.1", optional = true }
+log = { version = "0.4", default-features = false }
+
+# FRAME dependencies
+frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
+frame-executive = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+frame-support = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+frame-system = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+frame-system-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
+frame-system-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+frame-election-provider-support = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+frame-try-runtime = { version = "0.10.0-dev", optional = true, git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+
+pallet-balances = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-grandpa = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-randomness-collective-flip = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-sudo = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-transaction-payment = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-staking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-staking-reward-curve = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-aura = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-session = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-session-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
+pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-offences = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-offences-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
+pallet-treasury = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-utility = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-collective = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-election-provider-multi-phase = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-indices = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-bounties = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-authorship = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-contracts-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-contracts-primitives = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-mmr = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-scheduler = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-proxy = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-identity = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-recovery = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-bags-list = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-multisig = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+beefy-primitives = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-beefy = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-beefy-mmr = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+
+# Substrate primitives
+sp-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-block-builder = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-core = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-inherents = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-runtime = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-offchain = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-session = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-std = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-version = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-staking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-npos-elections = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+sp-io = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+
+
+# local dependencies
+bholdus-primitives = { version = "4.0.0-dev", path = "../../primitives/bholdus", default-features = false }
+bholdus-tokens = { version = "4.0.0-dev", path = "../../pallets/tokens", default-features = false }
+bholdus-nft = { version = "4.0.0-dev", path = "../../pallets/non-fungible-token", default-features = false }
+bholdus-support-nft = { package = "support-nft", version = "4.0.0-dev", path = "../../pallets/support/nft", default-features = false }
+bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", default-features = false }
+bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
+bholdus-dex = { version = "4.0.0-dev", path = "../../pallets/dex", default-features = false }
+bholdus-bridge-bsc = { version = "4.0.0-dev", path = "../../pallets/bridge/bsc", default-features = false }
+
+pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
+
+[features]
+default = ["std"]
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system-benchmarking",
+	"frame-system/runtime-benchmarks",
+	"hex-literal",
+	"pallet-balances/runtime-benchmarks",
+	"pallet-template/runtime-benchmarks",
+	"pallet-timestamp/runtime-benchmarks",
+	"pallet-staking/runtime-benchmarks",
+	"pallet-session-benchmarking",
+	"pallet-im-online/runtime-benchmarks",
+	"pallet-offences-benchmarking",
+	"pallet-treasury/runtime-benchmarks",
+	"pallet-collective/runtime-benchmarks",
+	"pallet-grandpa/runtime-benchmarks",
+	"pallet-election-provider-multi-phase/runtime-benchmarks",
+	"pallet-indices/runtime-benchmarks",
+	"pallet-bounties/runtime-benchmarks",
+	"pallet-contracts/runtime-benchmarks",
+	"pallet-mmr/runtime-benchmarks",
+	"pallet-multisig/runtime-benchmarks",
+	"pallet-proxy/runtime-benchmarks",
+	"pallet-identity/runtime-benchmarks",
+
+	"sp-runtime/runtime-benchmarks",
+]
+std = [
+	"codec/std",
+	"scale-info/std",
+	"frame-executive/std",
+	"frame-support/std",
+	"frame-system-rpc-runtime-api/std",
+	"frame-system/std",
+	"frame-try-runtime/std",
+	"pallet-balances/std",
+	"pallet-grandpa/std",
+	"pallet-randomness-collective-flip/std",
+	"pallet-sudo/std",
+	"pallet-template/std",
+	"pallet-timestamp/std",
+	"pallet-transaction-payment-rpc-runtime-api/std",
+	"pallet-transaction-payment/std",
+	"pallet-staking/std",
+	"pallet-aura/std",
+	"pallet-session/std",
+	"pallet-im-online/std",
+	"pallet-authority-discovery/std",
+	"pallet-offences/std",
+	"pallet-treasury/std",
+	"pallet-utility/std",
+	"pallet-collective/std",
+	"pallet-election-provider-multi-phase/std",
+	"pallet-indices/std",
+	"pallet-bounties/std",
+	"pallet-authorship/std",
+	"pallet-contracts/std",
+	"pallet-contracts-rpc-runtime-api/std",
+	"pallet-mmr/std",
+	"pallet-multisig/std",
+	"pallet-proxy/std",
+	"pallet-identity/std",
+	"pallet-recovery/std",
+	"pallet-beefy/std",
+	"pallet-beefy-mmr/std",
+
+	"bholdus-tokens/std",
+	"bholdus-nft/std",
+	"bholdus-support-nft/std",
+	"bholdus-support/std",
+	"bholdus-currencies/std",
+	"bholdus-dex/std",
+	"bholdus-primitives/std",
+	"bholdus-bridge-bsc/std",
+
+	"sp-api/std",
+	"sp-block-builder/std",
+	"sp-core/std",
+	"sp-inherents/std",
+	"sp-offchain/std",
+	"sp-runtime/std",
+	"sp-session/std",
+	"sp-std/std",
+	"sp-transaction-pool/std",
+	"sp-version/std",
+	"sp-staking/std",
+	"sp-authority-discovery/std",
+	"sp-npos-elections/std",
+	"sp-consensus-aura/std",
+	"sp-io/std",
+]
+try-runtime = [
+	"frame-try-runtime",
+	"frame-executive/try-runtime",
+	"frame-system/try-runtime",
+
+	"pallet-balances/try-runtime",
+	"pallet-grandpa/try-runtime",
+	"pallet-randomness-collective-flip/try-runtime",
+	"pallet-sudo/try-runtime",
+	"pallet-template/try-runtime",
+	"pallet-timestamp/try-runtime",
+	"pallet-transaction-payment/try-runtime",
+	"pallet-staking/try-runtime",
+	"pallet-aura/try-runtime",
+	"pallet-session/try-runtime",
+	"pallet-im-online/try-runtime",
+	"pallet-authority-discovery/try-runtime",
+	"pallet-offences/try-runtime",
+	"pallet-treasury/try-runtime",
+	"pallet-utility/try-runtime",
+	"pallet-collective/try-runtime",
+	"pallet-election-provider-multi-phase/try-runtime",
+	"pallet-indices/try-runtime",
+	"pallet-bounties/try-runtime",
+	"pallet-authorship/try-runtime",
+	"pallet-contracts/try-runtime",
+	"pallet-mmr/try-runtime",
+	"pallet-multisig/try-runtime",
+	"pallet-proxy/try-runtime",
+	"pallet-identity/try-runtime",
+	"pallet-recovery/try-runtime",
+]

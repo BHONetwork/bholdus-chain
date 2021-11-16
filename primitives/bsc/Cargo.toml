@@ -34,9 +34,9 @@ serde-hex = { version = "0.1.0", optional = true }
 triehash = { version = "0.8.4", default-features = false }
 hex = { version = "0.4", default-features = false, optional = true }
 # paritytech
-sp-io = { default-features = false, git = "https://github.com/bholdus/substrate", branch = "master" }
-sp-runtime = { default-features = false, git = "https://github.com/bholdus/substrate", branch = "master" }
-sp-std = { default-features = false, git = "https://github.com/bholdus/substrate", branch = "master" }
+sp-io = { default-features = false, git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
+sp-runtime = { default-features = false, git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
+sp-std = { default-features = false, git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
 
 [dev-dependencies]
 # crates.io

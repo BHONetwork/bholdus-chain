@@ -21,7 +21,7 @@ version = '1.0.124'
 # [dependencies.max-encoded-len]
 # default-features = false
 # git = 'https://github.com/bholdus/substrate.git'
-# branch = 'master'
+# branch = 'bholdus-monthly-2021-11'
 # version = '4.0.0-dev'
 
 [dependencies.codec]
@@ -35,32 +35,32 @@ version = '2.0.0'
 version = "4.0.0-dev"
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 optional = true
 
 [dependencies.frame-support]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.frame-system]
 default-features = false
 # path = '../frame/system'
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-runtime]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dependencies.sp-std]
 default-features = false
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 ## Bholdus pallets
@@ -86,22 +86,22 @@ path = '../../pallets/support/nft'
 
 [dev-dependencies.sp-core]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dev-dependencies.sp-io]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dev-dependencies.pallet-balances]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [dev-dependencies.pallet-utility]
 git = 'https://github.com/bholdus/substrate.git'
-branch = 'master'
+branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
 [features]
@@ -115,7 +115,7 @@ std = [
 	"sp-runtime/std",
 	"frame-support/std",
 	"frame-system/std",
-#"pallet-proxy/std",
+	#"pallet-proxy/std",
 	"bholdus-primitives/std",
 	"bholdus-support/std",
 	"bholdus-support-nft/std",
@@ -125,7 +125,6 @@ runtime-benchmarks = [
 	"frame-benchmarking",
 	"frame-support/runtime-benchmarks",
 	"frame-system/runtime-benchmarks",
-#"bholdus-primitives/runtime-benchmarks"
+	#"bholdus-primitives/runtime-benchmarks"
 ]
 try-runtime = ["frame-support/try-runtime"]
-
