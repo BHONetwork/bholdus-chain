@@ -172,8 +172,6 @@ pub mod pallet {
     pub enum Event<T: Config> {
         /// User initiated a crosschain transfer successfully. [outbound_transfer_id, from, to, amount]
         OutboundTransferInitiated(TransferId, T::AccountId, Bytes, BalanceOf<T>),
-        /// Inbound token release failed. [inbound_transfer_id, from, to, amount]
-        InboundTokenReleaseFailed(TransferId, Bytes, T::AccountId, BalanceOf<T>),
         /// Inbound Token release succeeded. [inbound_transfer_id, from, to, amount]
         InboundTokenReleased(TransferId, Bytes, T::AccountId, BalanceOf<T>),
     }
@@ -356,6 +354,8 @@ pub mod pallet {
             Ok(())
         }
 
+        /// Register relayer account responsible for relaying transfer between chains
+        /// Only `AdminOrigin` can access this operation
         #[pallet::weight(0)]
         #[transactional]
         pub fn force_register_relayer(
@@ -369,6 +369,8 @@ pub mod pallet {
             Ok(())
         }
 
+        /// Unregister relayer account
+        /// Only `AdminOrigin` can access this operation
         #[pallet::weight(0)]
         pub fn force_unregister_relayer(
             origin: OriginFor<T>,
@@ -381,6 +383,9 @@ pub mod pallet {
             Ok(())
         }
 
+        /// Register chain id that crosschain transfer supports
+        /// Chain id will be pre-defined by Bholdus team
+        /// Only `AdminOrigin` can access this operation
         #[pallet::weight(0)]
         pub fn force_register_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
@@ -390,6 +395,9 @@ pub mod pallet {
             Ok(())
         }
 
+        /// Unregister chain id
+        /// Chain id will be pre-defined by Bholdus team
+        /// Only `AdminOrigin` can access this operation
         #[pallet::weight(0)]
         pub fn force_unregister_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
@@ -399,6 +407,8 @@ pub mod pallet {
             Ok(())
         }
 
+        /// Set service fee that user will be charged when initiates a transfer
+        /// Only `AdminOrigin` can access this operation
         #[pallet::weight(0)]
         pub fn force_set_service_fee(
             origin: OriginFor<T>,
@@ -414,6 +424,9 @@ pub mod pallet {
             Ok(())
         }
 
+        /// Withdraw tokens locked in this pallet to some account
+        /// This operation is mainly used for any migration in the future
+        /// Only `AdminOrigin` can access this operation
         #[pallet::weight(0)]
         pub fn force_withdraw(origin: OriginFor<T>, to: T::AccountId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin.clone())?;
