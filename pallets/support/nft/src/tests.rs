@@ -114,16 +114,20 @@ fn mint_to_group_should_work() {
         // );
 
         assert_eq!(
-            TokensByGroup::<Runtime>::contains_key(GROUP_ID, CLASS_ID),
+            TokensByGroup::<Runtime>::contains_key((GROUP_ID, CLASS_ID, TOKEN_ID)),
             true
         );
 
         // let tokens_by_group = TokensByGroup::<Runtime>::get((GROUP_ID, CLASS_ID, TOKEN_ID));
         // println!("tokens-by-group{:#?}", tokens_by_group);
 
-        let tokens_by_group = TokensByGroup::<Runtime>::iter_prefix(GROUP_ID).collect::<Vec<_>>();
+        let tokens_by_group =
+            TokensByGroup::<Runtime>::iter_prefix((GROUP_ID, CLASS_ID)).collect::<Vec<_>>();
         println!("tokens-by-group{:#?}", tokens_by_group);
-        vec![((0, 2), ()), ((0, 1), ()), ((0, 0), ())]
+        // assert_eq!(
+        //     tokens_by_group,
+        //     vec![((0, 2), ()), ((0, 1), ()), ((0, 0), ())]
+        // )
     });
 }
 

@@ -184,29 +184,18 @@ pub mod pallet {
         ValueQuery,
     >;
 
-    // /// Store group info
-    // #[pallet::storage]
-    // #[pallet::getter(fn tokens_by_group)]
-    // pub type TokensByGroup<T: Config> = StorageNMap<
-    //     _,
-    //     (
-    //         NMapKey<Blake2_128Concat, T::GroupId>, // group id
-    //         NMapKey<Blake2_128Concat, T::ClassId>,
-    //         NMapKey<Blake2_128Concat, T::TokenId>,
-    //     ),
-    //     (T::AccountId, T::TokenId),
-    //     ValueQuery,
-    // >;
     /// Store group info
     #[pallet::storage]
     #[pallet::getter(fn tokens_by_group)]
-    pub type TokensByGroup<T: Config> = StorageDoubleMap<
+    pub type TokensByGroup<T: Config> = StorageNMap<
         _,
-        Twox64Concat,
-        T::GroupId,
-        Twox64Concat,
-        T::ClassId,
-        (T::AccountId, T::TokenId),
+        (
+            NMapKey<Blake2_128Concat, T::GroupId>, // group id
+            NMapKey<Blake2_128Concat, T::ClassId>,
+            NMapKey<Blake2_128Concat, T::TokenId>,
+        ),
+        T::TokenId,
+        //ValueQuery,
     >;
 
     #[pallet::genesis_config]
@@ -337,7 +326,6 @@ impl<T: Config> Pallet<T> {
                     .ok_or(ArithmeticError::Overflow)?;
                 Ok(())
             })?;
-
             let token_info = TokenInfo {
                 metadata: bounded_metadata,
                 owner: owner.clone(),
@@ -384,7 +372,7 @@ impl<T: Config> Pallet<T> {
             Tokens::<T>::insert(class_id, token_id, token_info);
             TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
             OwnedTokens::<T>::insert((owner, class_id, token_id), (owner, token_id));
-            TokensByGroup::<T>::insert(group_id, class_id, (owner, token_id));
+            TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
             Ok(token_id)
         })
     }

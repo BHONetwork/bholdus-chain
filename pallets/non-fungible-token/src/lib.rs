@@ -13,6 +13,7 @@
 
 use enumflags2::BitFlags;
 use frame_support::{
+    log,
     pallet_prelude::*,
     require_transactional,
     traits::{
@@ -115,7 +116,7 @@ pub mod pallet {
         /// Created NFT class: \[owner, class_id\]
         CreatedClass(T::AccountId, ClassIdOf<T>),
         /// Minted NFT: \[from, to, class_id, quantity\]
-        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, GroupIdOf<T>, u32),
+        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>, u32),
         /// Transferred NFT: \[from, to, class_id, token_id\]
         TransferredToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>),
         /// Burned NFT: \[owner, class_id, token_id\]
@@ -265,6 +266,7 @@ impl<T: Config> Pallet<T> {
         let group_id = bholdus_support_nft::Pallet::<T>::next_group_id();
         bholdus_support_nft::Pallet::<T>::create_group();
 
+        let token_id = bholdus_support_nft::Pallet::<T>::next_token_id(class_id);
         for _ in 0..quantity {
             bholdus_support_nft::Pallet::<T>::mint_to_group(
                 &to,
@@ -275,7 +277,7 @@ impl<T: Config> Pallet<T> {
             )?;
         }
 
-        Self::deposit_event(Event::MintedToken(who, to, class_id, group_id, quantity));
+        Self::deposit_event(Event::MintedToken(who, to, class_id, token_id, quantity));
         Ok(())
     }
 
