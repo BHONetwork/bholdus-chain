@@ -27,11 +27,6 @@ hex = '0.4.3'
 bholdus-cli = { version = '4.0.0-dev', path = 'cli' }
 bholdus-service = { version = '4.0.0-dev', path = 'service' }
 
-ulas-runtime = { version = '1.0.0', path = '../runtime/ulas' }
-cygnus-runtime = { version = '1.0.0', path = '../runtime/cygnus' }
-phoenix-runtime = { version = '1.0.0', path = '../runtime/phoenix' }
-
-
 [features]
 default = []
 runtime-benchmarks = ["bholdus-cli/runtime-benchmarks"]

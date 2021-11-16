@@ -66,7 +66,6 @@ pub use pallet_sudo::Call as SudoCall;
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
 
-use bholdus_bridge_bsc::BSCConfiguration;
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
 use bholdus_primitives::CurrencyId;
@@ -1058,19 +1057,10 @@ impl bholdus_dex::Config for Runtime {
     type PalletId = DexPalletId;
 }
 
-parameter_types! {
-    pub Configuration: BSCConfiguration = BSCConfiguration {
-        chain_id: 97,
-        min_gas_limit: 0x1388.into(),
-        max_gas_limit: U256::max_value(),
-        period: 0x03,
-        epoch_length: 0xc8,
-    };
-}
-impl bholdus_bridge_bsc::Config for Runtime {
-    type BSCConfiguration = Configuration;
-    type UnixTime = Timestamp;
-    type OnHeadersSubmitted = ();
+impl bholdus_bridge_native_transfer::Config for Runtime {
+    type Event = Event;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
+    type Currency = Balances;
 }
 
 /// Configure the pallet-template in pallets/template.
@@ -1117,6 +1107,7 @@ construct_runtime!(
         Mmr: pallet_mmr::{Pallet, Storage},
         Beefy: pallet_beefy::{Pallet, Config<T>, Storage},
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
+        BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>},
 
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},

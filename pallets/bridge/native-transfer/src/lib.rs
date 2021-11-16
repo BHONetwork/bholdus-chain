@@ -4,7 +4,6 @@ use bholdus_primitives::Balance;
 use codec::{Decode, Encode};
 use frame_support::{
     dispatch::DispatchResult,
-    log,
     pallet_prelude::*,
     traits::StorageVersion,
     traits::{Currency, ExistenceRequirement},

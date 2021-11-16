@@ -98,7 +98,7 @@ bholdus-support-nft = { package = "support-nft", version = "4.0.0-dev", path = "
 bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", default-features = false }
 bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
 bholdus-dex = { version = "4.0.0-dev", path = "../../pallets/dex", default-features = false }
-bholdus-bridge-bsc = { version = "4.0.0-dev", path = "../../pallets/bridge/bsc", default-features = false }
+bholdus-bridge-native-transfer = { version = "4.0.0-dev", path = "../../pallets/bridge/native-transfer", default-features = false }
 
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
 
@@ -129,6 +129,8 @@ runtime-benchmarks = [
 	"pallet-proxy/runtime-benchmarks",
 	"pallet-identity/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
+
+	"bholdus-bridge-native-transfer/runtime-benchmarks",
 ]
 std = [
 	"codec/std",
@@ -174,7 +176,7 @@ std = [
 	"bholdus-currencies/std",
 	"bholdus-dex/std",
 	"bholdus-primitives/std",
-	"bholdus-bridge-bsc/std",
+	"bholdus-bridge-native-transfer/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-core/std",
@@ -222,4 +224,6 @@ try-runtime = [
 	"pallet-proxy/try-runtime",
 	"pallet-identity/try-runtime",
 	"pallet-recovery/try-runtime",
+
+	"bholdus-bridge-native-transfer/try-runtime",
 ]
