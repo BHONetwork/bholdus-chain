@@ -115,7 +115,7 @@ pub mod pallet {
         /// Created NFT class: \[owner, class_id\]
         CreatedClass(T::AccountId, ClassIdOf<T>),
         /// Minted NFT: \[from, to, class_id, quantity\]
-        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, u32),
+        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, GroupIdOf<T>, u32),
         /// Transferred NFT: \[from, to, class_id, token_id\]
         TransferredToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>),
         /// Burned NFT: \[owner, class_id, token_id\]
@@ -275,7 +275,7 @@ impl<T: Config> Pallet<T> {
             )?;
         }
 
-        Self::deposit_event(Event::MintedToken(who, to, class_id, quantity));
+        Self::deposit_event(Event::MintedToken(who, to, class_id, group_id, quantity));
         Ok(())
     }
 
