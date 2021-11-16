@@ -112,13 +112,14 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("cygnus"),
     impl_name: create_runtime_str!("cygnus"),
     authoring_version: 1,
+
     // The version of the runtime specification. A full node will not attempt to use its native
     //   runtime in substitute for the on-chain Wasm runtime unless all of `spec_name`,
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
     spec_version: 1_000_000,
-    impl_version: 2,
+    impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
 };
@@ -1021,12 +1022,14 @@ impl bholdus_tokens::Config for Runtime {
 
 parameter_types! {
     pub MaxAttributesBytes: u32 = 2048;
+    pub MaxQuantity: u32 = 100;
 }
 
 impl bholdus_nft::Config for Runtime {
     type Event = Event;
     type PalletId = NftPalletId;
     type MaxAttributesBytes = MaxAttributesBytes;
+    type MaxQuantity = MaxQuantity;
     type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
 }
 
@@ -1037,10 +1040,12 @@ parameter_types! {
 
 impl bholdus_support_nft::Config for Runtime {
     type ClassId = u32;
+    type GroupId = u32;
     type TokenId = u64;
     type ClassData = bholdus_nft::ClassData;
     type TokenData = bholdus_nft::TokenData;
     type MaxClassMetadata = MaxClassMetadata;
+
     type MaxTokenMetadata = MaxTokenMetadata;
 }
 

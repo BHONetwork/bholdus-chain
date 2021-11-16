@@ -13,6 +13,7 @@
 
 use enumflags2::BitFlags;
 use frame_support::{
+    log,
     pallet_prelude::*,
     require_transactional,
     traits::{
@@ -51,6 +52,7 @@ pub type Attributes = BTreeMap<Vec<u8>, Vec<u8>>;
 
 pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
+pub type GroupIdOf<T> = <T as bholdus_support_nft::Config>::GroupId;
 
 #[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
@@ -80,6 +82,9 @@ pub mod pallet {
         /// The NFT's pallet id
         #[pallet::constant]
         type PalletId: Get<PalletId>;
+
+        /// The maximum quantity
+        type MaxQuantity: Get<u32>;
 
         /// Maximum number of bytes in attributes
         #[pallet::constant]
@@ -111,7 +116,7 @@ pub mod pallet {
         /// Created NFT class: \[owner, class_id\]
         CreatedClass(T::AccountId, ClassIdOf<T>),
         /// Minted NFT: \[from, to, class_id, quantity\]
-        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, u32),
+        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>, u32),
         /// Transferred NFT: \[from, to, class_id, token_id\]
         TransferredToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>),
         /// Burned NFT: \[owner, class_id, token_id\]
@@ -249,15 +254,30 @@ impl<T: Config> Pallet<T> {
         ensure!(quantity >= 1, Error::<T>::InvalidQuantity);
         let class_info = bholdus_support_nft::Pallet::<T>::classes(class_id)
             .ok_or(Error::<T>::ClassIdNotFound)?;
-        ensure!(who == class_info.owner, Error::<T>::NoPermission);
+        // ensure!(who == class_info.owner, Error::<T>::NoPermission);
+        //
+        ensure!(
+            quantity <= T::MaxQuantity::get(),
+            Error::<T>::InvalidQuantity
+        );
 
         let data = TokenData { attributes };
 
+        let group_id = bholdus_support_nft::Pallet::<T>::next_group_id();
+        bholdus_support_nft::Pallet::<T>::create_group();
+
+        let token_id = bholdus_support_nft::Pallet::<T>::next_token_id(class_id);
         for _ in 0..quantity {
-            bholdus_support_nft::Pallet::<T>::mint(&to, class_id, metadata.clone(), data.clone())?;
+            bholdus_support_nft::Pallet::<T>::mint_to_group(
+                &to,
+                class_id,
+                group_id,
+                metadata.clone(),
+                data.clone(),
+            )?;
         }
 
-        Self::deposit_event(Event::MintedToken(who, to, class_id, quantity));
+        Self::deposit_event(Event::MintedToken(who, to, class_id, token_id, quantity));
         Ok(())
     }
 

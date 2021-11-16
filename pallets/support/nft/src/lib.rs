@@ -65,6 +65,8 @@ pub mod pallet {
     pub trait Config: frame_system::Config {
         /// The class ID type
         type ClassId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
+        /// The group ID type
+        type GroupId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
         /// The token ID type
         type TokenId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
         /// The class properties type
@@ -73,6 +75,7 @@ pub mod pallet {
         type TokenData: Parameter + Member + MaybeSerializeDeserialize;
         /// The maximum size of a class's metadata
         type MaxClassMetadata: Get<u32>;
+
         /// The maximum size of a token's metadata
         type MaxTokenMetadata: Get<u32>;
     }
@@ -106,6 +109,8 @@ pub mod pallet {
     pub enum Error<T> {
         /// No available class ID
         NoAvailableClassId,
+        /// No available group ID
+        NoAvailableGroupId,
         /// No available token ID
         NoAvailableTokenId,
         /// Token(ClassId, TokenId) not found
@@ -125,6 +130,11 @@ pub mod pallet {
     #[pallet::storage]
     #[pallet::getter(fn next_class_id)]
     pub type NextClassId<T: Config> = StorageValue<_, T::ClassId, ValueQuery>;
+
+    /// Next available group ID.
+    #[pallet::storage]
+    #[pallet::getter(fn next_group_id)]
+    pub type NextGroupId<T: Config> = StorageValue<_, T::GroupId, ValueQuery>;
 
     /// Next available token ID.
     #[pallet::storage]
@@ -157,8 +167,35 @@ pub mod pallet {
             NMapKey<Blake2_128Concat, T::ClassId>,
             NMapKey<Blake2_128Concat, T::TokenId>,
         ),
-        (),
+        (T::AccountId, T::TokenId),
         ValueQuery,
+    >;
+
+    #[pallet::storage]
+    #[pallet::getter(fn owned_tokens)]
+    pub type OwnedTokens<T: Config> = StorageNMap<
+        _,
+        (
+            NMapKey<Blake2_128Concat, T::AccountId>, // owner
+            NMapKey<Blake2_128Concat, T::ClassId>,
+            NMapKey<Blake2_128Concat, T::TokenId>,
+        ),
+        (T::AccountId, T::TokenId),
+        ValueQuery,
+    >;
+
+    /// Store group info
+    #[pallet::storage]
+    #[pallet::getter(fn tokens_by_group)]
+    pub type TokensByGroup<T: Config> = StorageNMap<
+        _,
+        (
+            NMapKey<Blake2_128Concat, T::GroupId>, // group id
+            NMapKey<Blake2_128Concat, T::ClassId>,
+            NMapKey<Blake2_128Concat, T::TokenId>,
+        ),
+        T::TokenId,
+        //ValueQuery,
     >;
 
     #[pallet::genesis_config]
@@ -229,6 +266,19 @@ impl<T: Config> Pallet<T> {
 
         Ok(class_id)
     }
+
+    /// Create group
+    pub fn create_group() -> Result<T::GroupId, DispatchError> {
+        let group_id = NextGroupId::<T>::try_mutate(|id| -> Result<T::GroupId, DispatchError> {
+            let current_id = *id;
+            *id = id
+                .checked_add(&One::one())
+                .ok_or(Error::<T>::NoAvailableGroupId)?;
+            Ok(current_id)
+        })?;
+        Ok(group_id)
+    }
+
     /// Transfer NFT
     pub fn transfer(
         from: &T::AccountId,
@@ -245,7 +295,10 @@ impl<T: Config> Pallet<T> {
             info.owner = to.clone();
 
             TokensByOwner::<T>::remove((from, token.0, token.1));
-            TokensByOwner::<T>::insert((to, token.0, token.1), ());
+
+            TokensByOwner::<T>::insert((to, token.0, token.1), (to, token.1));
+
+            OwnedTokens::<T>::insert((to, token.0, token.1), (to, token.1));
             Ok(())
         })
     }
@@ -273,6 +326,43 @@ impl<T: Config> Pallet<T> {
                     .ok_or(ArithmeticError::Overflow)?;
                 Ok(())
             })?;
+            let token_info = TokenInfo {
+                metadata: bounded_metadata,
+                owner: owner.clone(),
+                data,
+            };
+
+            Tokens::<T>::insert(class_id, token_id, token_info);
+            TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
+            OwnedTokens::<T>::insert((owner, class_id, token_id), (owner, token_id));
+            Ok(token_id)
+        })
+    }
+
+    /// Mint NFT to `owner`
+    pub fn mint_to_group(
+        owner: &T::AccountId,
+        class_id: T::ClassId,
+        group_id: T::GroupId,
+        metadata: Vec<u8>,
+        data: T::TokenData,
+    ) -> Result<T::TokenId, DispatchError> {
+        NextTokenId::<T>::try_mutate(class_id, |id| -> Result<T::TokenId, DispatchError> {
+            let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> = metadata
+                .try_into()
+                .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
+            let token_id = *id;
+            *id = id
+                .checked_add(&One::one())
+                .ok_or(Error::<T>::NoAvailableTokenId)?;
+            Classes::<T>::try_mutate(class_id, |class_info| -> DispatchResult {
+                let info = class_info.as_mut().ok_or(Error::<T>::ClassNotFound)?;
+                info.total_issuance = info
+                    .total_issuance
+                    .checked_add(&One::one())
+                    .ok_or(ArithmeticError::Overflow)?;
+                Ok(())
+            })?;
 
             let token_info = TokenInfo {
                 metadata: bounded_metadata,
@@ -280,8 +370,9 @@ impl<T: Config> Pallet<T> {
                 data,
             };
             Tokens::<T>::insert(class_id, token_id, token_info);
-            TokensByOwner::<T>::insert((owner, class_id, token_id), ());
-
+            TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
+            OwnedTokens::<T>::insert((owner, class_id, token_id), (owner, token_id));
+            TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
             Ok(token_id)
         })
     }

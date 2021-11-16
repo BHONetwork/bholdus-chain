@@ -75,12 +75,14 @@ impl pallet_utility::Config for Runtime {
 parameter_types! {
     pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
     pub MaxAttributesBytes: u32 = 10;
+    pub MaxQuantity: u32 = 100;
 }
 
 impl Config for Runtime {
     type Event = Event;
     type PalletId = NftPalletId;
     type MaxAttributesBytes = MaxAttributesBytes;
+    type MaxQuantity = MaxQuantity;
     type WeightInfo = ();
 }
 
@@ -91,6 +93,7 @@ parameter_types! {
 
 impl bholdus_support_nft::Config for Runtime {
     type ClassId = u32;
+    type GroupId = u32;
     type TokenId = u64;
     type ClassData = ClassData;
     type TokenData = TokenData;
@@ -119,7 +122,9 @@ construct_runtime!(
 
 pub const ALICE: AccountId = AccountId::new([1u8; 32]);
 pub const BOB: AccountId = AccountId::new([2u8; 32]);
+pub const DAVE: AccountId = AccountId::new([3u8; 32]);
 pub const CLASS_ID: <Runtime as bholdus_support_nft::Config>::ClassId = 0;
+pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
 pub const CLASS_ID_NOT_EXIST: <Runtime as bholdus_support_nft::Config>::ClassId = 1;
 pub const TOKEN_ID: <Runtime as bholdus_support_nft::Config>::TokenId = 0;
 pub const TOKEN_ID_NOT_EXIST: <Runtime as bholdus_support_nft::Config>::TokenId = 1;
