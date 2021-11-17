@@ -980,7 +980,7 @@ parameter_types! {
 }
 
 parameter_type_with_key! {
-    pub ExistentialDeposits: |_asset_id: u32| -> Balance {
+    pub ExistentialDeposits: |_asset_id: u64| -> Balance {
         Zero::zero()
     };
 }
@@ -1003,7 +1003,7 @@ impl bholdus_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = Amount;
-    type AssetId = u32;
+    type AssetId = u64;
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
     type FieldDeposit = FieldDeposit;
