@@ -95,7 +95,7 @@ pub use types::*;
 use sp_runtime::{
     traits::{
         AccountIdConversion, AppendZerosInput, AtLeast32BitUnsigned, Bounded, CheckedAdd,
-        CheckedSub, MaybeSerializeDeserialize, Member, Saturating, StaticLookup, Zero,
+        CheckedSub, MaybeSerializeDeserialize, Member, One, Saturating, StaticLookup, Zero,
     },
     ArithmeticError, DispatchError, DispatchResult, RuntimeDebug, TokenError,
 };
@@ -224,7 +224,13 @@ pub mod pallet {
             + MaybeSerializeDeserialize;
 
         /// Identifier for the class of asset.
-        type AssetId: Member + Parameter + Copy + MaybeSerializeDeserialize + Ord;
+        type AssetId: Member
+            + Parameter
+            + Default
+            + Copy
+            + MaybeSerializeDeserialize
+            + Ord
+            + AtLeast32BitUnsigned;
 
         /// The currency mechanism.
         type Currency: PalletReservableCurrency<Self::AccountId>;
@@ -280,6 +286,11 @@ pub mod pallet {
         /// The minimum amount required to keep an account.
         type ExistentialDeposits: GetByKey<Self::AssetId, Self::Balance>;
     }
+
+    #[pallet::storage]
+    #[pallet::getter(fn next_asset_id)]
+    pub(super) type NextAssetId<T: Config<I>, I: 'static = ()> =
+        StorageValue<_, T::AssetId, ValueQuery>;
 
     #[pallet::storage]
     #[pallet::getter(fn asset)]
@@ -395,6 +406,8 @@ pub mod pallet {
 
     #[pallet::error]
     pub enum Error<T, I = ()> {
+        /// No available token ID
+        NoAvailableTokenId,
         /// Account balance must be greater than or equal to the transfer amount.
         BalanceLow,
         /// Value too low to create account due to existential deposit
@@ -462,21 +475,28 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::create())]
         pub fn create(
             origin: OriginFor<T>,
-            id: T::AssetId,
             admin: <T::Lookup as StaticLookup>::Source,
             min_balance: T::Balance,
         ) -> DispatchResult {
+            let token_id =
+                NextAssetId::<T, I>::try_mutate(|id| -> Result<T::AssetId, DispatchError> {
+                    let current_id = *id;
+                    *id = id
+                        .checked_add(&One::one())
+                        .ok_or(Error::<T, I>::NoAvailableTokenId)?;
+                    Ok(current_id)
+                })?;
+
             let owner = ensure_signed(origin)?;
             let admin = T::Lookup::lookup(admin)?;
 
-            ensure!(!Asset::<T, I>::contains_key(id), Error::<T, I>::InUse);
             ensure!(!min_balance.is_zero(), Error::<T, I>::MinBalanceZero);
 
             let deposit = T::AssetDeposit::get();
             T::Currency::reserve(&owner, deposit)?;
 
             Asset::<T, I>::insert(
-                id,
+                token_id,
                 AssetDetails {
                     owner: owner.clone(),
                     issuer: admin.clone(),
@@ -492,7 +512,7 @@ pub mod pallet {
                     is_frozen: false,
                 },
             );
-            Self::deposit_event(Event::Created(id, owner, admin));
+            Self::deposit_event(Event::Created(token_id, owner, admin));
             Ok(())
         }
 

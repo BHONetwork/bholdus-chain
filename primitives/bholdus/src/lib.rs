@@ -5,6 +5,7 @@
 
 pub mod currency;
 pub mod dex;
+pub mod token;
 
 use sp_runtime::{
     generic,
@@ -14,6 +15,7 @@ use sp_runtime::{
 
 pub use currency::*;
 pub use dex::*;
+pub use token::*;
 
 /// An index to a block.
 pub type BlockNumber = u32;
