@@ -1020,12 +1020,14 @@ impl bholdus_tokens::Config for Runtime {
 
 parameter_types! {
     pub MaxAttributesBytes: u32 = 2048;
+    pub MaxQuantity: u32 = 100;
 }
 
 impl bholdus_nft::Config for Runtime {
     type Event = Event;
     type PalletId = NftPalletId;
     type MaxAttributesBytes = MaxAttributesBytes;
+    type MaxQuantity = MaxQuantity;
     type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
 }
 
@@ -1036,6 +1038,7 @@ parameter_types! {
 
 impl bholdus_support_nft::Config for Runtime {
     type ClassId = u32;
+    type GroupId = u32;
     type TokenId = u64;
     type ClassData = bholdus_nft::ClassData;
     type TokenData = bholdus_nft::TokenData;
