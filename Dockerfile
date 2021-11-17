@@ -8,7 +8,7 @@ COPY . .
 
 RUN ./scripts/init.sh
 
-RUN cargo build --release --features with-bholdus-runtime
+RUN cargo build --release --features with-{{RELEASE_NETWORK}}-runtime
 
 RUN mv ./target/release/bholdus /usr/local/bin
 
