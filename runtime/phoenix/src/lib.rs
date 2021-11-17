@@ -1038,6 +1038,7 @@ parameter_types! {
 
 impl bholdus_support_nft::Config for Runtime {
     type ClassId = u32;
+    type GroupId = u32;
     type TokenId = u64;
     type ClassData = bholdus_nft::ClassData;
     type TokenData = bholdus_nft::TokenData;
