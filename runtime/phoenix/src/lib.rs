@@ -1046,7 +1046,7 @@ impl bholdus_support_nft::Config for Runtime {
     type MaxTokenMetadata = MaxTokenMetadata;
 }
 
-parameter_types! {
+/* parameter_types! {
     pub const ExchangeFee: (u32, u32) = (3,1000);
     pub const TradingPathLimit: u32 = 3;
     pub const DexPalletId: PalletId = PalletId(*b"bhol/dex");
@@ -1058,7 +1058,7 @@ impl bholdus_dex::Config for Runtime {
     type TradingPathLimit = TradingPathLimit;
     type Currency = Currencies;
     type PalletId = DexPalletId;
-}
+} */
 
 impl bholdus_bridge_native_transfer::Config for Runtime {
     type Event = Event;
@@ -1117,7 +1117,7 @@ construct_runtime!(
         // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
-        Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
+        // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
