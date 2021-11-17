@@ -204,10 +204,10 @@ fn transfer_should_fail() {
 #[test]
 fn burn_should_work() {
     ExtBuilder::default().build().execute_with(|| {
-        println!(
-            "burn: owned_tokens {:?}",
-            OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>()
-        );
+        // println!(
+        //     "burn: owned_tokens {:?}",
+        //     OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>()
+        // );
 
         assert_ok!(BholdusNFT::create_class(&ALICE, ()));
         assert_ok!(BholdusNFT::create_class(&ALICE, ()));

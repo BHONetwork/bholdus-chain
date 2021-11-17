@@ -115,8 +115,15 @@ pub mod pallet {
     pub enum Event<T: Config> {
         /// Created NFT class: \[owner, class_id\]
         CreatedClass(T::AccountId, ClassIdOf<T>),
-        /// Minted NFT: \[from, to, class_id, quantity\]
-        MintedToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>, u32),
+        /// Minted NFT: \[from, to, group_id, class_id, token_id,  quantity\]
+        MintedToken(
+            T::AccountId,
+            T::AccountId,
+            GroupIdOf<T>,
+            ClassIdOf<T>,
+            TokenIdOf<T>,
+            u32,
+        ),
         /// Transferred NFT: \[from, to, class_id, token_id\]
         TransferredToken(T::AccountId, T::AccountId, ClassIdOf<T>, TokenIdOf<T>),
         /// Burned NFT: \[owner, class_id, token_id\]
@@ -277,7 +284,9 @@ impl<T: Config> Pallet<T> {
             )?;
         }
 
-        Self::deposit_event(Event::MintedToken(who, to, class_id, token_id, quantity));
+        Self::deposit_event(Event::MintedToken(
+            who, to, group_id, class_id, token_id, quantity,
+        ));
         Ok(())
     }
 

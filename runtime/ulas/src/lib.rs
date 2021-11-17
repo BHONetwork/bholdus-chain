@@ -980,12 +980,12 @@ parameter_types! {
 }
 
 parameter_type_with_key! {
-    pub ExistentialDeposits: |_currency_id: CurrencyId| -> Balance {
+    pub ExistentialDeposits: |_asset_id: u64| -> Balance {
         Zero::zero()
     };
 }
 
-parameter_types! {
+/* parameter_types! {
     pub const GetNativeCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
 }
 
@@ -997,11 +997,13 @@ impl bholdus_currencies::Config for Runtime {
     type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
 }
 
+*/
+
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = Amount;
-    type AssetId = CurrencyId;
+    type AssetId = u64;
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
     type FieldDeposit = FieldDeposit;
@@ -1125,7 +1127,7 @@ construct_runtime!(
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
         // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.

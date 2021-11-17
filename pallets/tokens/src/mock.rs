@@ -21,6 +21,7 @@ pub type AccountId = u64;
 pub const BUSD: AssetId = 1;
 pub const ALICE: AccountId = 0;
 pub const BOB: AccountId = 1;
+pub const ASSET_ID: AssetId = 0;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>;
 type Block = frame_system::mocking::MockBlock<Runtime>;

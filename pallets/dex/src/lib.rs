@@ -16,11 +16,11 @@ use sp_runtime::{
 };
 use sp_std::{convert::TryInto, prelude::*, vec};
 
-#[cfg(test)]
-mod mock;
+// #[cfg(test)]
+// mod mock;
 
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;

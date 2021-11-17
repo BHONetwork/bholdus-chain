@@ -171,19 +171,6 @@ pub mod pallet {
         ValueQuery,
     >;
 
-    #[pallet::storage]
-    #[pallet::getter(fn owned_tokens)]
-    pub type OwnedTokens<T: Config> = StorageNMap<
-        _,
-        (
-            NMapKey<Blake2_128Concat, T::AccountId>, // owner
-            NMapKey<Blake2_128Concat, T::ClassId>,
-            NMapKey<Blake2_128Concat, T::TokenId>,
-        ),
-        (T::AccountId, T::TokenId),
-        ValueQuery,
-    >;
-
     /// Store group info
     #[pallet::storage]
     #[pallet::getter(fn tokens_by_group)]
@@ -298,7 +285,6 @@ impl<T: Config> Pallet<T> {
 
             TokensByOwner::<T>::insert((to, token.0, token.1), (to, token.1));
 
-            OwnedTokens::<T>::insert((to, token.0, token.1), (to, token.1));
             Ok(())
         })
     }
@@ -334,7 +320,6 @@ impl<T: Config> Pallet<T> {
 
             Tokens::<T>::insert(class_id, token_id, token_info);
             TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
-            OwnedTokens::<T>::insert((owner, class_id, token_id), (owner, token_id));
             Ok(token_id)
         })
     }
@@ -371,7 +356,6 @@ impl<T: Config> Pallet<T> {
             };
             Tokens::<T>::insert(class_id, token_id, token_info);
             TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
-            OwnedTokens::<T>::insert((owner, class_id, token_id), (owner, token_id));
             TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
             Ok(token_id)
         })

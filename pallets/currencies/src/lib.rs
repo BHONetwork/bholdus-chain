@@ -28,10 +28,12 @@ use sp_std::{
     fmt::Debug,
     marker, result,
 };
-#[cfg(test)]
-mod mock;
-#[cfg(test)]
-mod tests;
+
+// #[cfg(test)]
+// mod mock;
+// #[cfg(test)]
+// mod tests;
+
 mod weights;
 
 pub use pallet::*;
