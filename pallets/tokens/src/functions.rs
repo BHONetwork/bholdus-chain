@@ -7,7 +7,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 	http://www.apache.org/licenses/LICENSE-2.0
+//  http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -319,12 +319,19 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 
     /// Set GenesisConfig
     pub(super) fn do_set_genesis(
-        id: T::AssetId,
         who: &T::AccountId,
         amount: T::Balance,
     ) -> Result<bool, DispatchError> {
+        let asset_id =
+            NextAssetId::<T, I>::try_mutate(|id| -> Result<T::AssetId, DispatchError> {
+                let current_id = *id;
+                *id = id
+                    .checked_add(&One::one())
+                    .ok_or(Error::<T, I>::NoAvailableTokenId)?;
+                Ok(current_id)
+            })?;
         Asset::<T, I>::insert(
-            id,
+            asset_id,
             AssetDetails {
                 owner: who.clone(),
                 issuer: who.clone(),
@@ -341,10 +348,11 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             },
         );
 
-        Self::increase_balance(id, who, amount, |details| -> DispatchResult {
+        Self::increase_balance(asset_id, who, amount, |details| -> DispatchResult {
             details.supply = details.supply.saturating_add(amount);
             Ok(())
         })?;
+
         Ok(true)
     }
 

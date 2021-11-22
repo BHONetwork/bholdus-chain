@@ -46,9 +46,6 @@ impl frame_system::Config for Runtime {
     type OnSetCode = ();
 }
 
-type CurrencyId = u32;
-type Balance = u64;
-
 parameter_types! {
     pub const ExistentialDeposit: u64 = 1;
 }
@@ -75,17 +72,6 @@ parameter_types! {
     pub DustAccount: AccountId = PalletId(*b"orml/dst").into_account();
     pub MaxLocks: u32 = 100_000;
 }
-
-// impl orml_tokens::Config for Runtime {
-//     type Event = Event;
-//     type Balance = Balance;
-//     type Amount = i64;
-//     type AssetId = CurrencyId;
-//     type WeightInfo = ();
-//     type ExistentialDeposits = ExistentialDeposits;
-//     // type OnDust = orml_tokens::TransferDust<Runtime, DustAccount>;
-//     // type MaxLocks = MaxLocks;
-// }
 
 parameter_types! {
     pub const BasicDeposit: u64 = 10;
@@ -126,19 +112,19 @@ impl bholdus_tokens::Config for Runtime {
     type ExistentialDeposits = ExistentialDeposits;
 }
 
-parameter_types! {
-    pub const GetNativeCurrencyId: CurrencyId = NATIVE_CURRENCY_ID;
-}
+// parameter_types! {
+//     pub const GetNativeCurrencyId: CurrencyId = NATIVE_CURRENCY_ID;
+// }
 
 impl Config for Runtime {
     type Event = Event;
     type MultiCurrency = BholdusTokens;
-    type NativeCurrency = AdaptedBasicCurrency;
-    type GetNativeCurrencyId = GetNativeCurrencyId;
+    // type NativeCurrency = AdaptedBasicCurrency;
+    // type GetNativeCurrencyId = GetNativeCurrencyId;
     type WeightInfo = ();
 }
 
-pub type NativeCurrency = NativeCurrencyOf<Runtime>;
+// pub type NativeCurrency = NativeCurrencyOf<Runtime>;
 pub type AdaptedBasicCurrency = BasicCurrencyAdapter<Runtime, PalletBalances, i64, u64>;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>;
@@ -152,45 +138,43 @@ construct_runtime!(
     {
         System: frame_system::{Pallet, Call, Storage, Config, Event<T>},
         Currencies: currencies::{Pallet, Call, Event<T>},
-        // Tokens: orml_tokens::{Pallet, Storage, Event<T>, Config<T>},
         BholdusTokens: bholdus_tokens::{Pallet, Storage, Event<T>},
         PalletBalances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
     }
 );
 
+pub type CurrencyId = u64;
+pub type Balance = u64;
 pub const ALICE: AccountId = AccountId32::new([1u8; 32]);
 pub const BOB: AccountId = AccountId32::new([2u8; 32]);
 pub const EVA: AccountId = AccountId32::new([5u8; 32]);
+pub const TOKEN_ID: CurrencyId = 1;
+pub const NATIVE_CURRENCY_ID: CurrencyId = 0;
+pub const X_TOKEN_ID: CurrencyId = 2;
+
 pub const ID_1: LockIdentifier = *b"1       ";
 
 pub struct ExtBuilder {
-    balances: Vec<(AccountId, CurrencyId, Balance)>,
+    balances: Vec<(AccountId, Balance)>,
+    balances_tokens: Vec<(AccountId, Balance)>,
 }
 
 impl Default for ExtBuilder {
     fn default() -> Self {
         Self {
-            balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100), (ALICE, 1, 100)],
-            // balances: vec![(ALICE, NATIVE_CURRENCY_ID, 100)],
+            balances: vec![(ALICE, 100), (BOB, 100), (EVA, 100)],
+            balances_tokens: vec![(ALICE, 100), (BOB, 100), (ALICE, 100)], // token_id: 0,1,2,
         }
     }
 }
 
-pub const NATIVE_CURRENCY_ID: CurrencyId = 0;
-pub const X_TOKEN_ID: CurrencyId = 3;
-
 impl ExtBuilder {
-    pub fn balances(mut self, balances: Vec<(AccountId, CurrencyId, Balance)>) -> Self {
+    pub fn balances(mut self, balances: Vec<(AccountId, Balance)>) -> Self {
         self.balances = balances;
         self
     }
     pub fn one_hundred_for_alice_n_bob(self) -> Self {
-        self.balances(vec![
-            // (ALICE, NATIVE_CURRENCY_ID, 100),
-            // (BOB, NATIVE_CURRENCY_ID, 100),
-            (ALICE, X_TOKEN_ID, 100),
-            // (BOB, X_TOKEN_ID, 100),
-        ])
+        self.balances(vec![(ALICE, 100)])
     }
 
     pub fn build(self) -> sp_io::TestExternalities {
@@ -202,24 +186,23 @@ impl ExtBuilder {
             balances: self
                 .balances
                 .clone()
-                .into_iter()
-                .filter(|(_, currency_id, _)| *currency_id == NATIVE_CURRENCY_ID)
-                .map(|(account_id, _, initial_balance)| (account_id, initial_balance))
-                .collect::<Vec<_>>(),
+                // .into_iter()
+                // .filter(|(_, currency_id, _)| *currency_id == NATIVE_CURRENCY_ID)
+                // .map(|(account_id, initial_balance)| (account_id, initial_balance))
+                // .collect::<Vec<_>>(),
         }
         .assimilate_storage(&mut t)
         .unwrap();
 
         bholdus_tokens::GenesisConfig::<Runtime> {
             balances: self
-                .balances
-                .into_iter()
-                .filter(|(_, currency_id, _)| *currency_id != NATIVE_CURRENCY_ID)
-                .collect::<Vec<_>>(),
+                .balances_tokens
+                // .into_iter()
+                // .filter(|(_, currency_id, _)| *currency_id != NATIVE_CURRENCY_ID)
+                // .collect::<Vec<_>>(),
         }
         .assimilate_storage(&mut t)
         .unwrap();
-
         t.into()
     }
 }
