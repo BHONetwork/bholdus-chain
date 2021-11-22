@@ -385,7 +385,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: u128 = 1*DOLLARS;
+    pub const ExistentialDeposit: u128 = 1*UNITS/100;
     pub const MaxLocks: u32 = 50;
 }
 
@@ -1065,6 +1065,7 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type Event = Event;
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type Currency = Balances;
+    type MinimumDeposit = ExistentialDeposit;
 }
 
 /// Configure the pallet-template in pallets/template.
