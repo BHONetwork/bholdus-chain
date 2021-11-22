@@ -68,8 +68,8 @@ pub use sp_runtime::BuildStorage;
 
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
+use bholdus_primitives::CurrencyId;
 pub use bholdus_primitives::*;
-use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
@@ -116,7 +116,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_000_001,
+    spec_version: 1_000_003,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -181,7 +181,7 @@ parameter_types! {
         })
         .avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
         .build_or_panic();
-    pub const SS58Prefix: u16 = 2207;
+    pub const SS58Prefix: u16 = 2209;
 }
 
 // Configure FRAME pallets to include in runtime.
