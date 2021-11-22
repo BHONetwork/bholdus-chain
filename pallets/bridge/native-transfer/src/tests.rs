@@ -213,6 +213,16 @@ fn initiate_transfer_should_work() {
             BridgeNativeTransfer::initiate_transfer(
                 Origin::signed(ALICE),
                 to.clone(),
+                1,
+                target_chain
+            ),
+            crate::Error::<Runtime>::MinimumDepositRequired
+        );
+
+        assert_noop!(
+            BridgeNativeTransfer::initiate_transfer(
+                Origin::signed(ALICE),
+                to.clone(),
                 1_000_000u128,
                 target_chain
             ),
