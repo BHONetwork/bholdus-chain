@@ -1520,9 +1520,7 @@ name = "cygnus-runtime"
 version = "1.0.0"
 dependencies = [
  "beefy-primitives",
- "bholdus-bridge-bsc",
  "bholdus-currencies",
- "bholdus-dex",
  "bholdus-nft",
  "bholdus-primitives",
  "bholdus-support",
@@ -5357,12 +5355,11 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
  "bholdus-currencies",
- "bholdus-dex",
  "bholdus-nft",
  "bholdus-primitives",
  "bholdus-support",
@@ -8903,9 +8900,7 @@ name = "ulas-runtime"
 version = "1.0.0"
 dependencies = [
  "beefy-primitives",
- "bholdus-bridge-bsc",
  "bholdus-currencies",
- "bholdus-dex",
  "bholdus-nft",
  "bholdus-primitives",
  "bholdus-support",

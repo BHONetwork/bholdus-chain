@@ -66,7 +66,6 @@ pub use pallet_sudo::Call as SudoCall;
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
 
-use bholdus_bridge_bsc::BSCConfiguration;
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
 use bholdus_primitives::CurrencyId;
@@ -1063,7 +1062,7 @@ impl bholdus_dex::Config for Runtime {
     type PalletId = DexPalletId;
 }
  */
-parameter_types! {
+/* parameter_types! {
     pub Configuration: BSCConfiguration = BSCConfiguration {
         chain_id: 97,
         min_gas_limit: 0x1388.into(),
@@ -1077,7 +1076,7 @@ impl bholdus_bridge_bsc::Config for Runtime {
     type UnixTime = Timestamp;
     type OnHeadersSubmitted = ();
 }
-
+ */
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
     type Event = Event;
@@ -1394,6 +1393,20 @@ impl_runtime_apis! {
             opaque::SessionKeys::decode_into_raw_public_keys(&encoded)
         }
     }
+
+    #[cfg(feature = "try-runtime")]
+    impl frame_try_runtime::TryRuntime<Block> for Runtime {
+        fn on_runtime_upgrade() -> (Weight, Weight) {
+            log::info!("try-runtime::on_runtime_upgrade.");
+            let weight = Executive::try_runtime_upgrade().unwrap();
+            (weight, RuntimeBlockWeights::get().max_block)
+        }
+
+        fn execute_block_no_check(block: Block) -> Weight {
+            Executive::execute_block_no_check(block)
+        }
+    }
+
 
     #[cfg(feature = "runtime-benchmarks")]
     impl frame_benchmarking::Benchmark<Block> for Runtime {

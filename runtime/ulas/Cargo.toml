@@ -97,8 +97,6 @@ bholdus-nft = { version = "4.0.0-dev", path = "../../pallets/non-fungible-token"
 bholdus-support-nft = { package = "support-nft", version = "4.0.0-dev", path = "../../pallets/support/nft", default-features = false }
 bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", default-features = false }
 bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
-bholdus-dex = { version = "4.0.0-dev", path = "../../pallets/dex", default-features = false }
-bholdus-bridge-bsc = { version = "4.0.0-dev", path = "../../pallets/bridge/bsc", default-features = false }
 
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
 
@@ -175,9 +173,7 @@ std = [
 	"bholdus-support-nft/std",
 	"bholdus-support/std",
 	"bholdus-currencies/std",
-	"bholdus-dex/std",
 	"bholdus-primitives/std",
-	"bholdus-bridge-bsc/std",
 
 	"sp-api/std",
 	"sp-block-builder/std",
