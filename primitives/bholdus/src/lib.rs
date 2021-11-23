@@ -58,6 +58,11 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
 
+pub type TokenId = u64;
+
 pub type Ratio = FixedU128;
+pub type Rate = FixedU128;
 
 pub type NFTBalance = u128;
+/// An insert or duration in time.
+pub type EraIndex = u32;

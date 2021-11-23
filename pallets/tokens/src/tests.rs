@@ -1,9 +1,18 @@
 //! Tests for Tokens pallet.
 
 use super::*;
-use crate::{mock::*, Error};
+use crate::{mock::*, Error, Event};
 use frame_support::{assert_noop, assert_ok, traits::Currency};
 use sp_runtime::traits::BadOrigin;
+
+type Blacklist = BTreeMap<Vec<u8>, Vec<u8>>;
+
+fn test_blacklist(x: u8) -> Blacklist {
+    let mut blacklist: Blacklist = BTreeMap::new();
+    blacklist.insert(vec![x], vec![x]);
+    blacklist.insert(vec![x + 1], vec![x + 1]);
+    blacklist
+}
 
 #[test]
 fn genesis_issuance_should_work() {
@@ -18,6 +27,66 @@ fn genesis_issuance_should_work() {
             assert_eq!(BholdusTokens::total_issuance(BUSD), 100);
             assert_eq!(BholdusTokens::total_balance(BUSD, &ALICE), 50);
         })
+}
+
+/* #[test]
+fn blacklist_should_work() {
+    new_test_ext().execute_with(|| {
+        assert_ok!(BholdusTokens::set_blacklist(
+            Origin::root(),
+            vec![1],
+            vec![2]
+        ));
+
+        // System::assert_last_event(Event::BholdusTokens(crate::Event::BlacklistSet(
+        //     vec![1],
+        //     vec![2],
+        // )));
+
+        BholdusTokens::set_blacklist(Origin::root(), vec![1], vec![1]);
+        BholdusTokens::set_blacklist(Origin::root(), vec![2], vec![2]);
+        assert_eq!(AssetsBlacklist::<Runtime>::take(), test_blacklist(1));
+
+        BholdusTokens::set_blacklist(Origin::root(), vec![3], vec![3]);
+        BholdusTokens::set_blacklist(Origin::root(), vec![4], vec![4]);
+
+        let w = AssetsBlacklist::<Runtime>::take();
+        assert_eq!(w.keys().cloned().collect::<Vec<_>>(), [vec![3], vec![4]]);
+    });
+} */
+
+#[test]
+fn blacklist_should_work() {
+    new_test_ext().execute_with(|| {
+        assert_ok!(BholdusTokens::set_blacklist(
+            Origin::root(),
+            vec![1],
+            vec![2]
+        ));
+
+        assert_eq!(
+            AssetsBlacklist::<Runtime>::take().contains(&(vec![1], vec![2])),
+            true
+        );
+
+        BholdusTokens::set_blacklist(Origin::root(), vec![5], vec![6]);
+        BholdusTokens::set_blacklist(Origin::root(), vec![7], vec![8]);
+
+        // assert_eq!(
+        //     AssetsBlacklist::<Runtime>::take().contains(&(vec![5], vec![6])),
+        //     true
+        // );
+
+        assert_eq!(
+            AssetsBlacklist::<Runtime>::take().contains(&(vec![7], vec![8])),
+            true
+        );
+
+        assert_eq!(
+            AssetsBlacklist::<Runtime>::take().contains(&(vec![3], vec![4])),
+            false
+        );
+    })
 }
 
 #[test]
@@ -158,6 +227,13 @@ fn set_identity_should_not_work() {
 #[test]
 fn set_metadata_should_work() {
     new_test_ext().execute_with(|| {
+        BholdusTokens::set_blacklist(Origin::root(), vec![0u8; 1], vec![0u8; 2]);
+
+        assert_noop!(
+            BholdusTokens::set_metadata(Origin::signed(1), 0, vec![0u8; 1], vec![0u8; 2], 12),
+            Error::<Runtime>::AssetBlacklist
+        );
+
         // Cannot add metadata to unknown asset
         assert_noop!(
             BholdusTokens::set_metadata(Origin::signed(1), 0, vec![0u8; 10], vec![0u8; 10], 12),
@@ -191,6 +267,7 @@ fn set_metadata_should_work() {
             vec![0u8; 10],
             12
         ));
+
         assert_eq!(Balances::free_balance(&1), 9); // ??
 
         // Clear Metadata

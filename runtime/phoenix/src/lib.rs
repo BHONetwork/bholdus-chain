@@ -43,8 +43,8 @@ use sp_core::{
 use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::generic::Era;
 use sp_runtime::traits::{
-    self, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys, SaturatedConversion,
-    StaticLookup, Zero,
+    self, AccountIdConversion, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys,
+    SaturatedConversion, StaticLookup, Zero,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
@@ -68,8 +68,8 @@ pub use sp_runtime::BuildStorage;
 
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
-use bholdus_primitives::CurrencyId;
 pub use bholdus_primitives::*;
+use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
@@ -687,11 +687,13 @@ parameter_types! {
     pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
     pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
+    pub const StakingTokensPalletId: PalletId = PalletId(*b"bho/stkt");
     pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
     pub const MaximumReasonLength: u32 = 16384;
     pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
     pub const BountyValueMinimum: Balance = 5 * DOLLARS;
     pub const MaxApprovals: u32 = 100;
+    pub UnreleasedNativeVaultAccountId: AccountId = PalletId(*b"bho/urls").into_account();
 }
 
 impl pallet_treasury::Config for Runtime {
@@ -979,28 +981,22 @@ parameter_types! {
 }
 
 parameter_type_with_key! {
-    pub ExistentialDeposits: |_asset_id: u64| -> Balance {
+    pub ExistentialDeposits: |_asset_id: TokenId| -> Balance {
         Zero::zero()
     };
 }
 
-/* parameter_types! {
-    pub const GetNativeCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
-*/
-
-/* impl bholdus_currencies::Config for Runtime {
+impl bholdus_currencies::Config for Runtime {
     type Event = Event;
     type MultiCurrency = Tokens;
-    type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-    type GetNativeCurrencyId = GetNativeCurrencyId;
     type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
-} */
+}
 
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = Amount;
-    type AssetId = u64;
+    type AssetId = TokenId;
 
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
@@ -1018,6 +1014,29 @@ impl bholdus_tokens::Config for Runtime {
     type WeightInfo = bholdus_tokens::weights::SubstrateWeight<Runtime>;
     type ExistentialDeposits = ExistentialDeposits;
 }
+
+/* impl bholdus_support_rewards::Config for Runtime {
+    type Share = Balance;
+    type Balance = Balance;
+    type PoolId = bholdus_staking_tokens::PoolId;
+    type CurrencyId = TokenId;
+    type Handler = StakingTokens;
+}
+
+parameter_types! {
+    pub const GetStableCurrencyId: TokenId = 0;
+}
+
+impl bholdus_staking_tokens::Config for Runtime {
+    type Event = Event;
+    type RewardsSource = UnreleasedNativeVaultAccountId;
+    type StableCurrencyId = GetStableCurrencyId;
+    type Currency = Currencies;
+    // type EmergencyShutdown = EmergencyShutdown;
+    type PalletId = StakingTokensPalletId;
+    // type WeightInfo = weights::staking_tokens::WeightInfo<Runtime>;
+    type WeightInfo = ();
+} */
 
 parameter_types! {
     pub MaxAttributesBytes: u32 = 2048;
@@ -1114,11 +1133,13 @@ construct_runtime!(
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>},
 
-        Tokens: bholdus_tokens::{Pallet, Call, Storage, Event<T>},
+        Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
+        // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        // BholdusSupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
+        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
