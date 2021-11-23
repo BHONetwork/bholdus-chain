@@ -231,7 +231,7 @@ fn set_metadata_should_work() {
 
         assert_noop!(
             BholdusTokens::set_metadata(Origin::signed(1), 0, vec![0u8; 1], vec![0u8; 2], 12),
-            Error::<Runtime>::AssetBacklist
+            Error::<Runtime>::AssetBlacklist
         );
 
         // Cannot add metadata to unknown asset

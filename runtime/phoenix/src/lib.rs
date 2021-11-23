@@ -68,8 +68,8 @@ pub use sp_runtime::BuildStorage;
 
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
-use bholdus_primitives::CurrencyId;
 pub use bholdus_primitives::*;
+use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
