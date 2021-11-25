@@ -29,7 +29,7 @@ fn create_class_should_work() {
         assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1)));
 
         System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
-            class_id_account(),
+            ALICE, //class_id_account(),
             CLASS_ID,
         )));
 
@@ -55,12 +55,14 @@ fn mint_should_work() {
         assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1),));
 
         System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
-            class_id_account(),
+            ALICE, //class_id_account(),
             CLASS_ID,
         )));
 
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE//class_id_account()
+                ),
             BOB,
             CLASS_ID,
             metadata_2.clone(),
@@ -69,12 +71,8 @@ fn mint_should_work() {
         ));
 
         System::assert_last_event(Event::NFTModule(crate::Event::MintedToken(
-            class_id_account(),
-            BOB,
-            GROUP_ID,
-            CLASS_ID,
-            TOKEN_ID,
-            3,
+            ALICE, //class_id_account(),
+            BOB, GROUP_ID, CLASS_ID, TOKEN_ID, 3,
         )));
 
         // Test TokensByOwner
@@ -231,7 +229,9 @@ fn transfer_should_work() {
         ));
 
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE //class_id_account()
+                ),
             BOB,
             CLASS_ID,
             metadata.clone(),
@@ -280,7 +280,9 @@ fn transfer_should_fail() {
             Default::default(),
         ));
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE, //class_id_account()
+                ),
             BOB,
             CLASS_ID,
             metadata,
@@ -323,7 +325,9 @@ fn burn_should_work() {
         ));
 
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE//class_id_account()
+                ),
             BOB,
             CLASS_ID,
             metadata.clone(),
@@ -358,7 +362,10 @@ fn burn_should_fail() {
             Default::default(),
         ));
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                //class_id_account()
+                ALICE
+            ),
             BOB,
             CLASS_ID,
             metadata,
@@ -395,7 +402,9 @@ fn destroy_class_should_work() {
             Default::default(),
         ));
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE//class_id_account()
+                ),
             BOB,
             CLASS_ID,
             metadata,
@@ -405,12 +414,14 @@ fn destroy_class_should_work() {
 
         assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
         assert_ok!(NFTModule::destroy_class(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE//class_id_account()
+                ),
             CLASS_ID,
         ));
 
         System::assert_last_event(Event::NFTModule(crate::Event::DestroyedClass(
-            class_id_account(),
+            ALICE, //class_id_account(),
             CLASS_ID,
         )));
     })
@@ -426,7 +437,10 @@ fn destroy_class_should_fail() {
         ));
 
         assert_ok!(NFTModule::mint(
-            Origin::signed(class_id_account()),
+            Origin::signed(
+                ALICE,
+                //class_id_account()
+            ),
             BOB,
             CLASS_ID,
             metadata,
@@ -435,7 +449,12 @@ fn destroy_class_should_fail() {
         ));
 
         assert_noop!(
-            NFTModule::destroy_class(Origin::signed(class_id_account()), CLASS_ID_NOT_EXIST),
+            NFTModule::destroy_class(
+                Origin::signed(
+                    ALICE //class_id_account()
+                    ),
+                CLASS_ID_NOT_EXIST
+            ),
             Error::<Runtime>::ClassIdNotFound
         );
 
@@ -445,14 +464,21 @@ fn destroy_class_should_fail() {
         // );
 
         assert_noop!(
-            NFTModule::destroy_class(Origin::signed(class_id_account()), CLASS_ID),
+            NFTModule::destroy_class(
+                Origin::signed(
+                    ALICE //class_id_account()
+                    ),
+                CLASS_ID
+            ),
             Error::<Runtime>::CannotDestroyClass
         );
 
         assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
 
         assert_ok!(NFTModule::destroy_class(
-            Origin::signed(class_id_account()),
+            Origin::signed(ALICE
+                //class_id_account()
+                ),
             CLASS_ID,
         ));
     });

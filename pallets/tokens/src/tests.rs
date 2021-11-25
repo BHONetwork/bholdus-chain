@@ -29,32 +29,6 @@ fn genesis_issuance_should_work() {
         })
 }
 
-/* #[test]
-fn blacklist_should_work() {
-    new_test_ext().execute_with(|| {
-        assert_ok!(BholdusTokens::set_blacklist(
-            Origin::root(),
-            vec![1],
-            vec![2]
-        ));
-
-        // System::assert_last_event(Event::BholdusTokens(crate::Event::BlacklistSet(
-        //     vec![1],
-        //     vec![2],
-        // )));
-
-        BholdusTokens::set_blacklist(Origin::root(), vec![1], vec![1]);
-        BholdusTokens::set_blacklist(Origin::root(), vec![2], vec![2]);
-        assert_eq!(AssetsBlacklist::<Runtime>::take(), test_blacklist(1));
-
-        BholdusTokens::set_blacklist(Origin::root(), vec![3], vec![3]);
-        BholdusTokens::set_blacklist(Origin::root(), vec![4], vec![4]);
-
-        let w = AssetsBlacklist::<Runtime>::take();
-        assert_eq!(w.keys().cloned().collect::<Vec<_>>(), [vec![3], vec![4]]);
-    });
-} */
-
 #[test]
 fn blacklist_should_work() {
     new_test_ext().execute_with(|| {
@@ -86,6 +60,123 @@ fn blacklist_should_work() {
             AssetsBlacklist::<Runtime>::take().contains(&(vec![3], vec![4])),
             false
         );
+    })
+}
+
+#[test]
+fn create_and_mint_should_work() {
+    new_test_ext().execute_with(|| {
+        let name: Vec<u8> = vec![1];
+        let symbol: Vec<u8> = vec![1];
+        let decimals: u8 = 12;
+        let beneficiary = BOB;
+        let supply: Balance = 1000;
+        let min_balance: Balance = 10;
+
+        Balances::make_free_balance_be(&ALICE, 10);
+
+        Balances::make_free_balance_be(&BOB, 100);
+
+        Balances::make_free_balance_be(&EVE, 10);
+
+        /*BholdusTokens::set_blacklist(Origin::root(), vec![0u8; 1], vec![0u8; 2]);
+        assert_noop!(
+            BholdusTokens::create_and_mint(
+                Origin::signed(BOB),
+                ALICE,
+                vec![0u8; 1],
+                vec![0u8; 2],
+                decimals,
+                beneficiary,
+                supply,
+                min_balance,
+            ),
+            Error::<Runtime>::AssetBlacklist
+        );
+        */
+
+        assert_eq!(BholdusTokens::next_asset_id(), ASSET_ID);
+        assert_ok!(BholdusTokens::create_and_mint(
+            Origin::signed(BOB),
+            ALICE,
+            name,
+            symbol,
+            decimals,
+            beneficiary,
+            supply,
+            min_balance,
+        ));
+        assert_eq!(BholdusTokens::next_asset_id(), 1);
+        assert_eq!(BholdusTokens::total_balance(ASSET_ID, &BOB), 1000);
+        assert_eq!(BholdusTokens::total_issuance(ASSET_ID), 1000);
+
+        assert_ok!(BholdusTokens::mint(
+            Origin::signed(ALICE),
+            ASSET_ID,
+            ALICE,
+            500
+        ));
+        assert_eq!(BholdusTokens::total_balance(ASSET_ID, &ALICE), 500);
+        assert_eq!(BholdusTokens::total_issuance(ASSET_ID), 1500);
+
+        assert_ok!(BholdusTokens::mint(Origin::signed(ALICE), 0, EVE, 100));
+        assert_eq!(BholdusTokens::total_balance(ASSET_ID, &EVE), 100);
+        assert_eq!(BholdusTokens::total_issuance(ASSET_ID), 1600);
+
+        assert_ok!(BholdusTokens::freeze(
+            Origin::signed(ALICE),
+            ASSET_ID,
+            ALICE
+        ));
+        assert_noop!(
+            BholdusTokens::transfer(Origin::signed(ALICE), ASSET_ID, EVE, 50),
+            Error::<Runtime>::Frozen
+        );
+        assert_ok!(BholdusTokens::thaw(Origin::signed(ALICE), ASSET_ID, ALICE));
+        assert_ok!(BholdusTokens::transfer(
+            Origin::signed(ALICE),
+            ASSET_ID,
+            EVE,
+            50
+        ));
+        assert_eq!(BholdusTokens::total_balance(ASSET_ID, &ALICE), 450);
+        assert_eq!(BholdusTokens::total_balance(ASSET_ID, &EVE), 150);
+        assert_eq!(BholdusTokens::total_issuance(ASSET_ID), 1600);
+
+        assert_ok!(BholdusTokens::freeze_asset(Origin::signed(ALICE), ASSET_ID));
+        let w = Asset::<Runtime>::get(ASSET_ID)
+            .ok_or(Error::<Runtime>::Unknown)
+            .unwrap();
+        assert!(&w.is_frozen);
+
+        assert_noop!(
+            BholdusTokens::set_identity(Origin::signed(BOB), ASSET_ID, ten()),
+            Error::<Runtime>::Frozen
+        );
+
+        assert_noop!(
+            BholdusTokens::set_identity(Origin::signed(ALICE), ASSET_ID, ten()),
+            Error::<Runtime>::NoPermission
+        );
+
+        assert_ok!(BholdusTokens::thaw_asset(Origin::signed(ALICE), ASSET_ID));
+        let w1 = Asset::<Runtime>::get(ASSET_ID).ok_or(Error::<Runtime>::Unknown);
+        assert!(!&w1.unwrap().is_frozen);
+
+        assert_ok!(BholdusTokens::set_identity(
+            Origin::signed(1),
+            ASSET_ID,
+            ten()
+        ));
+
+        assert_eq!(BholdusTokens::identity(ASSET_ID).unwrap().info, ten());
+        assert!(!BholdusTokens::identity(ASSET_ID).unwrap().is_verifiable);
+        assert_ok!(BholdusTokens::verify_asset(Origin::root(), ASSET_ID));
+        assert_noop!(
+            BholdusTokens::verify_asset(Origin::signed(BOB), ASSET_ID),
+            BadOrigin
+        );
+        assert!(BholdusTokens::identity(ASSET_ID).unwrap().is_verifiable);
     })
 }
 
