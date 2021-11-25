@@ -5262,7 +5262,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.5"
+version = "1.0.6"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
