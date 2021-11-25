@@ -21,6 +21,45 @@ use super::*;
 
 // The main implementation block for the module.
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    pub fn maybe_add_metadata(
+        origin: &T::AccountId,
+        id: T::AssetId,
+        name: Vec<u8>,
+        symbol: Vec<u8>,
+        decimals: u8,
+    ) -> DispatchResult {
+        let blacklist = AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
+        println!("blacklist: {:?}", !blacklist);
+        ensure!(
+            !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
+            Error::<T, I>::AssetBlacklist
+        );
+
+        let bounded_name: BoundedVec<u8, T::StringLimit> = name
+            .clone()
+            .try_into()
+            .map_err(|_| Error::<T, I>::BadMetadata)?;
+        let bounded_symbol: BoundedVec<u8, T::StringLimit> = symbol
+            .clone()
+            .try_into()
+            .map_err(|_| Error::<T, I>::BadMetadata)?;
+
+        Metadata::<T, I>::mutate(id, |metadata| {
+            let new_deposit = T::MetadataDepositPerByte::get()
+                .saturating_mul(((name.len() + symbol.len()) as u32).into())
+                .saturating_add(T::MetadataDepositBase::get());
+            T::Currency::reserve(&origin, new_deposit)?;
+            *metadata = AssetMetadata {
+                deposit: new_deposit,
+                name: bounded_name,
+                symbol: bounded_symbol,
+                decimals,
+                is_frozen: false,
+            };
+
+            Ok(())
+        })
+    }
     // Public immutables
 
     /// Return the extra "sid-car" data for `id`/`who`, or `None` if the account doesn't exist.

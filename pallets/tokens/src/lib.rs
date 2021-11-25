@@ -381,6 +381,8 @@ pub mod pallet {
         IdentitySet(T::AssetId),
         /// Some asset class was created. \[asset_id, creator, owner\]
         Created(T::AssetId, T::AccountId, T::AccountId),
+        /// Some asset class was created and minted. \[asset_id, creator, owner\]
+        CreateMinted(T::AssetId, T::AccountId, T::AccountId),
         /// Some assets were issued. \[asset_id, owner, total_supply\]
         Issued(T::AssetId, T::AccountId, T::Balance),
         /// Some assets were transferred. \[asset_id, owner, total_supply\]
@@ -529,6 +531,73 @@ pub mod pallet {
             Ok(())
         }
 
+        #[pallet::weight(T::WeightInfo::create())]
+        pub fn create_and_mint(
+            origin: OriginFor<T>,
+            admin: <T::Lookup as StaticLookup>::Source,
+            name: Vec<u8>,
+            symbol: Vec<u8>,
+            decimals: u8,
+            beneficiary: <T::Lookup as StaticLookup>::Source,
+            #[pallet::compact] supply: T::Balance,
+            min_balance: T::Balance,
+        ) -> DispatchResult {
+            let owner = ensure_signed(origin)?;
+            let admin = T::Lookup::lookup(admin)?;
+            let beneficiary = T::Lookup::lookup(beneficiary)?;
+            if supply.is_zero() {
+                return Ok(());
+            }
+            ensure!(!min_balance.is_zero(), Error::<T, I>::MinBalanceZero);
+
+            let token_id =
+                NextAssetId::<T, I>::try_mutate(|id| -> Result<T::AssetId, DispatchError> {
+                    let current_id = *id;
+                    *id = id
+                        .checked_add(&One::one())
+                        .ok_or(Error::<T, I>::NoAvailableTokenId)?;
+                    Ok(current_id)
+                })?;
+
+            let deposit = T::AssetDeposit::get();
+            T::Currency::reserve(&owner, deposit)?;
+
+            Account::<T, I>::try_mutate(token_id, &beneficiary, |t| -> DispatchResult {
+                let new_balance = t.free.saturating_add(supply);
+                ensure!(new_balance >= min_balance, TokenError::BelowMinimum);
+                if t.free.is_zero() {
+                    t.sufficient = {
+                        frame_system::Pallet::<T>::inc_consumers(&beneficiary)
+                            .map_err(|_| Error::<T, I>::NoProvider)?;
+                        false
+                    };
+                }
+                t.free = new_balance;
+                println!("CreateMinted: Account: free {:?}", new_balance);
+
+                let details = AssetDetails {
+                    owner: owner.clone(),
+                    issuer: admin.clone(),
+                    admin: admin.clone(),
+                    freezer: admin.clone(),
+                    supply,
+                    deposit,
+                    min_balance,
+                    is_sufficient: false,
+                    accounts: 1,
+                    sufficients: 0,
+                    approvals: 0,
+                    is_frozen: false,
+                };
+                Asset::<T, I>::insert(token_id, details);
+                Self::maybe_add_metadata(&owner, token_id, name, symbol, decimals)?;
+                Ok(())
+            })?;
+
+            Self::deposit_event(Event::CreateMinted(token_id, owner, admin));
+            Ok(())
+        }
+
         /// Issue a new class of fungible assets from a privileged origin.
         ///
         /// This new asset class has no assets initially.
@@ -648,13 +717,13 @@ pub mod pallet {
                 let deposit = details.deposit + metadata.deposit + identity_deposit;
 
                 T::Currency::unreserve(
-                    &details.owner,
-                    deposit
-                    // details
-                    //     .deposit
-                    //     .saturating_add(metadata.deposit)
-                    //     .saturating_add(identity.total_deposit()),
-                );
+                        &details.owner,
+                        deposit
+                        // details
+                        //     .deposit
+                        //     .saturating_add(metadata.deposit)
+                        //     .saturating_add(identity.total_deposit()),
+                    );
 
                 for ((owner, _), approval) in Approvals::<T, I>::drain_prefix((&id,)) {
                     T::Currency::unreserve(&owner, approval.deposit);
