@@ -147,7 +147,6 @@ fn create_and_mint_should_work() {
         let w = Asset::<Runtime>::get(ASSET_ID)
             .ok_or(Error::<Runtime>::Unknown)
             .unwrap();
-        println!("Owner: {:?}", &w.owner);
         assert!(&w.is_frozen);
 
         assert_noop!(

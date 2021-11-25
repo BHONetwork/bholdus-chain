@@ -573,7 +573,6 @@ pub mod pallet {
                     };
                 }
                 t.free = new_balance;
-                println!("CreateMinted: Account: free {:?}", new_balance);
 
                 let details = AssetDetails {
                     owner: owner.clone(),
@@ -949,9 +948,6 @@ pub mod pallet {
             T::ForceOrigin::ensure_origin(origin)?;
             AssetsBlacklist::<T, I>::mutate(|assets_blacklist| {
                 assets_blacklist.insert((name.clone(), symbol.clone()));
-                if_std! {
-                    println!("Set AssetsBlacklist {:?}", assets_blacklist);
-                };
                 Self::deposit_event(Event::BlacklistSet(name.clone(), symbol.clone()));
             });
 
