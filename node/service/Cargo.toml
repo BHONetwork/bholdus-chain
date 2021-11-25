@@ -55,7 +55,6 @@ sc-telemetry = { version = "4.0.0-dev", git = "https://github.com/bholdus/substr
 sc-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-network = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-authority-discovery = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
-sc-sync-state-rpc = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-chain-spec = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 
 sp-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }

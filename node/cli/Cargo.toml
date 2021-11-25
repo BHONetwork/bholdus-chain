@@ -45,7 +45,7 @@ cli = [
 	"frame-benchmarking-cli",
 	"try-runtime-cli",
 ]
-runtime-benchmarks = ["service/runtime-benchmarks"]
+runtime-benchmarks = ["service/runtime-benchmarks", "frame-benchmarking-cli"]
 try-runtime = ["try-runtime-cli", "service/try-runtime"]
 
 with-ulas-runtime = ["service/with-ulas-runtime"]
