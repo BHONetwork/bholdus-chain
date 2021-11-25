@@ -25,6 +25,10 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
+pub mod weights;
+
+use weights::WeightInfo;
+
 type TransferId = u128;
 type Bytes = Vec<u8>;
 type FeeRate = (u32, u32);
@@ -86,6 +90,8 @@ pub mod pallet {
         /// Minimum amount to transfer. This should match `ExistentialDeposit` of `pallet_balance`
         #[pallet::constant]
         type MinimumDeposit: Get<BalanceOf<Self>>;
+        /// Weight info
+        type WeightInfo: weights::WeightInfo;
     }
 
     const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
@@ -205,7 +211,7 @@ pub mod pallet {
         /// User should submit this extrinsic to initiate a crosschain transfer.
         /// User will be charged with additional service fee.
         /// This service fee is rewarded to the relayer if the execution on the target chain succeeds.
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::initiate_transfer(1))]
         #[transactional]
         pub fn initiate_transfer(
             origin: OriginFor<T>,
@@ -279,7 +285,7 @@ pub mod pallet {
 
         /// Outbound
         /// Relayer will call this function to confirm the transfer and claim their rewards
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::confirm_transfer(0))]
         #[transactional]
         pub fn confirm_transfer(origin: OriginFor<T>, transfer_id: TransferId) -> DispatchResult {
             let who = ensure_signed(origin)?;
@@ -323,7 +329,7 @@ pub mod pallet {
 
         /// Inbound
         /// Relayer call this to release tokens to user corresponding to transfer sent from other chains.
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::release_tokens(0))]
         #[transactional]
         pub fn release_tokens(
             origin: OriginFor<T>,
@@ -366,7 +372,7 @@ pub mod pallet {
 
         /// Register relayer account responsible for relaying transfer between chains
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_register_relayer(0))]
         #[transactional]
         pub fn force_register_relayer(
             origin: OriginFor<T>,
@@ -381,7 +387,7 @@ pub mod pallet {
 
         /// Unregister relayer account
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_unregister_relayer(0))]
         pub fn force_unregister_relayer(
             origin: OriginFor<T>,
             relayer: T::AccountId,
@@ -396,7 +402,7 @@ pub mod pallet {
         /// Register chain id that crosschain transfer supports
         /// Chain id will be pre-defined by Bholdus team
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_register_chain(0))]
         pub fn force_register_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
 
@@ -408,7 +414,7 @@ pub mod pallet {
         /// Unregister chain id
         /// Chain id will be pre-defined by Bholdus team
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_unregister_chain(0))]
         pub fn force_unregister_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
 
@@ -419,7 +425,7 @@ pub mod pallet {
 
         /// Set service fee that user will be charged when initiates a transfer
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_set_service_fee(0))]
         pub fn force_set_service_fee(
             origin: OriginFor<T>,
             service_fee_rate: FeeRate,
@@ -437,7 +443,7 @@ pub mod pallet {
         /// Withdraw tokens locked in this pallet to some account
         /// This operation is mainly used for any migration in the future
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_withdraw(0))]
         pub fn force_withdraw(origin: OriginFor<T>, to: T::AccountId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin.clone())?;
 

@@ -77,6 +77,7 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type Currency = Balances;
     type MinimumDeposit = ExistentialDeposit;
+    type WeightInfo = ();
 }
 
 pub const ALICE: AccountId = 1;

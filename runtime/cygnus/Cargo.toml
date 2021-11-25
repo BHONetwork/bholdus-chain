@@ -46,11 +46,9 @@ pallet-staking = { version = "4.0.0-dev", git = "https://github.com/bholdus/subs
 pallet-staking-reward-curve = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-aura = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-session = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
-pallet-session-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
 pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-offences = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
-pallet-offences-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
 pallet-treasury = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-utility = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-collective = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
@@ -108,25 +106,9 @@ runtime-benchmarks = [
 	"frame-system-benchmarking",
 	"frame-system/runtime-benchmarks",
 	"hex-literal",
-	"pallet-balances/runtime-benchmarks",
-	"pallet-template/runtime-benchmarks",
-	"pallet-timestamp/runtime-benchmarks",
-	"pallet-staking/runtime-benchmarks",
-	"pallet-session-benchmarking",
-	"pallet-im-online/runtime-benchmarks",
-	"pallet-offences-benchmarking",
-	"pallet-treasury/runtime-benchmarks",
-	"pallet-collective/runtime-benchmarks",
-	"pallet-grandpa/runtime-benchmarks",
-	"pallet-election-provider-multi-phase/runtime-benchmarks",
-	"pallet-indices/runtime-benchmarks",
-	"pallet-bounties/runtime-benchmarks",
-	"pallet-contracts/runtime-benchmarks",
-	"pallet-mmr/runtime-benchmarks",
-	"pallet-multisig/runtime-benchmarks",
-	"pallet-proxy/runtime-benchmarks",
-	"pallet-identity/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
+
+	"pallet-collective/runtime-benchmarks",
 ]
 std = [
 	"codec/std",
