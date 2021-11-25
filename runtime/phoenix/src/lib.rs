@@ -116,7 +116,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_000_000,
+    spec_version: 1_000_005,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -155,8 +155,8 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2 seconds of compute with a 6 second average block time.
-const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
+/// We allow for 1 second of compute with a 3 seconds average block time.
+const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -181,7 +181,7 @@ parameter_types! {
         })
         .avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
         .build_or_panic();
-    pub const SS58Prefix: u16 = 2207;
+    pub const SS58Prefix: u16 = 2209;
 }
 
 // Configure FRAME pallets to include in runtime.
@@ -385,7 +385,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: u128 = 1*DOLLARS;
+    pub const ExistentialDeposit: u128 = 1*UNITS/100;
     pub const MaxLocks: u32 = 50;
 }
 
@@ -1015,7 +1015,7 @@ impl bholdus_tokens::Config for Runtime {
     type ExistentialDeposits = ExistentialDeposits;
 }
 
-impl bholdus_support_rewards::Config for Runtime {
+/* impl bholdus_support_rewards::Config for Runtime {
     type Share = Balance;
     type Balance = Balance;
     type PoolId = bholdus_staking_tokens::PoolId;
@@ -1036,7 +1036,7 @@ impl bholdus_staking_tokens::Config for Runtime {
     type PalletId = StakingTokensPalletId;
     // type WeightInfo = weights::staking_tokens::WeightInfo<Runtime>;
     type WeightInfo = ();
-}
+} */
 
 parameter_types! {
     pub MaxAttributesBytes: u32 = 2048;
@@ -1084,6 +1084,7 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type Event = Event;
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type Currency = Balances;
+    type MinimumDeposit = ExistentialDeposit;
 }
 
 /// Configure the pallet-template in pallets/template.
@@ -1134,10 +1135,10 @@ construct_runtime!(
 
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
-        StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
+        // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        BholdusSupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
+        // BholdusSupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
@@ -1403,6 +1404,19 @@ impl_runtime_apis! {
             encoded: Vec<u8>,
         ) -> Option<Vec<(Vec<u8>, KeyTypeId)>> {
             opaque::SessionKeys::decode_into_raw_public_keys(&encoded)
+        }
+    }
+
+    #[cfg(feature = "try-runtime")]
+    impl frame_try_runtime::TryRuntime<Block> for Runtime {
+        fn on_runtime_upgrade() -> (Weight, Weight) {
+            log::info!("try-runtime::on_runtime_upgrade.");
+            let weight = Executive::try_runtime_upgrade().unwrap();
+            (weight, RuntimeBlockWeights::get().max_block)
+        }
+
+        fn execute_block_no_check(block: Block) -> Weight {
+            Executive::execute_block_no_check(block)
         }
     }
 

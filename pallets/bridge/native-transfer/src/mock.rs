@@ -1,5 +1,5 @@
 use crate::{self as bholdus_bridge_native_transfer, pallet};
-use frame_support::parameter_types;
+use frame_support::{parameter_types, traits::ExistenceRequirement};
 use frame_system as system;
 use sp_core::H256;
 use sp_runtime::{
@@ -58,7 +58,7 @@ impl system::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: u64 = 1;
+    pub const ExistentialDeposit: u64 = 10;
 }
 impl pallet_balances::Config for Runtime {
     type Balance = Balance;
@@ -76,6 +76,7 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type Event = Event;
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type Currency = Balances;
+    type MinimumDeposit = ExistentialDeposit;
 }
 
 pub const ALICE: AccountId = 1;

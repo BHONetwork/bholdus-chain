@@ -83,6 +83,9 @@ pub mod pallet {
         type Currency: Currency<Self::AccountId, Balance = Balance>;
         /// Admin Origin
         type AdminOrigin: EnsureOrigin<Self::Origin>;
+        /// Minimum amount to transfer. This should match `ExistentialDeposit` of `pallet_balance`
+        #[pallet::constant]
+        type MinimumDeposit: Get<BalanceOf<Self>>;
     }
 
     const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
@@ -192,6 +195,8 @@ pub mod pallet {
         OutboundTransferNotFound,
         /// Inbound transfer received is already executed or the transfer doesn't exists
         UnexpectedInboundTransfer,
+        /// Minimum deposit required
+        MinimumDepositRequired,
     }
 
     #[pallet::call]
@@ -214,6 +219,11 @@ pub mod pallet {
             ensure!(
                 RegisteredChains::<T>::get(target_chain),
                 Error::<T>::MustBeRegisteredChain
+            );
+
+            ensure!(
+                amount >= T::MinimumDeposit::get(),
+                Error::<T>::MinimumDepositRequired
             );
 
             let service_fee_rate = FixedU128::checked_from_rational(

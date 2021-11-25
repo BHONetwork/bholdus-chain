@@ -4,7 +4,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "phoenix-runtime"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.0"
+version = "1.0.5"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -97,7 +97,6 @@ bholdus-nft = { version = "4.0.0-dev", path = "../../pallets/non-fungible-token"
 bholdus-support-nft = { package = "support-nft", version = "4.0.0-dev", path = "../../pallets/support/nft", default-features = false }
 bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", default-features = false }
 bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
-bholdus-dex = { version = "4.0.0-dev", path = "../../pallets/dex", default-features = false }
 bholdus-bridge-native-transfer = { version = "4.0.0-dev", path = "../../pallets/bridge/native-transfer", default-features = false }
 
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
@@ -139,6 +138,7 @@ std = [
 	"frame-support/std",
 	"frame-system-rpc-runtime-api/std",
 	"frame-system/std",
+	"frame-try-runtime/std",
 	"pallet-balances/std",
 	"pallet-grandpa/std",
 	"pallet-randomness-collective-flip/std",
@@ -174,7 +174,6 @@ std = [
 	"bholdus-support-nft/std",
 	"bholdus-support/std",
 	"bholdus-currencies/std",
-	"bholdus-dex/std",
 	"bholdus-primitives/std",
 	"bholdus-bridge-native-transfer/std",
 	"sp-api/std",
