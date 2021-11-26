@@ -101,6 +101,8 @@ use sp_runtime::{
 };
 use sp_std::{
     borrow::Borrow,
+    collections::btree_map::BTreeMap,
+    collections::btree_set::BTreeSet,
     convert::{Infallible, TryFrom, TryInto},
     marker,
     prelude::*,
@@ -109,7 +111,7 @@ use sp_std::{
 
 // Identity
 use enumflags2::BitFlags;
-use sp_std::{fmt::Debug, iter::once, ops::Add};
+use sp_std::{fmt::Debug, if_std, iter::once, ops::Add};
 
 use codec::{Decode, Encode, HasCompact};
 use frame_support::{
@@ -158,7 +160,7 @@ pub mod pallet {
 
     #[pallet::genesis_config]
     pub struct GenesisConfig<T: Config<I>, I: 'static = ()> {
-        pub balances: Vec<(T::AccountId, T::AssetId, T::Balance)>,
+        pub balances: Vec<(T::AccountId, T::Balance)>,
     }
     #[cfg(feature = "std")]
     impl<T: Config<I>, I: 'static> Default for GenesisConfig<T, I> {
@@ -171,24 +173,24 @@ pub mod pallet {
     impl<T: Config<I>, I: 'static> GenesisBuild<T, I> for GenesisConfig<T, I> {
         fn build(&self) {
             // ensure no duplicates exist.
-            let unique_endowed_accounts = self
-                .balances
-                .iter()
-                .map(|(account_id, asset_id, _)| (account_id, asset_id))
-                .collect::<std::collections::BTreeSet<_>>();
-            assert!(
-                unique_endowed_accounts.len() == self.balances.len(),
-                "duplicate endowed accounts in genesis."
-            );
+            // let unique_endowed_accounts = self
+            //     .balances
+            //     .iter()
+            //     .map(|(account_id, _)| (account_id, asset_id))
+            //     .collect::<std::collections::BTreeSet<_>>();
+            // assert!(
+            //     unique_endowed_accounts.len() == self.balances.len(),
+            //     "duplicate endowed accounts in genesis."
+            // );
 
             self.balances
                 .iter()
-                .for_each(|(account_id, asset_id, initial_balance)| {
-                    assert!(
-                        *initial_balance >= T::ExistentialDeposits::get(&asset_id),
-                        "the balance must be greater than existential deposit.",
-                    );
-                    Pallet::<T, I>::set_genesis(*asset_id, account_id, *initial_balance);
+                .for_each(|(account_id, initial_balance)| {
+                    // assert!(
+                    //     *initial_balance >= T::ExistentialDeposits::get(&asset_id),
+                    //     "the balance must be greater than existential deposit.",
+                    // );
+                    Pallet::<T, I>::set_genesis(account_id, *initial_balance);
                 });
         }
     }
@@ -288,6 +290,11 @@ pub mod pallet {
     }
 
     #[pallet::storage]
+    #[pallet::getter(fn assets_blacklist)]
+    pub type AssetsBlacklist<T: Config<I>, I: 'static = ()> =
+        StorageValue<_, BTreeSet<(Vec<u8>, Vec<u8>)>, ValueQuery>;
+
+    #[pallet::storage]
     #[pallet::getter(fn next_asset_id)]
     pub(super) type NextAssetId<T: Config<I>, I: 'static = ()> =
         StorageValue<_, T::AssetId, ValueQuery>;
@@ -374,6 +381,8 @@ pub mod pallet {
         IdentitySet(T::AssetId),
         /// Some asset class was created. \[asset_id, creator, owner\]
         Created(T::AssetId, T::AccountId, T::AccountId),
+        /// Some asset class was created and minted. \[asset_id, creator, owner\]
+        CreateMinted(T::AssetId, T::AccountId, T::AccountId),
         /// Some assets were issued. \[asset_id, owner, total_supply\]
         Issued(T::AssetId, T::AccountId, T::Balance),
         /// Some assets were transferred. \[asset_id, owner, total_supply\]
@@ -398,6 +407,10 @@ pub mod pallet {
         ForceCreated(T::AssetId, T::AccountId),
         /// New metadata has been set for an asset. \[asset_id, name, symbol, decimals, is_frozen\]
         MetadataSet(T::AssetId, Vec<u8>, Vec<u8>, u8, bool),
+
+        /// Set blacklist. \[name, symbol\]
+        BlacklistSet(Vec<u8>, Vec<u8>),
+
         /// Metadata has been cleared for an asset. \[asset_id\]
         MetadataCleared(T::AssetId),
         /// New identity has been set for an asset. \[asset_id, name\]
@@ -406,6 +419,8 @@ pub mod pallet {
 
     #[pallet::error]
     pub enum Error<T, I = ()> {
+        /// Asset belong blacklist
+        AssetBlacklist,
         /// No available token ID
         NoAvailableTokenId,
         /// Account balance must be greater than or equal to the transfer amount.
@@ -513,6 +528,72 @@ pub mod pallet {
                 },
             );
             Self::deposit_event(Event::Created(token_id, owner, admin));
+            Ok(())
+        }
+
+        #[pallet::weight(T::WeightInfo::create())]
+        pub fn create_and_mint(
+            origin: OriginFor<T>,
+            admin: <T::Lookup as StaticLookup>::Source,
+            name: Vec<u8>,
+            symbol: Vec<u8>,
+            decimals: u8,
+            beneficiary: <T::Lookup as StaticLookup>::Source,
+            #[pallet::compact] supply: T::Balance,
+            min_balance: T::Balance,
+        ) -> DispatchResult {
+            let owner = ensure_signed(origin)?;
+            let admin = T::Lookup::lookup(admin)?;
+            let beneficiary = T::Lookup::lookup(beneficiary)?;
+            if supply.is_zero() {
+                return Ok(());
+            }
+            ensure!(!min_balance.is_zero(), Error::<T, I>::MinBalanceZero);
+
+            let token_id =
+                NextAssetId::<T, I>::try_mutate(|id| -> Result<T::AssetId, DispatchError> {
+                    let current_id = *id;
+                    *id = id
+                        .checked_add(&One::one())
+                        .ok_or(Error::<T, I>::NoAvailableTokenId)?;
+                    Ok(current_id)
+                })?;
+
+            let deposit = T::AssetDeposit::get();
+            T::Currency::reserve(&owner, deposit)?;
+
+            Account::<T, I>::try_mutate(token_id, &beneficiary, |t| -> DispatchResult {
+                let new_balance = t.free.saturating_add(supply);
+                ensure!(new_balance >= min_balance, TokenError::BelowMinimum);
+                if t.free.is_zero() {
+                    t.sufficient = {
+                        frame_system::Pallet::<T>::inc_consumers(&beneficiary)
+                            .map_err(|_| Error::<T, I>::NoProvider)?;
+                        false
+                    };
+                }
+                t.free = new_balance;
+
+                let details = AssetDetails {
+                    owner: owner.clone(),
+                    issuer: admin.clone(),
+                    admin: admin.clone(),
+                    freezer: admin.clone(),
+                    supply,
+                    deposit,
+                    min_balance,
+                    is_sufficient: false,
+                    accounts: 1,
+                    sufficients: 0,
+                    approvals: 0,
+                    is_frozen: false,
+                };
+                Asset::<T, I>::insert(token_id, details);
+                Self::maybe_add_metadata(&owner, token_id, name, symbol, decimals)?;
+                Ok(())
+            })?;
+
+            Self::deposit_event(Event::CreateMinted(token_id, owner, admin));
             Ok(())
         }
 
@@ -635,13 +716,13 @@ pub mod pallet {
                 let deposit = details.deposit + metadata.deposit + identity_deposit;
 
                 T::Currency::unreserve(
-                    &details.owner,
-                    deposit
-                    // details
-                    //     .deposit
-                    //     .saturating_add(metadata.deposit)
-                    //     .saturating_add(identity.total_deposit()),
-                );
+                        &details.owner,
+                        deposit
+                        // details
+                        //     .deposit
+                        //     .saturating_add(metadata.deposit)
+                        //     .saturating_add(identity.total_deposit()),
+                    );
 
                 for ((owner, _), approval) in Approvals::<T, I>::drain_prefix((&id,)) {
                     T::Currency::unreserve(&owner, approval.deposit);
@@ -858,6 +939,21 @@ pub mod pallet {
             })
         }
 
+        #[pallet::weight(0)]
+        pub fn set_blacklist(
+            origin: OriginFor<T>,
+            name: Vec<u8>,
+            symbol: Vec<u8>,
+        ) -> DispatchResult {
+            T::ForceOrigin::ensure_origin(origin)?;
+            AssetsBlacklist::<T, I>::mutate(|assets_blacklist| {
+                assets_blacklist.insert((name.clone(), symbol.clone()));
+                Self::deposit_event(Event::BlacklistSet(name.clone(), symbol.clone()));
+            });
+
+            Ok(())
+        }
+
         /// Set the metadata for an asset.
         ///
         /// Origin must be Signed and the sender should be the Owner of the asset `id`.
@@ -884,6 +980,11 @@ pub mod pallet {
             decimals: u8,
         ) -> DispatchResult {
             let origin = ensure_signed(origin)?;
+
+            ensure!(
+                !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
+                Error::<T, I>::AssetBlacklist
+            );
 
             let bounded_name: BoundedVec<u8, T::StringLimit> = name
                 .clone()
@@ -1017,8 +1118,8 @@ pub mod pallet {
 }
 
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
-    pub(crate) fn set_genesis(currency_id: T::AssetId, who: &T::AccountId, amount: T::Balance) {
-        Self::do_set_genesis(currency_id, who, amount);
+    pub(crate) fn set_genesis(who: &T::AccountId, amount: T::Balance) {
+        Self::do_set_genesis(who, amount);
     }
 
     pub(crate) fn try_mutate_account<R, E>(

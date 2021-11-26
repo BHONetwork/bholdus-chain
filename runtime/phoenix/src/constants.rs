@@ -39,8 +39,15 @@ pub mod time {
     ///
     /// <https://research.web3.foundation/en/latest/polkadot/block-production/Babe.html#-6.-practical-results>
     ///
+    /// We're not using BABE anymore, and use AURA instead so this is the comment for AURA part
+    ///
+    /// This determines the average expected block time that we are targeting.
+    /// Blocks will be produced at a minimum duration defined by `SLOT_DURATION`.
+    /// `SLOT_DURATION` is picked up by `pallet_timestamp` which is in turn picked
+    /// up by `pallet_aura` to implement `fn slot_duration()`.
+    ///
     /// Change this to adjust the block time.
-    pub const MILLISECS_PER_BLOCK: Moment = 6000;
+    pub const MILLISECS_PER_BLOCK: Moment = 3000;
     pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
 
     // NOTE: Currently it is not possible to change the slot duration after the chain has started.

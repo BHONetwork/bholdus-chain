@@ -527,24 +527,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bholdus-bridge-bsc"
-version = "4.0.0-dev"
-dependencies = [
- "array-bytes",
- "bsc-primitives",
- "frame-support",
- "frame-system",
- "pallet-timestamp",
- "parity-scale-codec",
- "scale-info",
- "serde_json",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "bholdus-bridge-native-transfer"
 version = "4.0.0-dev"
 dependencies = [
@@ -590,27 +572,6 @@ version = "4.0.0-dev"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
- "frame-support",
- "frame-system",
- "pallet-balances",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "bholdus-dex"
-version = "4.0.0-dev"
-dependencies = [
- "bholdus-currencies",
- "bholdus-primitives",
- "bholdus-support",
- "bholdus-tokens",
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-balances",
@@ -736,7 +697,6 @@ dependencies = [
  "sc-rpc",
  "sc-rpc-api",
  "sc-service",
- "sc-sync-state-rpc",
  "sc-telemetry",
  "sc-transaction-pool",
  "serde",
@@ -1555,13 +1515,11 @@ dependencies = [
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
- "pallet-offences-benchmarking",
  "pallet-proxy",
  "pallet-randomness-collective-flip",
  "pallet-recovery",
  "pallet-scheduler",
  "pallet-session",
- "pallet-session-benchmarking",
  "pallet-staking",
  "pallet-staking-reward-curve",
  "pallet-sudo",
@@ -4435,6 +4393,7 @@ name = "pallet-babe"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -4529,7 +4488,6 @@ name = "pallet-bounties"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -4575,7 +4533,6 @@ dependencies = [
  "parity-scale-codec",
  "pwasm-utils",
  "rand 0.7.3",
- "rand_pcg",
  "scale-info",
  "serde",
  "smallvec 1.7.0",
@@ -4648,13 +4605,11 @@ name = "pallet-election-provider-multi-phase"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-election-provider-support",
  "frame-support",
  "frame-system",
  "log",
  "parity-scale-codec",
- "rand 0.7.3",
  "scale-info",
  "sp-arithmetic",
  "sp-core",
@@ -4663,8 +4618,6 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "static_assertions",
- "strum 0.21.0",
- "strum_macros 0.21.1",
 ]
 
 [[package]]
@@ -4711,7 +4664,6 @@ name = "pallet-im-online"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
@@ -4731,7 +4683,6 @@ name = "pallet-indices"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4799,7 +4750,6 @@ name = "pallet-multisig"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4827,34 +4777,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-offences-benchmarking"
-version = "4.0.0-dev"
-source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
-dependencies = [
- "frame-benchmarking",
- "frame-election-provider-support",
- "frame-support",
- "frame-system",
- "pallet-babe",
- "pallet-balances",
- "pallet-grandpa",
- "pallet-im-online",
- "pallet-offences",
- "pallet-session",
- "pallet-staking",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-proxy"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4929,27 +4855,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-session-benchmarking"
-version = "4.0.0-dev"
-source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-session",
- "pallet-staking",
- "rand 0.7.3",
- "sp-runtime",
- "sp-session",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-staking"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-election-provider-support",
  "frame-support",
  "frame-system",
@@ -4957,7 +4866,6 @@ dependencies = [
  "pallet-authorship",
  "pallet-session",
  "parity-scale-codec",
- "rand_chacha 0.2.2",
  "scale-info",
  "serde",
  "sp-application-crypto",
@@ -5075,7 +4983,6 @@ name = "pallet-treasury"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "impl-trait-for-tuples",
@@ -5355,7 +5262,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.2"
+version = "1.0.6"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -5377,6 +5284,7 @@ dependencies = [
  "pallet-aura",
  "pallet-authority-discovery",
  "pallet-authorship",
+ "pallet-babe",
  "pallet-bags-list",
  "pallet-balances",
  "pallet-beefy",
@@ -5394,13 +5302,11 @@ dependencies = [
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
- "pallet-offences-benchmarking",
  "pallet-proxy",
  "pallet-randomness-collective-flip",
  "pallet-recovery",
  "pallet-scheduler",
  "pallet-session",
- "pallet-session-benchmarking",
  "pallet-staking",
  "pallet-staking-reward-curve",
  "pallet-sudo",
@@ -6459,49 +6365,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sc-consensus-babe"
-version = "0.10.0-dev"
-source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
-dependencies = [
- "async-trait",
- "derive_more",
- "fork-tree",
- "futures 0.3.17",
- "log",
- "merlin",
- "num-bigint",
- "num-rational 0.2.4",
- "num-traits",
- "parity-scale-codec",
- "parking_lot",
- "rand 0.7.3",
- "retain_mut",
- "sc-client-api",
- "sc-consensus",
- "sc-consensus-epochs",
- "sc-consensus-slots",
- "sc-keystore",
- "sc-telemetry",
- "schnorrkel",
- "serde",
- "sp-api",
- "sp-application-crypto",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-consensus-babe",
- "sp-consensus-slots",
- "sp-consensus-vrf",
- "sp-core",
- "sp-inherents",
- "sp-io",
- "sp-keystore",
- "sp-runtime",
- "sp-version",
- "substrate-prometheus-endpoint",
-]
-
-[[package]]
 name = "sc-consensus-epochs"
 version = "0.10.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
@@ -6988,28 +6851,6 @@ dependencies = [
  "parking_lot",
  "sc-client-api",
  "sp-core",
-]
-
-[[package]]
-name = "sc-sync-state-rpc"
-version = "0.10.0-dev"
-source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
-dependencies = [
- "jsonrpc-core 18.0.0",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "parity-scale-codec",
- "sc-chain-spec",
- "sc-client-api",
- "sc-consensus-babe",
- "sc-consensus-epochs",
- "sc-finality-grandpa",
- "sc-rpc-api",
- "serde",
- "serde_json",
- "sp-blockchain",
- "sp-runtime",
- "thiserror",
 ]
 
 [[package]]
@@ -7864,7 +7705,7 @@ dependencies = [
  "lazy_static",
  "sp-core",
  "sp-runtime",
- "strum 0.20.0",
+ "strum",
 ]
 
 [[package]]
@@ -8285,32 +8126,14 @@ version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7318c509b5ba57f18533982607f24070a55d353e90d4cae30c467cdb2ad5ac5c"
 dependencies = [
- "strum_macros 0.20.1",
+ "strum_macros",
 ]
-
-[[package]]
-name = "strum"
-version = "0.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aaf86bbcfd1fa9670b7a129f64fc0c9fcbbfe4f1bc4210e9e98fe71ffc12cde2"
 
 [[package]]
 name = "strum_macros"
 version = "0.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee8bc6b87a5112aeeab1f4a9f7ab634fe6cbefc4850006df31267f4cfb9e3149"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.21.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d06aaeeee809dbc59eb4556183dd927df67db1540de5be8d3ec0b6636358a5ec"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -8935,13 +8758,11 @@ dependencies = [
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
- "pallet-offences-benchmarking",
  "pallet-proxy",
  "pallet-randomness-collective-flip",
  "pallet-recovery",
  "pallet-scheduler",
  "pallet-session",
- "pallet-session-benchmarking",
  "pallet-staking",
  "pallet-staking-reward-curve",
  "pallet-sudo",

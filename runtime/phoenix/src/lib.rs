@@ -43,8 +43,8 @@ use sp_core::{
 use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::generic::Era;
 use sp_runtime::traits::{
-    self, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys, SaturatedConversion,
-    StaticLookup, Zero,
+    self, AccountIdConversion, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys,
+    SaturatedConversion, StaticLookup, Zero,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
@@ -68,8 +68,8 @@ pub use sp_runtime::BuildStorage;
 
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
-use bholdus_primitives::CurrencyId;
 pub use bholdus_primitives::*;
+use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
@@ -116,7 +116,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_000_002,
+    spec_version: 1_000_006,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -155,8 +155,8 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2 seconds of compute with a 6 second average block time.
-const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
+/// We allow for 1 second of compute with a 3 seconds average block time.
+const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -687,11 +687,13 @@ parameter_types! {
     pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
     pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
+    pub const StakingTokensPalletId: PalletId = PalletId(*b"bho/stkt");
     pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
     pub const MaximumReasonLength: u32 = 16384;
     pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
     pub const BountyValueMinimum: Balance = 5 * DOLLARS;
     pub const MaxApprovals: u32 = 100;
+    pub UnreleasedNativeVaultAccountId: AccountId = PalletId(*b"bho/urls").into_account();
 }
 
 impl pallet_treasury::Config for Runtime {
@@ -979,28 +981,22 @@ parameter_types! {
 }
 
 parameter_type_with_key! {
-    pub ExistentialDeposits: |_asset_id: u64| -> Balance {
+    pub ExistentialDeposits: |_asset_id: TokenId| -> Balance {
         Zero::zero()
     };
 }
 
-/* parameter_types! {
-    pub const GetNativeCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
-*/
-
-/* impl bholdus_currencies::Config for Runtime {
+impl bholdus_currencies::Config for Runtime {
     type Event = Event;
     type MultiCurrency = Tokens;
-    type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-    type GetNativeCurrencyId = GetNativeCurrencyId;
     type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
-} */
+}
 
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = Amount;
-    type AssetId = u64;
+    type AssetId = TokenId;
 
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
@@ -1018,6 +1014,29 @@ impl bholdus_tokens::Config for Runtime {
     type WeightInfo = bholdus_tokens::weights::SubstrateWeight<Runtime>;
     type ExistentialDeposits = ExistentialDeposits;
 }
+
+/* impl bholdus_support_rewards::Config for Runtime {
+    type Share = Balance;
+    type Balance = Balance;
+    type PoolId = bholdus_staking_tokens::PoolId;
+    type CurrencyId = TokenId;
+    type Handler = StakingTokens;
+}
+
+parameter_types! {
+    pub const GetStableCurrencyId: TokenId = 0;
+}
+
+impl bholdus_staking_tokens::Config for Runtime {
+    type Event = Event;
+    type RewardsSource = UnreleasedNativeVaultAccountId;
+    type StableCurrencyId = GetStableCurrencyId;
+    type Currency = Currencies;
+    // type EmergencyShutdown = EmergencyShutdown;
+    type PalletId = StakingTokensPalletId;
+    // type WeightInfo = weights::staking_tokens::WeightInfo<Runtime>;
+    type WeightInfo = ();
+} */
 
 parameter_types! {
     pub MaxAttributesBytes: u32 = 2048;
@@ -1066,6 +1085,7 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type Currency = Balances;
     type MinimumDeposit = ExistentialDeposit;
+    type WeightInfo = bholdus_bridge_native_transfer::weights::SubstrateWeight<Runtime>;
 }
 
 /// Configure the pallet-template in pallets/template.
@@ -1114,11 +1134,13 @@ construct_runtime!(
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>},
 
-        Tokens: bholdus_tokens::{Pallet, Call, Storage, Event<T>},
+        Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
+        // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        // BholdusSupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
+        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
@@ -1411,44 +1433,12 @@ impl_runtime_apis! {
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
             // issues. To get around that, we separated the Session benchmarks into its own crate,
             // which is why we need these two lines below.
-            use pallet_session_benchmarking::Pallet as SessionBench;
-            use pallet_offences_benchmarking::Pallet as OffencesBench;
             use frame_system_benchmarking::Pallet as SystemBench;
 
             let mut list = Vec::<BenchmarkList>::new();
 
-            // list_benchmark!(list, extra, pallet_assets, Assets);
-            list_benchmark!(list, extra, pallet_babe, Babe);
-            list_benchmark!(list, extra, pallet_bags_list, BagsList);
-            list_benchmark!(list, extra, pallet_balances, Balances);
-            list_benchmark!(list, extra, pallet_bounties, Bounties);
-            list_benchmark!(list, extra, pallet_collective, Council);
-            list_benchmark!(list, extra, pallet_contracts, Contracts);
-            // list_benchmark!(list, extra, pallet_democracy, Democracy);
-            list_benchmark!(list, extra, pallet_election_provider_multi_phase, ElectionProviderMultiPhase);
-            // list_benchmark!(list, extra, pallet_elections_phragmen, Elections);
-            // list_benchmark!(list, extra, pallet_gilt, Gilt);
-            list_benchmark!(list, extra, pallet_grandpa, Grandpa);
-            list_benchmark!(list, extra, pallet_identity, Identity);
-            list_benchmark!(list, extra, pallet_im_online, ImOnline);
-            list_benchmark!(list, extra, pallet_indices, Indices);
-            // list_benchmark!(list, extra, pallet_lottery, Lottery);
-            // list_benchmark!(list, extra, pallet_membership, TechnicalMembership);
-            list_benchmark!(list, extra, pallet_mmr, Mmr);
-            list_benchmark!(list, extra, pallet_multisig, Multisig);
-            list_benchmark!(list, extra, pallet_offences, OffencesBench::<Runtime>);
-            list_benchmark!(list, extra, pallet_proxy, Proxy);
-            list_benchmark!(list, extra, pallet_scheduler, Scheduler);
-            list_benchmark!(list, extra, pallet_session, SessionBench::<Runtime>);
-            list_benchmark!(list, extra, pallet_staking, Staking);
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
-            list_benchmark!(list, extra, pallet_timestamp, Timestamp);
-            // list_benchmark!(list, extra, pallet_tips, Tips);
-            // list_benchmark!(list, extra, pallet_transaction_storage, TransactionStorage);
-            list_benchmark!(list, extra, pallet_treasury, Treasury);
-            // list_benchmark!(list, extra, pallet_uniques, Uniques);
-            list_benchmark!(list, extra, pallet_utility, Utility);
-            // list_benchmark!(list, extra, pallet_vesting, Vesting);
+            list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1463,12 +1453,8 @@ impl_runtime_apis! {
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
             // issues. To get around that, we separated the Session benchmarks into its own crate,
             // which is why we need these two lines below.
-            use pallet_session_benchmarking::Pallet as SessionBench;
-            use pallet_offences_benchmarking::Pallet as OffencesBench;
             use frame_system_benchmarking::Pallet as SystemBench;
 
-            impl pallet_session_benchmarking::Config for Runtime {}
-            impl pallet_offences_benchmarking::Config for Runtime {}
             impl frame_system_benchmarking::Config for Runtime {}
 
             let whitelist: Vec<TrackedStorageKey> = vec![
@@ -1491,38 +1477,8 @@ impl_runtime_apis! {
             let mut batches = Vec::<BenchmarkBatch>::new();
             let params = (&config, &whitelist);
 
-            // add_benchmark!(params, batches, pallet_assets, Assets);
-            add_benchmark!(params, batches, pallet_babe, Babe);
-            add_benchmark!(params, batches, pallet_balances, Balances);
-            add_benchmark!(params, batches, pallet_bags_list, BagsList);
-            add_benchmark!(params, batches, pallet_bounties, Bounties);
-            add_benchmark!(params, batches, pallet_collective, Council);
-            add_benchmark!(params, batches, pallet_contracts, Contracts);
-            // add_benchmark!(params, batches, pallet_democracy, Democracy);
-            add_benchmark!(params, batches, pallet_election_provider_multi_phase, ElectionProviderMultiPhase);
-            // add_benchmark!(params, batches, pallet_elections_phragmen, Elections);
-            // add_benchmark!(params, batches, pallet_gilt, Gilt);
-            add_benchmark!(params, batches, pallet_grandpa, Grandpa);
-            add_benchmark!(params, batches, pallet_identity, Identity);
-            add_benchmark!(params, batches, pallet_im_online, ImOnline);
-            add_benchmark!(params, batches, pallet_indices, Indices);
-            // add_benchmark!(params, batches, pallet_lottery, Lottery);
-            // add_benchmark!(params, batches, pallet_membership, TechnicalMembership);
-            add_benchmark!(params, batches, pallet_mmr, Mmr);
-            add_benchmark!(params, batches, pallet_multisig, Multisig);
-            add_benchmark!(params, batches, pallet_offences, OffencesBench::<Runtime>);
-            add_benchmark!(params, batches, pallet_proxy, Proxy);
-            add_benchmark!(params, batches, pallet_scheduler, Scheduler);
-            add_benchmark!(params, batches, pallet_session, SessionBench::<Runtime>);
-            add_benchmark!(params, batches, pallet_staking, Staking);
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
-            add_benchmark!(params, batches, pallet_timestamp, Timestamp);
-            // add_benchmark!(params, batches, pallet_tips, Tips);
-            // add_benchmark!(params, batches, pallet_transaction_storage, TransactionStorage);
-            add_benchmark!(params, batches, pallet_treasury, Treasury);
-            // add_benchmark!(params, batches, pallet_uniques, Uniques);
-            add_benchmark!(params, batches, pallet_utility, Utility);
-            // add_benchmark!(params, batches, pallet_vesting, Vesting);
+            add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             Ok(batches)
         }

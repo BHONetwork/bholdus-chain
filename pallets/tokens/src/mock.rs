@@ -21,6 +21,7 @@ pub type AccountId = u64;
 pub const BUSD: AssetId = 1;
 pub const ALICE: AccountId = 0;
 pub const BOB: AccountId = 1;
+pub const EVE: AccountId = 2;
 pub const ASSET_ID: AssetId = 0;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>;
@@ -182,29 +183,29 @@ pub fn ten() -> AssetIdentity {
 }
 
 pub struct ExtBuilder {
-    balances: Vec<(AccountId, AssetId, Balance)>,
+    balances: Vec<(AccountId, Balance)>,
 }
 
 impl Default for ExtBuilder {
     fn default() -> Self {
         Self {
-            balances: vec![(DustAccount::get(), BUSD, ExistentialDeposits::get(&BUSD))],
+            balances: vec![(DustAccount::get(), ExistentialDeposits::get(&BUSD))],
         }
     }
 }
 
 impl ExtBuilder {
-    pub fn balances(mut self, mut balances: Vec<(AccountId, AssetId, Balance)>) -> Self {
+    pub fn balances(mut self, mut balances: Vec<(AccountId, Balance)>) -> Self {
         self.balances.append(&mut balances);
         self
     }
 
     pub fn one_hundred_for_alice(self) -> Self {
-        self.balances(vec![(ALICE, BUSD, 100)])
+        self.balances(vec![(ALICE, 100)])
     }
 
     pub fn one_hundred_for_alice_n_bob(self) -> Self {
-        self.balances(vec![(ALICE, BUSD, 100), (BOB, BUSD, 100)])
+        self.balances(vec![(ALICE, 100), (BOB, 100)])
     }
 
     pub fn build(self) -> sp_io::TestExternalities {

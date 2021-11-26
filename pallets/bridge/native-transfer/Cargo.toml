@@ -31,11 +31,11 @@ sp-runtime = { default-features = false, git = 'https://github.com/bholdus/subst
 bholdus-primitives = { version = '4.0.0-dev', default-features = false, path = '../../../primitives/bholdus' }
 
 [dev-dependencies]
-serde = "1.0.119"
 hex = "0.4.3"
+serde = "1.0.119"
 sp-core = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 sp-io = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
-pallet-balances = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+pallet-balances = { git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 
 [features]
 default = ['std']

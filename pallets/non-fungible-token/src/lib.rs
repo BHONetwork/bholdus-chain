@@ -147,9 +147,9 @@ pub mod pallet {
             origin: OriginFor<T>,
             attributes: Attributes,
         ) -> DispatchResultWithPostInfo {
-            let who = ensure_signed(origin)?;
+            let owner = ensure_signed(origin)?;
             let next_id = bholdus_support_nft::Pallet::<T>::next_class_id();
-            let owner: T::AccountId = T::PalletId::get().into_sub_account(next_id);
+            // let owner: T::AccountId = T::PalletId::get().into_sub_account(next_id);
             let data = ClassData { attributes };
             bholdus_support_nft::Pallet::<T>::create_class(&owner, data)?;
             Self::deposit_event(Event::CreatedClass(owner, next_id));

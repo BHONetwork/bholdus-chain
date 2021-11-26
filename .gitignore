@@ -16,6 +16,7 @@
 .direnv
 
 .vscode
+.vscode-remote
 
 key-insert
 

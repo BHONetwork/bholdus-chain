@@ -7,7 +7,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 	http://www.apache.org/licenses/LICENSE-2.0
+//  http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,44 @@ use super::*;
 
 // The main implementation block for the module.
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    pub fn maybe_add_metadata(
+        origin: &T::AccountId,
+        id: T::AssetId,
+        name: Vec<u8>,
+        symbol: Vec<u8>,
+        decimals: u8,
+    ) -> DispatchResult {
+        let blacklist = AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
+        ensure!(
+            !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
+            Error::<T, I>::AssetBlacklist
+        );
+
+        let bounded_name: BoundedVec<u8, T::StringLimit> = name
+            .clone()
+            .try_into()
+            .map_err(|_| Error::<T, I>::BadMetadata)?;
+        let bounded_symbol: BoundedVec<u8, T::StringLimit> = symbol
+            .clone()
+            .try_into()
+            .map_err(|_| Error::<T, I>::BadMetadata)?;
+
+        Metadata::<T, I>::mutate(id, |metadata| {
+            let new_deposit = T::MetadataDepositPerByte::get()
+                .saturating_mul(((name.len() + symbol.len()) as u32).into())
+                .saturating_add(T::MetadataDepositBase::get());
+            T::Currency::reserve(&origin, new_deposit)?;
+            *metadata = AssetMetadata {
+                deposit: new_deposit,
+                name: bounded_name,
+                symbol: bounded_symbol,
+                decimals,
+                is_frozen: false,
+            };
+
+            Ok(())
+        })
+    }
     // Public immutables
 
     /// Return the extra "sid-car" data for `id`/`who`, or `None` if the account doesn't exist.
@@ -319,12 +357,19 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 
     /// Set GenesisConfig
     pub(super) fn do_set_genesis(
-        id: T::AssetId,
         who: &T::AccountId,
         amount: T::Balance,
     ) -> Result<bool, DispatchError> {
+        let asset_id =
+            NextAssetId::<T, I>::try_mutate(|id| -> Result<T::AssetId, DispatchError> {
+                let current_id = *id;
+                *id = id
+                    .checked_add(&One::one())
+                    .ok_or(Error::<T, I>::NoAvailableTokenId)?;
+                Ok(current_id)
+            })?;
         Asset::<T, I>::insert(
-            id,
+            asset_id,
             AssetDetails {
                 owner: who.clone(),
                 issuer: who.clone(),
@@ -341,10 +386,11 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             },
         );
 
-        Self::increase_balance(id, who, amount, |details| -> DispatchResult {
+        Self::increase_balance(asset_id, who, amount, |details| -> DispatchResult {
             details.supply = details.supply.saturating_add(amount);
             Ok(())
         })?;
+
         Ok(true)
     }
 

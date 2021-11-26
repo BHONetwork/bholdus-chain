@@ -8,8 +8,8 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use phoenix_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
     BholdusSupportNFTConfig, CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig,
-    IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig, BHO,
-    MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+    TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
@@ -382,20 +382,15 @@ fn testnet_genesis(
         },
         treasury: Default::default(),
 
-        /* tokens: TokensConfig {
+        tokens: TokensConfig {
             balances: endowed_accounts
                 .iter()
                 .cloned()
                 .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
-                    if !is_native_currency {
-                        Some((account_id, currency_id, balance))
-                    } else {
-                        None
-                    }
+                    Some((account_id, balance))
                 })
                 .collect::<Vec<_>>(),
         },
-        */
         bholdus_support_nft: BholdusSupportNFTConfig { tokens: vec![] },
         /* dex: DexConfig {
             initial_provisioning_trading_pairs: vec![],
