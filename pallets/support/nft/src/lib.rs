@@ -26,9 +26,11 @@ use sp_runtime::{
     ArithmeticError, DispatchError, DispatchResult, RuntimeDebug,
 };
 
-use sp_std::{convert::TryInto, vec::Vec};
+use sp_std::{convert::TryInto, if_std, vec::Vec};
 
+#[cfg(test)]
 mod mock;
+#[cfg(test)]
 mod tests;
 
 pub use pallet::*;
@@ -139,7 +141,12 @@ pub mod pallet {
     /// Next available token ID.
     #[pallet::storage]
     #[pallet::getter(fn next_token_id)]
-    pub type NextTokenId<T: Config> =
+    pub type NextTokenId<T: Config> = StorageValue<_, T::TokenId, ValueQuery>;
+
+    /// Next available token ID.
+    #[pallet::storage]
+    #[pallet::getter(fn next_token_class_id)]
+    pub type NextTokenIdByClass<T: Config> =
         StorageMap<_, Twox64Concat, T::ClassId, T::TokenId, ValueQuery>;
 
     /// Store class info.
@@ -296,7 +303,7 @@ impl<T: Config> Pallet<T> {
         metadata: Vec<u8>,
         data: T::TokenData,
     ) -> Result<T::TokenId, DispatchError> {
-        NextTokenId::<T>::try_mutate(class_id, |id| -> Result<T::TokenId, DispatchError> {
+        NextTokenIdByClass::<T>::mutate(class_id, |id| -> Result<T::TokenId, DispatchError> {
             let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> = metadata
                 .try_into()
                 .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
@@ -332,33 +339,47 @@ impl<T: Config> Pallet<T> {
         metadata: Vec<u8>,
         data: T::TokenData,
     ) -> Result<T::TokenId, DispatchError> {
-        NextTokenId::<T>::try_mutate(class_id, |id| -> Result<T::TokenId, DispatchError> {
-            let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> = metadata
-                .try_into()
-                .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
-            let token_id = *id;
-            *id = id
-                .checked_add(&One::one())
-                .ok_or(Error::<T>::NoAvailableTokenId)?;
-            Classes::<T>::try_mutate(class_id, |class_info| -> DispatchResult {
-                let info = class_info.as_mut().ok_or(Error::<T>::ClassNotFound)?;
-                info.total_issuance = info
-                    .total_issuance
-                    .checked_add(&One::one())
-                    .ok_or(ArithmeticError::Overflow)?;
-                Ok(())
-            })?;
+        NextTokenIdByClass::<T>::try_mutate(
+            class_id,
+            |class_token_id| -> Result<T::TokenId, DispatchError> {
+                NextTokenId::<T>::try_mutate(|id| -> Result<T::TokenId, DispatchError> {
+                    let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> = metadata
+                        .try_into()
+                        .map_err(|_| Error::<T>::MaxMetadataExceeded)?;
+                    let token_id = *id;
+                    *id = id
+                        .checked_add(&One::one())
+                        .ok_or(Error::<T>::NoAvailableTokenId)?;
 
-            let token_info = TokenInfo {
-                metadata: bounded_metadata,
-                owner: owner.clone(),
-                data,
-            };
-            Tokens::<T>::insert(class_id, token_id, token_info);
-            TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
-            TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
-            Ok(token_id)
-        })
+                    *class_token_id = token_id;
+
+                    Classes::<T>::try_mutate(class_id, |class_info| -> DispatchResult {
+                        let info = class_info.as_mut().ok_or(Error::<T>::ClassNotFound)?;
+                        info.total_issuance = info
+                            .total_issuance
+                            .checked_add(&One::one())
+                            .ok_or(ArithmeticError::Overflow)?;
+                        Ok(())
+                    })?;
+
+                    let token_info = TokenInfo {
+                        metadata: bounded_metadata,
+                        owner: owner.clone(),
+                        data,
+                    };
+                    if_std!(println!(
+                        "SupportNFT class_id-token_id-class_token_id {:?}:{:?}:{:?}",
+                        class_id, token_id, class_token_id
+                    ));
+
+                    Tokens::<T>::insert(class_id, token_id, token_info);
+                    TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
+                    TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
+                    Ok(token_id)
+                });
+                Ok(*class_token_id)
+            },
+        )
     }
 
     /// Burn NFT
@@ -391,7 +412,7 @@ impl<T: Config> Pallet<T> {
                 Error::<T>::CannotDestroyClass
             );
 
-            NextTokenId::<T>::remove(class_id);
+            NextTokenIdByClass::<T>::remove(class_id);
             Ok(())
         })
     }

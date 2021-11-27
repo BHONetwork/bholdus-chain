@@ -40,8 +40,12 @@ use sp_runtime::{
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 // pub mod benchmarking;
+//
+#[cfg(test)]
 mod mock;
+#[cfg(test)]
 mod tests;
+
 pub mod weights;
 
 pub use pallet::*;
@@ -273,7 +277,8 @@ impl<T: Config> Pallet<T> {
         let group_id = bholdus_support_nft::Pallet::<T>::next_group_id();
         bholdus_support_nft::Pallet::<T>::create_group();
 
-        let token_id = bholdus_support_nft::Pallet::<T>::next_token_id(class_id);
+        let token_id = bholdus_support_nft::Pallet::<T>::next_token_id();
+
         for _ in 0..quantity {
             bholdus_support_nft::Pallet::<T>::mint_to_group(
                 &to,
