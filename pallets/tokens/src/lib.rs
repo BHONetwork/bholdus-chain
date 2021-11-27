@@ -381,8 +381,15 @@ pub mod pallet {
         IdentitySet(T::AssetId),
         /// Some asset class was created. \[asset_id, creator, owner\]
         Created(T::AssetId, T::AccountId, T::AccountId),
-        /// Some asset class was created and minted. \[asset_id, creator, owner\]
-        CreateMinted(T::AssetId, T::AccountId, T::AccountId),
+        /// Some asset class was created and minted. \[asset_id, creator, owner, beneficiary,
+        /// metadata\]
+        CreateMinted(
+            T::AssetId,
+            T::AccountId,
+            T::AccountId,
+            T::AccountId,
+            AssetMetadata<DepositBalanceOf<T, I>, BoundedVec<u8, T::StringLimit>>,
+        ),
         /// Some assets were issued. \[asset_id, owner, total_supply\]
         Issued(T::AssetId, T::AccountId, T::Balance),
         /// Some assets were transferred. \[asset_id, owner, total_supply\]
@@ -550,6 +557,22 @@ pub mod pallet {
             }
             ensure!(!min_balance.is_zero(), Error::<T, I>::MinBalanceZero);
 
+            let blacklist =
+                AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
+            ensure!(
+                !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
+                Error::<T, I>::AssetBlacklist
+            );
+
+            let bounded_name: BoundedVec<u8, T::StringLimit> = name
+                .clone()
+                .try_into()
+                .map_err(|_| Error::<T, I>::BadMetadata)?;
+            let bounded_symbol: BoundedVec<u8, T::StringLimit> = symbol
+                .clone()
+                .try_into()
+                .map_err(|_| Error::<T, I>::BadMetadata)?;
+
             let token_id =
                 NextAssetId::<T, I>::try_mutate(|id| -> Result<T::AssetId, DispatchError> {
                     let current_id = *id;
@@ -589,11 +612,34 @@ pub mod pallet {
                     is_frozen: false,
                 };
                 Asset::<T, I>::insert(token_id, details);
-                Self::maybe_add_metadata(&owner, token_id, name, symbol, decimals)?;
+
+                let new_deposit = T::MetadataDepositPerByte::get()
+                    .saturating_mul(((name.len() + symbol.len()) as u32).into())
+                    .saturating_add(T::MetadataDepositBase::get());
+                T::Currency::reserve(&owner, new_deposit)?;
+
+                let metadata = AssetMetadata {
+                    deposit: new_deposit,
+                    name: bounded_name,
+                    symbol: bounded_symbol,
+                    decimals,
+                    is_frozen: false,
+                };
+                // if_std!(
+                //     println!("Update event {:?}", &metadata);
+                // );
+                Metadata::<T, I>::insert(token_id, metadata.clone());
+                Self::deposit_event(Event::CreateMinted(
+                    token_id,
+                    owner,
+                    admin,
+                    beneficiary.clone(),
+                    metadata.clone(),
+                ));
+
                 Ok(())
             })?;
 
-            Self::deposit_event(Event::CreateMinted(token_id, owner, admin));
             Ok(())
         }
 
