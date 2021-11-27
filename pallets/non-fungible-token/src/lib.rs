@@ -40,8 +40,12 @@ use sp_runtime::{
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 // pub mod benchmarking;
+//
+#[cfg(test)]
 mod mock;
+#[cfg(test)]
 mod tests;
+
 pub mod weights;
 
 pub use pallet::*;
@@ -147,9 +151,9 @@ pub mod pallet {
             origin: OriginFor<T>,
             attributes: Attributes,
         ) -> DispatchResultWithPostInfo {
-            let who = ensure_signed(origin)?;
+            let owner = ensure_signed(origin)?;
             let next_id = bholdus_support_nft::Pallet::<T>::next_class_id();
-            let owner: T::AccountId = T::PalletId::get().into_sub_account(next_id);
+            // let owner: T::AccountId = T::PalletId::get().into_sub_account(next_id);
             let data = ClassData { attributes };
             bholdus_support_nft::Pallet::<T>::create_class(&owner, data)?;
             Self::deposit_event(Event::CreatedClass(owner, next_id));
@@ -273,7 +277,8 @@ impl<T: Config> Pallet<T> {
         let group_id = bholdus_support_nft::Pallet::<T>::next_group_id();
         bholdus_support_nft::Pallet::<T>::create_group();
 
-        let token_id = bholdus_support_nft::Pallet::<T>::next_token_id(class_id);
+        let token_id = bholdus_support_nft::Pallet::<T>::next_token_id();
+
         for _ in 0..quantity {
             bholdus_support_nft::Pallet::<T>::mint_to_group(
                 &to,

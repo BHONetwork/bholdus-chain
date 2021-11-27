@@ -29,7 +29,6 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         decimals: u8,
     ) -> DispatchResult {
         let blacklist = AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
-        println!("blacklist: {:?}", !blacklist);
         ensure!(
             !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
             Error::<T, I>::AssetBlacklist

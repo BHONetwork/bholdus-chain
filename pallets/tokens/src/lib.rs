@@ -573,7 +573,6 @@ pub mod pallet {
                     };
                 }
                 t.free = new_balance;
-                println!("CreateMinted: Account: free {:?}", new_balance);
 
                 let details = AssetDetails {
                     owner: owner.clone(),
