@@ -445,7 +445,7 @@ impl pallet_authorship::Config for Runtime {
 
 parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
-    pub const Period: BlockNumber = 1 * HOURS;
+    pub const Period: BlockNumber = EPOCH_DURATION_IN_BLOCKS;
     pub const Offset: BlockNumber = 0;
 }
 
