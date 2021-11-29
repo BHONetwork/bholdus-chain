@@ -76,13 +76,14 @@
 
 pub use crate::imbalances::{NegativeImbalance, PositiveImbalance};
 
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
 mod imbalances;
-pub mod weights;
-//#[cfg(feature = "runtime-benchmarks")]
 #[cfg(test)]
 pub mod mock;
 #[cfg(test)]
 mod tests;
+pub mod weights;
 
 mod extra_mutator;
 pub use extra_mutator::*;
@@ -538,7 +539,7 @@ pub mod pallet {
             Ok(())
         }
 
-        #[pallet::weight(T::WeightInfo::create())]
+        #[pallet::weight(T::WeightInfo::create_and_mint(name.len() as u32, symbol.len() as u32))]
         pub fn create_and_mint(
             origin: OriginFor<T>,
             admin: <T::Lookup as StaticLookup>::Source,

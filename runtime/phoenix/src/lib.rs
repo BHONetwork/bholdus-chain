@@ -1430,6 +1430,9 @@ impl_runtime_apis! {
             use frame_benchmarking::{list_benchmark, Benchmarking, BenchmarkList};
             use frame_support::traits::StorageInfoTrait;
 
+            use bholdus_nft::benchmarking::Pallet as NftBench;
+            use bholdus_tokens::benchmarking::Pallet as TokensBench;
+
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
             // issues. To get around that, we separated the Session benchmarks into its own crate,
             // which is why we need these two lines below.
@@ -1438,6 +1441,8 @@ impl_runtime_apis! {
             let mut list = Vec::<BenchmarkList>::new();
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_token, TokensBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_nft, NftBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             let storage_info = AllPalletsWithSystem::storage_info();
@@ -1454,6 +1459,8 @@ impl_runtime_apis! {
             // issues. To get around that, we separated the Session benchmarks into its own crate,
             // which is why we need these two lines below.
             use frame_system_benchmarking::Pallet as SystemBench;
+            use bholdus_nft::benchmarking::Pallet as NftBench;
+            use bholdus_tokens::benchmarking::Pallet as TokensBench;
 
             impl frame_system_benchmarking::Config for Runtime {}
 
@@ -1478,6 +1485,8 @@ impl_runtime_apis! {
             let params = (&config, &whitelist);
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, bholdus_tokens, TokensBench::<Runtime>);
+            add_benchmark!(params, batches, bholdus_nft, NftBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             Ok(batches)

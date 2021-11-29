@@ -15,8 +15,8 @@ pub trait WeightInfo {
 	fn destroy_class() -> Weight;
 }
 
-pub struct NFTWeight<T>(PhantomData<T>);
-impl<T: frame_system::Config> WeightInfo for NFTWeight<T> {
+pub struct SubstrateWeight<T>(PhantomData<T>);
+impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	fn create_class() -> Weight {
 		(177_661_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(4 as Weight))
