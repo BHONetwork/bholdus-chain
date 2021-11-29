@@ -39,8 +39,8 @@ use sp_runtime::{
 };
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
-// pub mod benchmarking;
-//
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
 #[cfg(test)]
 mod mock;
 #[cfg(test)]
