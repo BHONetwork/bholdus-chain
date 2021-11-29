@@ -387,7 +387,7 @@ fn testnet_genesis(
                 .cloned()
                 .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
                     if !is_native_currency {
-                        Some((account_id, currency_id, balance))
+                        Some((account_id, balance))
                     } else {
                         None
                     }

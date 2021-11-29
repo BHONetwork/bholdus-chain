@@ -1480,6 +1480,7 @@ name = "cygnus-runtime"
 version = "1.0.0"
 dependencies = [
  "beefy-primitives",
+ "bholdus-bridge-native-transfer",
  "bholdus-currencies",
  "bholdus-nft",
  "bholdus-primitives",

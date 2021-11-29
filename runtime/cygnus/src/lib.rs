@@ -446,7 +446,7 @@ impl pallet_authorship::Config for Runtime {
 
 parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
-    pub const Period: BlockNumber = 1 * HOURS;
+    pub const Period: BlockNumber = EPOCH_DURATION_IN_BLOCKS;
     pub const Offset: BlockNumber = 0;
 }
 
@@ -1049,6 +1049,14 @@ impl bholdus_support_nft::Config for Runtime {
     type MaxTokenMetadata = MaxTokenMetadata;
 }
 
+impl bholdus_bridge_native_transfer::Config for Runtime {
+    type Event = Event;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
+    type Currency = Balances;
+    type MinimumDeposit = ExistentialDeposit;
+    type WeightInfo = bholdus_bridge_native_transfer::weights::SubstrateWeight<Runtime>;
+}
+
 /* parameter_types! {
     pub const ExchangeFee: (u32, u32) = (3,1000);
     pub const TradingPathLimit: u32 = 3;
@@ -1122,6 +1130,7 @@ construct_runtime!(
         Mmr: pallet_mmr::{Pallet, Storage},
         Beefy: pallet_beefy::{Pallet, Config<T>, Storage},
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
+        BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>},
 
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
@@ -1425,6 +1434,7 @@ impl_runtime_apis! {
             let mut list = Vec::<BenchmarkList>::new();
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1464,6 +1474,7 @@ impl_runtime_apis! {
             let params = (&config, &whitelist);
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             Ok(batches)
         }
