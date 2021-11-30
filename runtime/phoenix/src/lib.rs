@@ -986,11 +986,11 @@ parameter_type_with_key! {
     };
 }
 
-impl bholdus_currencies::Config for Runtime {
-    type Event = Event;
-    type MultiCurrency = Tokens;
-    type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
-}
+// impl bholdus_currencies::Config for Runtime {
+//     type Event = Event;
+//     type MultiCurrency = Tokens;
+//     type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
+// }
 
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
@@ -1140,7 +1140,7 @@ construct_runtime!(
         // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
         // BholdusSupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
-        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
