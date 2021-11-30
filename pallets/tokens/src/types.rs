@@ -255,7 +255,7 @@ impl Default for Data {
 /// NOTE: This is should be stored at the end of the storage item to facilitate the addition of
 /// extra fields in a backwards compatible way through a specialized `Decode` impl.
 #[derive(Clone, Encode, Decode, Eq, PartialEq, Default, RuntimeDebug, TypeInfo)]
-#[cfg_attr(test, derive(Default))]
+// #[cfg_attr(test, derive(Default))]
 pub struct AssetIdentity {
     /// Additional fields of the identity that are not catered for with the struct's explicit
     /// fields.
@@ -291,7 +291,7 @@ pub struct AssetIdentity {
 /// NOTE: This should be stored at the end of the storage item to facilitate the addition of extra
 /// fields in a backwards compatible way through a specialized `Decod` impl.
 #[derive(Clone, Encode, Decode, Eq, PartialEq, Default, RuntimeDebug, TypeInfo)]
-#[cfg_attr(test, derive(Default))]
+// #[cfg_attr(test, derive(Default))]
 pub struct BasicInformation {
     /// Stored as UTF-8.
     pub project_name: Data,
@@ -315,7 +315,7 @@ pub struct BasicInformation {
 
 /// NOTE: Social Profile
 #[derive(Clone, Encode, Decode, Eq, PartialEq, Default, RuntimeDebug, TypeInfo)]
-#[cfg_attr(test, derive(Default))]
+// #[cfg_attr(test, derive(Default))]
 pub struct SocialProfile {
     /// Wnitepaper
     pub whitepaper: Data,
