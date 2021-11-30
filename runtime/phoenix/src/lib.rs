@@ -1048,7 +1048,7 @@ impl bholdus_nft::Config for Runtime {
     type PalletId = NftPalletId;
     type MaxAttributesBytes = MaxAttributesBytes;
     type MaxQuantity = MaxQuantity;
-    type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
+    type WeightInfo = bholdus_nft::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
