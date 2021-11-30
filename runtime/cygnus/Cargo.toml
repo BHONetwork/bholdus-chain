@@ -112,6 +112,8 @@ runtime-benchmarks = [
 
 	"pallet-collective/runtime-benchmarks",
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
+	"bholdus-tokens/runtime-benchmarks",
+	"bholdus-nft/runtime-benchmarks",
 ]
 std = [
 	"codec/std",

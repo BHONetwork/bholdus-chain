@@ -79,7 +79,7 @@ use impls::Author;
 /// Import some useful constants
 pub mod constants;
 pub mod weights;
-pub use constants::{currency::*, time::*, fee};
+pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
 
 /// Import the template pallet.
@@ -1030,7 +1030,7 @@ impl bholdus_nft::Config for Runtime {
     type PalletId = NftPalletId;
     type MaxAttributesBytes = MaxAttributesBytes;
     type MaxQuantity = MaxQuantity;
-    type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
+    type WeightInfo = bholdus_nft::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -1435,6 +1435,7 @@ impl_runtime_apis! {
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
+            list_benchmark!(list, extra, bholdus_nft, NFT);
 
             let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1475,6 +1476,7 @@ impl_runtime_apis! {
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
+            add_benchmark!(params, batches, bholdus_nft, NFT);
 
             Ok(batches)
         }
