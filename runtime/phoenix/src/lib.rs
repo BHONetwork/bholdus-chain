@@ -79,7 +79,7 @@ use impls::Author;
 /// Import some useful constants
 pub mod constants;
 pub mod weights;
-pub use constants::{currency::*, time::*};
+pub use constants::{currency::*, time::*, fee};
 mod voter_bags;
 
 /// Import the template pallet.
@@ -156,7 +156,7 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 1 second of compute with a 3 seconds average block time.
-const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
+pub const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -415,7 +415,7 @@ impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
     type TransactionByteFee = TransactionByteFee;
     type OperationalFeeMultiplier = OperationalFeeMultiplier;
-    type WeightToFee = IdentityFee<Balance>;
+    type WeightToFee = fee::WeightToFee;
     type FeeMultiplierUpdate =
         TargetedFeeAdjustment<Self, TargetBlockFullness, AdjustmentVariable, MinimumMultiplier>;
 }
