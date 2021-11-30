@@ -79,7 +79,7 @@ use impls::Author;
 /// Import some useful constants
 pub mod constants;
 pub mod weights;
-pub use constants::{currency::*, time::*, fee};
+pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
 
 /// Import the template pallet.
