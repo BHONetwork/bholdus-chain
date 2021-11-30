@@ -1441,7 +1441,7 @@ impl_runtime_apis! {
             let mut list = Vec::<BenchmarkList>::new();
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
-            list_benchmark!(list, extra, bholdus_token, TokensBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_tokens, TokensBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_nft, NFT);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
