@@ -4,7 +4,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "cygnus-runtime"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.7"
+version = "1.0.8"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]

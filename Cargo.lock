@@ -1477,7 +1477,7 @@ dependencies = [
 
 [[package]]
 name = "cygnus-runtime"
-version = "1.0.7"
+version = "1.0.8"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
