@@ -86,6 +86,11 @@ benchmarks! {
 
     }: _(RawOrigin::Root, caller)
 
+    force_freeze {
+    }: _(RawOrigin::Root)
+
+    force_unfreeze {}: _(RawOrigin::Root)
+
 }
 
 impl_benchmark_test_suite!(

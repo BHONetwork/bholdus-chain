@@ -493,7 +493,7 @@ pub mod pallet {
         }
 
         /// Freeze the bridge
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_freeze())]
         pub fn force_freeze(origin: OriginFor<T>) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin.clone())?;
 
@@ -502,7 +502,7 @@ pub mod pallet {
             Ok(())
         }
 
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::force_unfreeze())]
         pub fn force_unfreeze(origin: OriginFor<T>) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin.clone())?;
 
