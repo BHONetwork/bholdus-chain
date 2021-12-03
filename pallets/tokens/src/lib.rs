@@ -77,7 +77,7 @@
 pub use crate::imbalances::{NegativeImbalance, PositiveImbalance};
 
 #[cfg(feature = "runtime-benchmarks")]
-pub mod benchmarking;
+mod benchmarking;
 mod imbalances;
 #[cfg(test)]
 pub mod mock;
