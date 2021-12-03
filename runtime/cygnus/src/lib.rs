@@ -1130,7 +1130,7 @@ construct_runtime!(
         Mmr: pallet_mmr::{Pallet, Storage},
         Beefy: pallet_beefy::{Pallet, Config<T>, Storage},
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
-        BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>},
+        BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
