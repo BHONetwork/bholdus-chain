@@ -106,6 +106,31 @@ pub mod pallet {
         }
     }
 
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config> {
+        service_fee: FeeRate,
+        marker: PhantomData<T>,
+    }
+
+    #[cfg(feature = "std")]
+    impl<T: Config> Default for GenesisConfig<T> {
+        fn default() -> GenesisConfig<T> {
+            Self {
+                service_fee: (3, 10_000),
+                marker: PhantomData,
+            }
+        }
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+        fn build(&self) {
+            FixedU128::checked_from_rational(self.service_fee.0, self.service_fee.1)
+                .expect("Invalid fee rate");
+            ServiceFeeRate::<T>::put(self.service_fee.clone());
+        }
+    }
+
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
     #[pallet::storage_version(STORAGE_VERSION)]
@@ -118,10 +143,6 @@ pub mod pallet {
     #[pallet::type_value]
     pub(super) fn DefaultNextConfirmOutboundTransferId() -> TransferId {
         0
-    }
-    #[pallet::type_value]
-    pub(super) fn DefaultServiceFeeRate() -> FeeRate {
-        (3, 10_000)
     }
     #[pallet::type_value]
     pub(super) fn DefaultNextInboundTransferId() -> TransferId {
@@ -154,7 +175,7 @@ pub mod pallet {
     /// The service fee rate to charge users
     #[pallet::storage]
     #[pallet::getter(fn service_fee_rate)]
-    pub(super) type ServiceFeeRate<T> = StorageValue<_, FeeRate, ValueQuery, DefaultServiceFeeRate>;
+    pub(super) type ServiceFeeRate<T> = StorageValue<_, FeeRate, ValueQuery>;
 
     /// The inbound transfer id that should be received next
     #[pallet::storage]
@@ -175,6 +196,11 @@ pub mod pallet {
     #[pallet::getter(fn registered_chains)]
     pub(super) type RegisteredChains<T: Config> =
         StorageMap<_, Blake2_128Concat, ChainId, bool, ValueQuery>;
+
+    /// Indicating the bridge is frozen by admin
+    #[pallet::storage]
+    #[pallet::getter(fn is_frozen)]
+    pub(super) type Frozen<T: Config> = StorageValue<_, bool, ValueQuery>;
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -203,6 +229,8 @@ pub mod pallet {
         UnexpectedInboundTransfer,
         /// Minimum deposit required
         MinimumDepositRequired,
+        /// Bridge is freezed
+        Frozen,
     }
 
     #[pallet::call]
@@ -219,6 +247,8 @@ pub mod pallet {
             amount: BalanceOf<T>,
             target_chain: ChainId,
         ) -> DispatchResult {
+            ensure!(!Self::is_frozen(), Error::<T>::Frozen);
+
             let who = ensure_signed(origin)?;
 
             // Only registered chains can receive the fund
@@ -288,6 +318,8 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::confirm_transfer(0))]
         #[transactional]
         pub fn confirm_transfer(origin: OriginFor<T>, transfer_id: TransferId) -> DispatchResult {
+            ensure!(!Self::is_frozen(), Error::<T>::Frozen);
+
             let who = ensure_signed(origin)?;
 
             // Only registered relayers are allowed
@@ -338,6 +370,8 @@ pub mod pallet {
             to: T::AccountId,
             amount: BalanceOf<T>,
         ) -> DispatchResult {
+            ensure!(!Self::is_frozen(), Error::<T>::Frozen);
+
             let who = ensure_signed(origin)?;
 
             // Only registered relayers are allowed
@@ -454,6 +488,25 @@ pub mod pallet {
                 locked_tokens,
                 ExistenceRequirement::AllowDeath,
             )?;
+
+            Ok(())
+        }
+
+        /// Freeze the bridge
+        #[pallet::weight(0)]
+        pub fn force_freeze(origin: OriginFor<T>) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin.clone())?;
+
+            Frozen::<T>::put(true);
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        pub fn force_unfreeze(origin: OriginFor<T>) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin.clone())?;
+
+            Frozen::<T>::put(false);
 
             Ok(())
         }

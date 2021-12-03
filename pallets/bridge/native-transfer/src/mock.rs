@@ -1,5 +1,8 @@
 use crate::{self as bholdus_bridge_native_transfer, pallet};
-use frame_support::{parameter_types, traits::ExistenceRequirement};
+use frame_support::{
+    parameter_types,
+    traits::{ExistenceRequirement, GenesisBuild},
+};
 use frame_system as system;
 use sp_core::H256;
 use sp_runtime::{
@@ -111,6 +114,10 @@ impl ExtBuilder {
         }
         .assimilate_storage(&mut t)
         .unwrap();
+
+        crate::pallet::GenesisConfig::<Runtime>::default()
+            .assimilate_storage(&mut t)
+            .unwrap();
 
         sp_io::TestExternalities::from(t)
     }

@@ -229,6 +229,20 @@ fn initiate_transfer_should_work() {
             pallet_balances::Error::<Runtime>::InsufficientBalance
         );
 
+        assert_ok!(BridgeNativeTransfer::force_freeze(Origin::root()));
+
+        assert_noop!(
+            BridgeNativeTransfer::initiate_transfer(
+                Origin::signed(ALICE),
+                to.clone(),
+                transfer_amount,
+                target_chain
+            ),
+            crate::Error::<Runtime>::Frozen
+        );
+
+        assert_ok!(BridgeNativeTransfer::force_unfreeze(Origin::root()));
+
         assert_initiate_transfer(&ALICE, to.clone(), transfer_amount, target_chain, 0);
         assert_initiate_transfer(&BOB, to.clone(), transfer_amount, target_chain, 1);
     });
@@ -285,6 +299,15 @@ fn confirm_transfer_should_work() {
             BridgeNativeTransfer::confirm_transfer(Origin::signed(relayer_id), 1),
             crate::Error::<Runtime>::UnexpectedOutboundTransferConfirmation
         );
+
+        assert_ok!(BridgeNativeTransfer::force_freeze(Origin::root()));
+
+        assert_noop!(
+            BridgeNativeTransfer::confirm_transfer(Origin::signed(ALICE), 0),
+            crate::Error::<Runtime>::Frozen
+        );
+
+        assert_ok!(BridgeNativeTransfer::force_unfreeze(Origin::root()));
 
         assert_confirm_transfer(relayer_id, 0);
         assert_confirm_transfer(relayer_id, 1);
@@ -375,6 +398,21 @@ fn release_tokens_should_work() {
                 crate::Error::<Runtime>::UnexpectedInboundTransfer
             );
 
+            assert_ok!(BridgeNativeTransfer::force_freeze(Origin::root()));
+
+            assert_noop!(
+                BridgeNativeTransfer::release_tokens(
+                    Origin::signed(relayer_id),
+                    1,
+                    from.clone(),
+                    ALICE,
+                    1_000u128
+                ),
+                crate::Error::<Runtime>::Frozen
+            );
+
+            assert_ok!(BridgeNativeTransfer::force_unfreeze(Origin::root()));
+
             assert_release_tokens(relayer_id, 0, from.clone(), ALICE, 1_000u128);
 
             assert_noop!(
@@ -399,4 +437,28 @@ fn release_tokens_should_work() {
                 pallet_balances::Error::<Runtime>::InsufficientBalance
             );
         });
+}
+
+#[test]
+fn force_freeze_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            BridgeNativeTransfer::force_freeze(Origin::signed(ALICE)),
+            BadOrigin
+        );
+        assert_ok!(BridgeNativeTransfer::force_freeze(Origin::root()));
+        assert_eq!(BridgeNativeTransfer::is_frozen(), true);
+    })
+}
+
+#[test]
+fn force_unfreeze_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            BridgeNativeTransfer::force_unfreeze(Origin::signed(ALICE)),
+            BadOrigin
+        );
+        assert_ok!(BridgeNativeTransfer::force_unfreeze(Origin::root()));
+        assert_eq!(BridgeNativeTransfer::is_frozen(), false);
+    })
 }
