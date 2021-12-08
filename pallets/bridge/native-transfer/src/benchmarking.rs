@@ -51,37 +51,36 @@ benchmarks! {
     }: _(RawOrigin::Signed(caller.clone()), 0, from.clone(), caller.clone(), amount)
 
     force_register_relayer {
-        let s in 1 .. 1000;
         let caller: T::AccountId = whitelisted_caller();
 
     }: _(RawOrigin::Root, caller)
 
     force_unregister_relayer {
-        let s in 1 .. 1000;
         let caller: T::AccountId = whitelisted_caller();
 
     }: _(RawOrigin::Root, caller)
 
     force_register_chain {
-        let s in 1 .. 1000;
         let caller: T::AccountId = whitelisted_caller();
 
     }: _(RawOrigin::Root, 1)
 
     force_unregister_chain {
-        let s in 1 .. 1000;
         let caller: T::AccountId = whitelisted_caller();
 
     }: _(RawOrigin::Root, 1)
 
     force_set_service_fee {
-        let s in 1 .. 1000;
         let caller: T::AccountId = whitelisted_caller();
 
-    }: _(RawOrigin::Root, (3,10))
+    }: _(RawOrigin::Root, 10)
+
+    force_set_platform_fee {
+        let caller: T::AccountId = whitelisted_caller();
+
+    }: _(RawOrigin::Root, 10)
 
     force_withdraw {
-        let s in 1 .. 1000;
         let caller: T::AccountId = whitelisted_caller();
 
     }: _(RawOrigin::Root, caller)

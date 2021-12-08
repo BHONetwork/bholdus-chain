@@ -48,15 +48,31 @@ fn force_unregister_relayer_should_work() {
 fn force_set_service_fee_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         assert_noop!(
-            BridgeNativeTransfer::force_set_service_fee(Origin::signed(ALICE), (4, 10)),
+            BridgeNativeTransfer::force_set_service_fee(Origin::signed(ALICE), 10),
             BadOrigin
         );
 
         assert_ok!(BridgeNativeTransfer::force_set_service_fee(
             Origin::root(),
-            (4, 10)
+            10
         ));
-        assert_eq!(BridgeNativeTransfer::service_fee_rate(), (4, 10));
+        assert_eq!(BridgeNativeTransfer::service_fee(), 10);
+    });
+}
+
+#[test]
+fn force_set_platform_fee_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            BridgeNativeTransfer::force_set_platform_fee(Origin::signed(ALICE), 10),
+            BadOrigin
+        );
+
+        assert_ok!(BridgeNativeTransfer::force_set_platform_fee(
+            Origin::root(),
+            10
+        ));
+        assert_eq!(BridgeNativeTransfer::platform_fee(), 10);
     });
 }
 
@@ -110,12 +126,10 @@ fn assert_initiate_transfer(
         Balances::free_balance(from),
         initial_from_balance.checked_sub(amount).unwrap()
     );
-    let service_fee_rate = BridgeNativeTransfer::service_fee_rate();
-    let service_fee = FixedU128::checked_from_rational(service_fee_rate.0, service_fee_rate.1)
-        .unwrap()
-        .checked_mul_int(amount)
-        .unwrap();
-    let total_charge = amount.checked_add(service_fee).unwrap();
+    let service_fee = BridgeNativeTransfer::service_fee();
+    let platform_fee = BridgeNativeTransfer::platform_fee();
+    let fee = service_fee.checked_add(platform_fee).unwrap();
+    let total_charge = amount.checked_add(fee).unwrap();
 
     assert_eq!(
         Balances::free_balance(BridgeNativeTransfer::pallet_account_id()),
@@ -126,7 +140,7 @@ fn assert_initiate_transfer(
         OutboundTransferInfo {
             amount,
             from: from.clone(),
-            service_fee,
+            service_fee: fee,
             target_chain,
             to: to.clone()
         }

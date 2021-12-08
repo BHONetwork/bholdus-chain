@@ -25,13 +25,14 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
+mod migrations;
+
 pub mod weights;
 
 use weights::WeightInfo;
 
 type TransferId = u128;
 type Bytes = Vec<u8>;
-type FeeRate = (u32, u32);
 type ChainId = u16;
 
 #[derive(Clone, Encode, Decode, PartialEq, Eq, RuntimeDebug, Default, TypeInfo)]
@@ -94,7 +95,7 @@ pub mod pallet {
         type WeightInfo: weights::WeightInfo;
     }
 
-    const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
+    const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
 
     #[pallet::extra_constants]
     impl<T: Config> Pallet<T> {
@@ -108,16 +109,16 @@ pub mod pallet {
 
     #[pallet::genesis_config]
     pub struct GenesisConfig<T: Config> {
-        service_fee: FeeRate,
-        marker: PhantomData<T>,
+        service_fee: BalanceOf<T>,
+        platform_fee: BalanceOf<T>,
     }
 
     #[cfg(feature = "std")]
     impl<T: Config> Default for GenesisConfig<T> {
         fn default() -> GenesisConfig<T> {
             Self {
-                service_fee: (3, 10_000),
-                marker: PhantomData,
+                service_fee: 0,
+                platform_fee: 0,
             }
         }
     }
@@ -125,9 +126,29 @@ pub mod pallet {
     #[pallet::genesis_build]
     impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
         fn build(&self) {
-            FixedU128::checked_from_rational(self.service_fee.0, self.service_fee.1)
-                .expect("Invalid fee rate");
-            ServiceFeeRate::<T>::put(self.service_fee.clone());
+            ServiceFee::<T>::put(self.service_fee.clone());
+        }
+    }
+
+    #[pallet::hooks]
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+        fn on_runtime_upgrade() -> Weight {
+            migrations::migrate::<T>()
+        }
+
+        #[cfg(feature = "try-runtime")]
+        fn pre_upgrade() -> Result<(), &'static str> {
+            Ok(())
+        }
+
+        #[cfg(feature = "try-runtime")]
+        fn post_upgrade() -> Result<(), &'static str> {
+            ensure!(
+                Self::service_fee() == 0,
+                "Service fee is not 0 after upgrade"
+            );
+
+            Ok(())
         }
     }
 
@@ -172,10 +193,15 @@ pub mod pallet {
         OptionQuery,
     >;
 
-    /// The service fee rate to charge users
+    /// The service fee to charge users
     #[pallet::storage]
-    #[pallet::getter(fn service_fee_rate)]
-    pub(super) type ServiceFeeRate<T> = StorageValue<_, FeeRate, ValueQuery>;
+    #[pallet::getter(fn service_fee)]
+    pub(super) type ServiceFee<T> = StorageValue<_, BalanceOf<T>, ValueQuery>;
+
+    /// The platform fee to charge users
+    #[pallet::storage]
+    #[pallet::getter(fn platform_fee)]
+    pub(super) type PlatformFee<T> = StorageValue<_, BalanceOf<T>, ValueQuery>;
 
     /// The inbound transfer id that should be received next
     #[pallet::storage]
@@ -262,19 +288,11 @@ pub mod pallet {
                 Error::<T>::MinimumDepositRequired
             );
 
-            let service_fee_rate = FixedU128::checked_from_rational(
-                Self::service_fee_rate().0,
-                Self::service_fee_rate().1,
-            )
-            .ok_or(Error::<T>::InvalidServiceFeeRate)?;
-
-            let service_fee = service_fee_rate
-                .checked_mul_int(amount)
+            let fee = Self::service_fee()
+                .checked_add(Self::platform_fee())
                 .ok_or(ArithmeticError::Overflow)?;
 
-            let total_charge = service_fee
-                .checked_add(amount)
-                .ok_or(ArithmeticError::Overflow)?;
+            let total_charge = fee.checked_add(amount).ok_or(ArithmeticError::Overflow)?;
 
             // Lock user tokens
             T::Currency::transfer(
@@ -292,7 +310,7 @@ pub mod pallet {
                     from: who.clone(),
                     to: to.clone(),
                     amount,
-                    service_fee,
+                    service_fee: fee,
                     target_chain,
                 },
             );
@@ -406,7 +424,7 @@ pub mod pallet {
 
         /// Register relayer account responsible for relaying transfer between chains
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(T::WeightInfo::force_register_relayer(0))]
+        #[pallet::weight(T::WeightInfo::force_register_relayer())]
         #[transactional]
         pub fn force_register_relayer(
             origin: OriginFor<T>,
@@ -421,7 +439,7 @@ pub mod pallet {
 
         /// Unregister relayer account
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(T::WeightInfo::force_unregister_relayer(0))]
+        #[pallet::weight(T::WeightInfo::force_unregister_relayer())]
         pub fn force_unregister_relayer(
             origin: OriginFor<T>,
             relayer: T::AccountId,
@@ -436,7 +454,7 @@ pub mod pallet {
         /// Register chain id that crosschain transfer supports
         /// Chain id will be pre-defined by Bholdus team
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(T::WeightInfo::force_register_chain(0))]
+        #[pallet::weight(T::WeightInfo::force_register_chain())]
         pub fn force_register_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
 
@@ -448,7 +466,7 @@ pub mod pallet {
         /// Unregister chain id
         /// Chain id will be pre-defined by Bholdus team
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(T::WeightInfo::force_unregister_chain(0))]
+        #[pallet::weight(T::WeightInfo::force_unregister_chain())]
         pub fn force_unregister_chain(origin: OriginFor<T>, chain: ChainId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
 
@@ -459,17 +477,28 @@ pub mod pallet {
 
         /// Set service fee that user will be charged when initiates a transfer
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(T::WeightInfo::force_set_service_fee(0))]
+        #[pallet::weight(T::WeightInfo::force_set_service_fee())]
         pub fn force_set_service_fee(
             origin: OriginFor<T>,
-            service_fee_rate: FeeRate,
+            service_fee: BalanceOf<T>,
         ) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin)?;
 
-            FixedU128::checked_from_rational(service_fee_rate.0, service_fee_rate.1)
-                .ok_or(ArithmeticError::Overflow)?;
+            ServiceFee::<T>::put(service_fee);
 
-            ServiceFeeRate::<T>::put(service_fee_rate);
+            Ok(())
+        }
+
+        /// Set platform fee
+        /// Only `AdminOrigin` can access this operation
+        #[pallet::weight(T::WeightInfo::force_set_platform_fee())]
+        pub fn force_set_platform_fee(
+            origin: OriginFor<T>,
+            platform_fee: BalanceOf<T>,
+        ) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin)?;
+
+            PlatformFee::<T>::put(platform_fee);
 
             Ok(())
         }
@@ -477,7 +506,7 @@ pub mod pallet {
         /// Withdraw tokens locked in this pallet to some account
         /// This operation is mainly used for any migration in the future
         /// Only `AdminOrigin` can access this operation
-        #[pallet::weight(T::WeightInfo::force_withdraw(0))]
+        #[pallet::weight(T::WeightInfo::force_withdraw())]
         pub fn force_withdraw(origin: OriginFor<T>, to: T::AccountId) -> DispatchResult {
             T::AdminOrigin::ensure_origin(origin.clone())?;
 
