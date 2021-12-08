@@ -718,7 +718,7 @@ pub mod pallet {
         #[pallet::weight(T::WeightInfo::destroy(
                 witness.accounts.saturating_sub(witness.sufficients),
                 witness.sufficients,
-                witness.approvals,
+                // witness.approvals,
         ))]
         pub fn destroy(
             origin: OriginFor<T>,
