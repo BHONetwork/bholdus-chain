@@ -1077,6 +1077,15 @@ impl bholdus_bridge_bsc::Config for Runtime {
     type OnHeadersSubmitted = ();
 }
  */
+
+ impl bholdus_bridge_native_transfer::Config for Runtime {
+    type Event = Event;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
+    type Currency = Balances;
+    type MinimumDeposit = ExistentialDeposit;
+    type WeightInfo = bholdus_bridge_native_transfer::weights::SubstrateWeight<Runtime>;
+}
+
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
     type Event = Event;
@@ -1121,6 +1130,7 @@ construct_runtime!(
         Mmr: pallet_mmr::{Pallet, Storage},
         Beefy: pallet_beefy::{Pallet, Config<T>, Storage},
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
+        BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
         Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
