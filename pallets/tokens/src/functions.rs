@@ -18,9 +18,22 @@
 //! Functions for the Assets pallet.
 
 use super::*;
+use scale_info::prelude::string::String;
+use sp_std::if_std;
 
 // The main implementation block for the module.
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    pub fn is_valid_symbol(symbol: Vec<u8>) -> bool {
+        let str_trim = String::from_utf8(symbol.clone()).unwrap().replace(" ", "");
+        let val: Vec<u8> = str_trim.into_bytes();
+        symbol == val
+    }
+
+    pub fn get_name(name: Vec<u8>) -> Vec<u8> {
+        let str_trim = String::from_utf8(name.clone()).unwrap().replace(" ", "");
+        str_trim.into_bytes()
+    }
+
     pub fn maybe_add_metadata(
         origin: &T::AccountId,
         id: T::AssetId,
@@ -125,6 +138,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         if account.free.checked_add(&amount).is_none() {
             return DepositConsequence::Overflow;
         }
+
         if account.free.is_zero() {
             if amount < details.min_balance {
                 return DepositConsequence::BelowMinimum;
@@ -146,15 +160,18 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         who: &T::AccountId,
         amount: T::Balance,
         keep_alive: bool,
+        action: Action,
     ) -> WithdrawConsequence<T::Balance> {
         use WithdrawConsequence::*;
         let details = match Asset::<T, I>::get(id) {
             Some(details) => details,
             None => return UnknownAsset,
         };
+
         if details.supply.checked_sub(&amount).is_none() {
             return Underflow;
         }
+
         if details.is_frozen {
             return Frozen;
         }
@@ -171,15 +188,23 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
                 }
             }
 
-            let is_provider = false;
+            /*let is_provider = false;
             let is_required = is_provider && !frame_system::Pallet::<T>::can_dec_provider(who);
             let must_keep_alive = keep_alive || is_required;
+            */
 
             if rest < details.min_balance {
-                if must_keep_alive {
-                    WouldDie
+                /*if must_keep_alive {
+                   WouldDie
                 } else {
                     ReducedToZero(rest)
+                }
+                */
+
+                match action {
+                    Action::Burn => ReducedToZero(rest),
+                    Action::Transfer => NoFunds,
+                    _ => ReducedToZero(rest),
                 }
             } else {
                 Success
@@ -211,6 +236,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         } else {
             let is_provider = false;
             let is_required = is_provider && !frame_system::Pallet::<T>::can_dec_provider(who);
+
             if keep_alive || is_required {
                 // We want to keep the account around.
                 account.free.saturating_sub(details.min_balance)
@@ -242,11 +268,17 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         target: &T::AccountId,
         amount: T::Balance,
         f: DebitFlags,
+        action: Action,
     ) -> Result<T::Balance, DispatchError> {
+        let asset_details = Asset::<T, I>::get(id).ok_or_else(|| Error::<T, I>::Unknown)?;
+        ensure!(
+            asset_details.supply >= amount,
+            Error::<T, I>::ExceedTotalSupply
+        );
         let actual = Self::reducible_balance(id, target, f.keep_alive)?.min(amount);
         ensure!(f.best_effort || actual >= amount, Error::<T, I>::BalanceLow);
 
-        let conseq = Self::can_decrease(id, target, actual, f.keep_alive);
+        let conseq = Self::can_decrease(id, target, actual, f.keep_alive, action);
         let actual = match conseq.into_result() {
             Ok(dust) => actual.saturating_add(dust), //< guaranteed by reducible_balance
             Err(e) => {
@@ -408,17 +440,17 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         maybe_check_admin: Option<T::AccountId>,
         f: DebitFlags,
     ) -> Result<T::Balance, DispatchError> {
-        let actual = Self::decrease_balance(id, target, amount, f, |actual, details| {
-            // Check admin rights.
-            if let Some(check_admin) = maybe_check_admin {
-                ensure!(&check_admin == &details.admin, Error::<T, I>::NoPermission);
-            }
+        let actual =
+            Self::decrease_balance(id, target, amount, f, Action::Burn, |actual, details| {
+                // Check admin rights.
+                if let Some(check_admin) = maybe_check_admin {
+                    ensure!(&check_admin == &details.admin, Error::<T, I>::NoPermission);
+                }
+                debug_assert!(details.supply >= actual, "checked in prep; qed");
+                details.supply = details.supply.saturating_sub(actual);
 
-            debug_assert!(details.supply >= actual, "checked in prep; qed");
-            details.supply = details.supply.saturating_sub(actual);
-
-            Ok(())
-        })?;
+                Ok(())
+            })?;
         Self::deposit_event(Event::Burned(id, target.clone(), actual));
         Ok(actual)
     }
@@ -436,6 +468,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         target: &T::AccountId,
         amount: T::Balance,
         f: DebitFlags,
+        action: Action,
         check: impl FnOnce(
             T::Balance,
             &mut AssetDetails<T::Balance, T::AccountId, DepositBalanceOf<T, I>>,
@@ -445,8 +478,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
             return Ok(amount);
         }
 
-        let actual = Self::prep_debit(id, target, amount, f)?;
-
+        let actual = Self::prep_debit(id, target, amount, f, action)?;
         Asset::<T, I>::try_mutate(id, |maybe_details| -> DispatchResult {
             let details = maybe_details.as_mut().ok_or(Error::<T, I>::Unknown)?;
 
@@ -486,9 +518,8 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         if amount.is_zero() || from == to {
             return Ok(());
         }
-
         // Figure out the debit and credit, together with side-effects.
-        let debit = Self::prep_debit(currency_id, &from, amount, f.into())?;
+        let debit = Self::prep_debit(currency_id, &from, amount, f.into(), Action::Transfer)?;
         let (credit, maybe_burn) = Self::prep_credit(currency_id, &to, amount, debit, f.burn_dust)?;
 
         Asset::<T, I>::try_mutate(currency_id, |maybe_details| -> DispatchResult {

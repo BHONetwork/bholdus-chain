@@ -169,7 +169,6 @@ benchmarks_instance_pallet! {
         let witness = Asset::<T, I>::get(&asset_id).unwrap().destroy_witness();
     }: _(SystemOrigin::Signed(caller.clone()), asset_id, witness)
 
-
     // verify {
     //     assert_last_event::<T, I>(Event::ForceCreated(Default::default(), caller).into());
     // }
@@ -200,11 +199,35 @@ benchmarks_instance_pallet! {
     //     assert_last_event::<T, I>(Event::Issued(Default::default(), caller, amount).into());
     // }
 
-         transfer {
+    burn {
         let name = vec![0u8; 1];
         let symbol = vec![0u8; 2];
         let decimals = 12;
         let amount = T::Balance::from(100u32);
+        let burn_amount = T::Balance::from(90u32);
+
+        let asset_id = Assets::<T, I>::next_asset_id();
+        let caller: T::AccountId = whitelisted_caller();
+        let caller_lookup = T::Lookup::unlookup(caller.clone());
+        T::Currency::make_free_balance_be(&caller, DepositBalanceOf::<T, I>::max_value());
+
+        Assets::<T, I>::create_and_mint(
+            SystemOrigin::Signed(caller.clone()).into(), // origin
+            caller_lookup.clone(),
+            name,                                        // name
+            symbol,                                      // symbol
+            decimals,                                    // decimal
+            caller_lookup.clone(),                       // beneficiary
+            amount,                                      // supply
+            1u32.into());
+    }: _(SystemOrigin::Signed(caller.clone()), asset_id, caller_lookup.clone(), burn_amount)
+
+    transfer {
+        let name = vec![0u8; 1];
+        let symbol = vec![0u8; 2];
+        let decimals = 12;
+        let amount = T::Balance::from(100u32);
+        let transfer_amount = T::Balance::from(90u32);
 
         let asset_id = Assets::<T, I>::next_asset_id();
         let caller: T::AccountId = whitelisted_caller();
@@ -224,7 +247,7 @@ benchmarks_instance_pallet! {
         let target_lookup = T::Lookup::unlookup(target.clone());
         T::Currency::make_free_balance_be(&target, DepositBalanceOf::<T, I>::max_value());
 
-    }: _(SystemOrigin::Signed(caller.clone()), asset_id, target_lookup, amount)
+    }: _(SystemOrigin::Signed(caller.clone()), asset_id, target_lookup, transfer_amount)
 
     // verify {
     //     assert_last_event::<T, I>(Event::Transferred(Default::default(), caller, target, amount).into());

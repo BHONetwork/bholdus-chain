@@ -187,6 +187,13 @@ impl From<TransferFlags> for DebitFlags {
 // Can also be `None`.
 
 #[derive(Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
+pub enum Action {
+    Transfer,
+    Burn,
+    Withdraw,
+}
+
+#[derive(Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub enum Data {
     /// No data here.
     None,

@@ -266,6 +266,9 @@ pub mod pallet {
         /// The maximum length of a name or symbol stored on-chain.
         type StringLimit: Get<u32>;
 
+        /// The maximum of decimals
+        type MaxDecimals: Get<u32>;
+
         /// A hook to allow a per-asset, per-account minimum balance to be enforced. This must be
         /// respected in all permissionless operations.
         type Freezer: FrozenBalance<Self::AssetId, Self::AccountId, Self::Balance>;
@@ -427,6 +430,15 @@ pub mod pallet {
 
     #[pallet::error]
     pub enum Error<T, I = ()> {
+        /// Invalid Symbol
+        InvalidSymbol,
+
+        /// Invalid Decimals
+        InvalidDecimals,
+
+        /// Invalid amount
+        ExceedTotalSupply,
+
         /// Asset belong blacklist
         AssetBlacklist,
         /// No available token ID
@@ -556,7 +568,15 @@ pub mod pallet {
             if supply.is_zero() {
                 return Ok(());
             }
+            ensure!(
+                Self::is_valid_symbol(symbol.clone()),
+                Error::<T, I>::InvalidSymbol
+            );
             ensure!(!min_balance.is_zero(), Error::<T, I>::MinBalanceZero);
+            ensure!(
+                decimals.clone() <= T::MaxDecimals::get() as u8,
+                Error::<T, I>::InvalidDecimals
+            );
 
             let blacklist =
                 AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
@@ -565,7 +585,7 @@ pub mod pallet {
                 Error::<T, I>::AssetBlacklist
             );
 
-            let bounded_name: BoundedVec<u8, T::StringLimit> = name
+            let bounded_name: BoundedVec<u8, T::StringLimit> = Self::get_name(name.clone())
                 .clone()
                 .try_into()
                 .map_err(|_| Error::<T, I>::BadMetadata)?;
@@ -805,6 +825,35 @@ pub mod pallet {
             let beneficiary = T::Lookup::lookup(beneficiary)?;
 
             Self::do_mint(id, &beneficiary, amount, Some(origin))?;
+            Ok(())
+        }
+
+        /// Reduce the balance of `who` by as much as possible up to `amount` assets of `id`.
+        ///
+        /// - `id`: The identifier of the asset to have some amount burned.
+        /// - `who`: The account to be debited from.
+        /// - `amount`: The maximum amount by which `who`'s balance should be reduced.
+        ///
+        /// Emits `Burned` with the actual amount burned. If this takes the balance to below the
+        /// minimum for the asset, then the amount burned is increased to take it to zero.
+        ///
+        /// Weight: `O(1)`
+        #[pallet::weight(T::WeightInfo::burn())]
+        pub fn burn(
+            origin: OriginFor<T>,
+            #[pallet::compact] id: T::AssetId,
+            who: <T::Lookup as StaticLookup>::Source,
+            #[pallet::compact] amount: T::Balance,
+        ) -> DispatchResult {
+            let origin = ensure_signed(origin)?;
+            let who = T::Lookup::lookup(who)?;
+
+            let f = DebitFlags {
+                keep_alive: false,
+                best_effort: true,
+            };
+            let _ = Self::do_burn(id, &who, amount, Some(origin), f)?;
+
             Ok(())
         }
 
