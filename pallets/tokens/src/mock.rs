@@ -89,6 +89,7 @@ parameter_types! {
     pub const AssetDeposit: u64 = 1;
     pub const ApprovalDeposit: u64 = 1;
     pub const StringLimit: u32 = 50;
+    pub const MaxDecimals: u8 = 18;
     pub const MetadataDepositBase: u64 = 1;
     pub const MetadataDepositPerByte: u64 = 1;
 }
@@ -125,6 +126,7 @@ impl Config for Runtime {
     type MetadataDepositPerByte = MetadataDepositPerByte;
     type ApprovalDeposit = ApprovalDeposit;
     type StringLimit = StringLimit;
+    type MaxDecimals = MaxDecimals;
     type MaxAdditionalFields = MaxAdditionalFields;
     type MaxRegistrars = MaxRegistrars;
     type Freezer = TestFreezer;

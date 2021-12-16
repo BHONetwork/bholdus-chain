@@ -60,7 +60,7 @@ impl<T: Config<I>, I: 'static> fungibles::Inspect<<T as SystemConfig>::AccountId
         who: &<T as SystemConfig>::AccountId,
         amount: Self::Balance,
     ) -> WithdrawConsequence<Self::Balance> {
-        Pallet::<T, I>::can_decrease(asset, who, amount, false)
+        Pallet::<T, I>::can_decrease(asset, who, amount, false, Action::Withdraw)
     }
 }
 
@@ -140,7 +140,7 @@ impl<T: Config<I>, I: 'static> fungibles::Unbalanced<T::AccountId> for Pallet<T,
             keep_alive: false,
             best_effort: false,
         };
-        Self::decrease_balance(asset, who, amount, f, |_, _| Ok(()))
+        Self::decrease_balance(asset, who, amount, f, Action::Transfer, |_, _| Ok(()))
     }
     fn decrease_balance_at_most(
         asset: T::AssetId,
@@ -151,7 +151,8 @@ impl<T: Config<I>, I: 'static> fungibles::Unbalanced<T::AccountId> for Pallet<T,
             keep_alive: false,
             best_effort: true,
         };
-        Self::decrease_balance(asset, who, amount, f, |_, _| Ok(())).unwrap_or(Zero::zero())
+        Self::decrease_balance(asset, who, amount, f, Action::Transfer, |_, _| Ok(()))
+            .unwrap_or(Zero::zero())
     }
     fn increase_balance(
         asset: T::AssetId,

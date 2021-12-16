@@ -80,6 +80,7 @@ parameter_types! {
     pub const MaxSubAccounts: u32 = 2;
     pub const MaxAdditionalFields: u32 = 2;
     pub const MaxRegistrars: u32 = 20;
+    pub const MaxDecimals: u8 = 18;
 }
 
 parameter_types! {
@@ -110,6 +111,7 @@ impl bholdus_tokens::Config for Runtime {
     type Extra = ();
     type WeightInfo = ();
     type ExistentialDeposits = ExistentialDeposits;
+    type MaxDecimals = MaxDecimals;
 }
 
 // parameter_types! {

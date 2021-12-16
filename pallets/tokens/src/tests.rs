@@ -4,6 +4,7 @@ use super::*;
 use crate::{mock::*, Error, Event};
 use frame_support::{assert_noop, assert_ok, traits::Currency};
 use sp_runtime::traits::BadOrigin;
+use sp_std::if_std;
 
 type Blacklist = BTreeMap<Vec<u8>, Vec<u8>>;
 
@@ -43,8 +44,16 @@ fn blacklist_should_work() {
             true
         );
 
-        BholdusTokens::set_blacklist(Origin::root(), vec![5], vec![6]);
-        BholdusTokens::set_blacklist(Origin::root(), vec![7], vec![8]);
+        assert_ok!(BholdusTokens::set_blacklist(
+            Origin::root(),
+            vec![5],
+            vec![6]
+        ));
+        assert_ok!(BholdusTokens::set_blacklist(
+            Origin::root(),
+            vec![7],
+            vec![8]
+        ));
 
         // assert_eq!(
         //     AssetsBlacklist::<Runtime>::take().contains(&(vec![5], vec![6])),
@@ -64,9 +73,84 @@ fn blacklist_should_work() {
 }
 
 #[test]
+fn passed_name() {
+    new_test_ext().execute_with(|| {
+        let s0 = String::from("BHO");
+        let s1 = String::from("B  HO  ");
+
+        let v: Vec<u8> = s1.into_bytes();
+        let s = String::from_utf8(v).unwrap();
+        let s_trim = s.replace(" ", "");
+
+        assert_eq!(s_trim, s0);
+        assert_eq!(s_trim.into_bytes(), s0.into_bytes());
+    })
+}
+
+#[test]
+fn invalid_symbol() {
+    new_test_ext().execute_with(|| {
+        let s0 = String::from("BHO");
+        let s1 = String::from("B  HO  ");
+
+        let v: Vec<u8> = s1.into_bytes();
+        let s = String::from_utf8(v).unwrap();
+
+        assert_eq!(s.into_bytes() != s0.into_bytes(), true);
+    })
+}
+
+#[test]
+fn max_decimals() {
+    new_test_ext().execute_with(|| {
+        assert_eq!(u8::MAX, 255);
+        let name = vec![0u8; 10];
+        let symbol: Vec<u8> = vec![1];
+        let decimals: u8 = 12;
+        let beneficiary = ALICE;
+        let supply: Balance = 1000;
+        let min_balance: Balance = 10;
+        Balances::make_free_balance_be(&ALICE, 10);
+        let max_decimals: u8 = MaxDecimals::get() as u8;
+        assert_noop!(
+            BholdusTokens::create_and_mint(
+                Origin::signed(ALICE),
+                ALICE,
+                name,
+                symbol,
+                max_decimals + 1,
+                beneficiary,
+                supply,
+                min_balance,
+            ),
+            Error::<Runtime>::InvalidDecimals
+        );
+
+        // string length limit check
+        let limit = StringLimit::get() as usize;
+        assert_noop!(
+            BholdusTokens::create_and_mint(
+                Origin::signed(ALICE),
+                ALICE,
+                vec![0u8; limit + 1], // name
+                vec![0u8; 10],
+                decimals,
+                beneficiary,
+                supply,
+                min_balance,
+            ),
+            Error::<Runtime>::BadMetadata
+        );
+    });
+}
+
+#[test]
 fn create_and_mint_should_work() {
     new_test_ext().execute_with(|| {
-        let name: Vec<u8> = vec![1];
+        let invalid_symbol: Vec<u8> = String::from("B HO ").into_bytes();
+        // let name: Vec<u8> = vec![1];
+        let name: Vec<u8> = String::from("B HO").into_bytes();
+        let name0: Vec<u8> = String::from("BHO").into_bytes();
         let symbol: Vec<u8> = vec![1];
         let decimals: u8 = 12;
         let beneficiary = BOB;
@@ -78,6 +162,20 @@ fn create_and_mint_should_work() {
         Balances::make_free_balance_be(&BOB, 100);
 
         Balances::make_free_balance_be(&EVE, 10);
+
+        assert_noop!(
+            BholdusTokens::create_and_mint(
+                Origin::signed(BOB),
+                ALICE,
+                vec![0u8; 1],   // name
+                invalid_symbol, // symbol
+                decimals,
+                beneficiary,
+                supply,
+                min_balance,
+            ),
+            Error::<Runtime>::InvalidSymbol
+        );
 
         /*BholdusTokens::set_blacklist(Origin::root(), vec![0u8; 1], vec![0u8; 2]);
         assert_noop!(
@@ -106,6 +204,12 @@ fn create_and_mint_should_work() {
             supply,
             min_balance,
         ));
+        let metadata = Metadata::<Runtime>::get(ASSET_ID);
+
+        let bounded_name = BholdusTokens::get_name(name0.clone());
+
+        assert_eq!(metadata.name, bounded_name);
+
         assert_eq!(BholdusTokens::next_asset_id(), 1);
         assert_eq!(BholdusTokens::total_balance(ASSET_ID, &BOB), 1000);
         assert_eq!(BholdusTokens::total_issuance(ASSET_ID), 1000);
@@ -205,6 +309,131 @@ fn basic_minting_should_work() {
         assert_ok!(BholdusTokens::mint(Origin::signed(1), 0, 2, 100));
         assert_eq!(BholdusTokens::total_balance(0, &2), 100);
     });
+}
+
+#[test]
+fn burning_asset_balance_with_positive_balance_should_work() {
+    new_test_ext().execute_with(|| {
+        let name: Vec<u8> = String::from("BNB").into_bytes();
+        let symbol: Vec<u8> = vec![1];
+        let decimals: u8 = 18;
+        let beneficiary = ALICE;
+        let supply: Balance = 1000;
+        let min_balance: Balance = 10;
+
+        Balances::make_free_balance_be(&ALICE, 10);
+        Balances::make_free_balance_be(&BOB, 10);
+        let asset_id = BholdusTokens::next_asset_id();
+
+        assert_ok!(BholdusTokens::create_and_mint(
+            Origin::signed(ALICE),
+            ALICE,
+            name,
+            symbol,
+            decimals,
+            beneficiary,
+            supply,
+            min_balance,
+        ));
+
+        assert_ok!(BholdusTokens::burn(
+            Origin::signed(ALICE),
+            asset_id.clone(),
+            ALICE,
+            supply.clone()
+        ));
+        assert_eq!(BholdusTokens::total_balance(asset_id.clone(), &ALICE), 0);
+        assert_eq!(BholdusTokens::total_issuance(asset_id.clone()), 0);
+        assert_ok!(BholdusTokens::mint(
+            Origin::signed(ALICE),
+            asset_id.clone(),
+            BOB,
+            100
+        ));
+        assert_eq!(BholdusTokens::total_balance(asset_id.clone(), &BOB), 100);
+        assert_eq!(BholdusTokens::total_issuance(asset_id.clone()), 100);
+
+        assert_ok!(BholdusTokens::burn(
+            Origin::signed(ALICE),
+            asset_id.clone(),
+            BOB,
+            50
+        ));
+        assert_eq!(BholdusTokens::total_balance(asset_id.clone(), &BOB), 50);
+        assert_eq!(BholdusTokens::total_issuance(asset_id.clone()), 50);
+    })
+}
+
+#[test]
+fn burning_asset_balance_with_zero_balance_does_nothing() {
+    new_test_ext().execute_with(|| {
+        let name: Vec<u8> = String::from("BNB").into_bytes();
+        let symbol: Vec<u8> = vec![1];
+        let decimals: u8 = 18;
+        let beneficiary = ALICE;
+        let supply: Balance = 1000;
+        let min_balance: Balance = 10;
+
+        Balances::make_free_balance_be(&ALICE, 10);
+        Balances::make_free_balance_be(&BOB, 10);
+        let asset_id = BholdusTokens::next_asset_id();
+
+        assert_ok!(BholdusTokens::create_and_mint(
+            Origin::signed(ALICE),
+            ALICE,
+            name,
+            symbol,
+            decimals,
+            beneficiary,
+            supply,
+            min_balance,
+        ));
+
+        assert_eq!(BholdusTokens::total_balance(asset_id, &BOB), 0);
+        assert_ok!(BholdusTokens::burn(Origin::signed(ALICE), asset_id, BOB, 0));
+    })
+}
+
+#[test]
+fn burn_token_should_not_work() {
+    new_test_ext().execute_with(|| {
+        let name: Vec<u8> = String::from("BNB").into_bytes();
+        let symbol: Vec<u8> = vec![1];
+        let decimals: u8 = 18;
+        let beneficiary = ALICE;
+        let supply: Balance = 1000;
+        let min_balance: Balance = 10;
+
+        Balances::make_free_balance_be(&ALICE, 10);
+        Balances::make_free_balance_be(&BOB, 10);
+        let asset_id = BholdusTokens::next_asset_id();
+
+        assert_ok!(BholdusTokens::create_and_mint(
+            Origin::signed(ALICE),
+            ALICE,
+            name,
+            symbol,
+            decimals,
+            beneficiary,
+            supply,
+            min_balance,
+        ));
+
+        assert_noop!(
+            BholdusTokens::burn(Origin::signed(BOB), asset_id, ALICE, 100),
+            Error::<Runtime>::NoPermission
+        );
+
+        assert_noop!(
+            BholdusTokens::burn(
+                Origin::signed(ALICE),
+                asset_id.clone(),
+                ALICE,
+                supply.clone() + 1
+            ),
+            Error::<Runtime>::ExceedTotalSupply
+        );
+    })
 }
 
 #[test]
@@ -388,6 +617,43 @@ fn transferring_to_frozen_account_should_work() {
         assert_ok!(BholdusTokens::transfer(Origin::signed(1), ASSET_ID, 2, 50));
         assert_eq!(BholdusTokens::total_balance(ASSET_ID, &2), 150);
     });
+}
+
+#[test]
+fn transfer_minimum_balance() {
+    new_test_ext().execute_with(|| {
+        let minimum_balance = 1;
+        Balances::make_free_balance_be(&ALICE, 100);
+        let asset_id = BholdusTokens::next_asset_id();
+        assert_ok!(BholdusTokens::force_create(
+            Origin::root(),
+            asset_id,
+            ALICE,
+            true,
+            minimum_balance.clone()
+        ));
+        assert_ok!(BholdusTokens::mint(
+            Origin::signed(ALICE),
+            asset_id,
+            ALICE,
+            100
+        ));
+
+        assert_eq!(BholdusTokens::total_issuance(asset_id), 100);
+        assert_eq!(BholdusTokens::total_balance(asset_id, &ALICE), 100);
+        /*let w = BholdusTokens::transfer(Origin::signed(ALICE), asset_id, BOB, 100);
+        match w {
+            Ok(w) => w,
+            Err(error) => panic!("Problem transferring amount"),
+        };
+        */
+        assert_ok!(BholdusTokens::transfer(
+            Origin::signed(ALICE),
+            asset_id,
+            BOB,
+            100 - 1
+        ));
+    })
 }
 
 #[test]

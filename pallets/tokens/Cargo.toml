@@ -81,7 +81,6 @@ version = '4.0.0-dev'
 
 
 [dev-dependencies.pallet-balances]
-default-features = false
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
@@ -98,4 +97,6 @@ std = [
 	'sp-std/std',
 	'sp-runtime/std',
 ]
-runtime-benchmarks = ['frame-benchmarking']
+runtime-benchmarks = ['frame-benchmarking',
+	"sp-runtime/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",]
