@@ -48,6 +48,7 @@ use sp_runtime::traits::{
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
+    traits::AccountIdConversion,
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill, Perquintill,
 };
@@ -79,7 +80,7 @@ use impls::Author;
 /// Import some useful constants
 pub mod constants;
 pub mod weights;
-pub use constants::{currency::*, time::*};
+pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
 
 /// Import the template pallet.
@@ -156,7 +157,7 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2 seconds of compute with a 6 second average block time.
-const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
+const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -385,7 +386,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: u128 = 1*DOLLARS;
+    pub const ExistentialDeposit: u128 = 1*UNITS/100;
     pub const MaxLocks: u32 = 50;
 }
 
@@ -415,7 +416,7 @@ impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
     type TransactionByteFee = TransactionByteFee;
     type OperationalFeeMultiplier = OperationalFeeMultiplier;
-    type WeightToFee = IdentityFee<Balance>;
+    type WeightToFee = fee::WeightToFee;
     type FeeMultiplierUpdate =
         TargetedFeeAdjustment<Self, TargetBlockFullness, AdjustmentVariable, MinimumMultiplier>;
 }
@@ -445,7 +446,7 @@ impl pallet_authorship::Config for Runtime {
 
 parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
-    pub const Period: BlockNumber = 1 * HOURS;
+    pub const Period: BlockNumber = EPOCH_DURATION_IN_BLOCKS;
     pub const Offset: BlockNumber = 0;
 }
 
@@ -687,11 +688,13 @@ parameter_types! {
     pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
     pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
+    pub const StakingTokensPalletId: PalletId = PalletId(*b"bho/stkt");
     pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
     pub const MaximumReasonLength: u32 = 16384;
     pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
     pub const BountyValueMinimum: Balance = 5 * DOLLARS;
     pub const MaxApprovals: u32 = 100;
+    pub UnreleasedNativeVaultAccountId: AccountId = PalletId(*b"bho/urls").into_account();
 }
 
 impl pallet_treasury::Config for Runtime {
@@ -1080,7 +1083,7 @@ impl bholdus_bridge_bsc::Config for Runtime {
 }
  */
 
- impl bholdus_bridge_native_transfer::Config for Runtime {
+impl bholdus_bridge_native_transfer::Config for Runtime {
     type Event = Event;
     type AdminOrigin = EnsureRoot<Self::AccountId>;
     type Currency = Balances;
