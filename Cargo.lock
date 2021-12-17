@@ -8723,7 +8723,7 @@ dependencies = [
 
 [[package]]
 name = "ulas-runtime"
-version = "1.0.0"
+version = "1.0.10"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
