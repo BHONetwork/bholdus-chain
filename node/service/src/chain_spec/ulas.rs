@@ -16,9 +16,10 @@ use sp_runtime::{
 };
 use ulas_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
-    BholdusSupportNFTConfig, CouncilConfig, GenesisConfig, GrandpaConfig, ImOnlineConfig,
-    IndicesConfig, SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-    TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, GenesisConfig,
+    GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig,
+    SudoConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL,
+    WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -384,7 +385,7 @@ fn testnet_genesis(
                 .cloned()
                 .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
                     if !is_native_currency {
-                        Some((account_id, currency_id, balance))
+                        Some((account_id, balance))
                     } else {
                         None
                     }
@@ -392,6 +393,7 @@ fn testnet_genesis(
                 .collect::<Vec<_>>(),
         },
         bholdus_support_nft: BholdusSupportNFTConfig { tokens: vec![] },
+        bridge_native_transfer: Default::default(),
         /* dex: DexConfig {
             initial_provisioning_trading_pairs: vec![],
             initial_enabled_trading_pairs: initial_dex_liquidity_pairs
