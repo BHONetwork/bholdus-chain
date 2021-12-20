@@ -21,7 +21,7 @@ branch = 'bholdus-monthly-2021-11'
 version = '3.0.0'
 
 [dependencies]
-futures = { version = "0.3.9", features = ["compat"] }
+futures = { version = "0.3.19", features = ["compat"] }
 hex = '0.4.3'
 
 bholdus-cli = { version = '4.0.0-dev', path = 'cli' }
