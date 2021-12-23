@@ -71,6 +71,14 @@ pallet-multisig = { version = "4.0.0-dev", git = "https://github.com/bholdus/sub
 beefy-primitives = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-beefy = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-beefy-mmr = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-ethereum = { default-features = false, version = "4.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-evm = { default-features = false, version = "6.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-evm-precompile-modexp = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-evm-precompile-sha3fips = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-evm-precompile-simple = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-base-fee = { default-features = false, version = "1.0.0", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-dynamic-fee = { default-features = false, version = "4.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fp-self-contained = { default-features = false, version = "1.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 
 # Substrate primitives
 sp-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
@@ -112,6 +120,8 @@ runtime-benchmarks = [
 	'pallet-balances/runtime-benchmarks',
 	'pallet-timestamp/runtime-benchmarks',
 	'pallet-collective/runtime-benchmarks',
+	"pallet-ethereum/runtime-benchmarks",
+	"pallet-evm/runtime-benchmarks",
 	"hex-literal",
 
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
@@ -157,6 +167,12 @@ std = [
 	"pallet-recovery/std",
 	"pallet-beefy/std",
 	"pallet-beefy-mmr/std",
+	"pallet-ethereum/std",
+	"pallet-evm/std",
+	"pallet-evm-precompile-simple/std",
+	"pallet-evm-precompile-sha3fips/std",
+	"pallet-base-fee/std",
+	"pallet-dynamic-fee/std",
 	"bholdus-tokens/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
@@ -179,6 +195,7 @@ std = [
 	"sp-npos-elections/std",
 	"sp-consensus-aura/std",
 	"sp-io/std",
+	"fp-self-contained/std",
 ]
 try-runtime = [
 	"frame-try-runtime",
