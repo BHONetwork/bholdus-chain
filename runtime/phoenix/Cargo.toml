@@ -71,6 +71,7 @@ pallet-multisig = { version = "4.0.0-dev", git = "https://github.com/bholdus/sub
 beefy-primitives = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-beefy = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-beefy-mmr = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
+pallet-evm = { default-features = false, version = "6.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 
 # Substrate primitives
 sp-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
@@ -112,6 +113,7 @@ runtime-benchmarks = [
 	'pallet-balances/runtime-benchmarks',
 	'pallet-timestamp/runtime-benchmarks',
 	'pallet-collective/runtime-benchmarks',
+	"pallet-evm/runtime-benchmarks",
 	"hex-literal",
 
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
@@ -157,6 +159,7 @@ std = [
 	"pallet-recovery/std",
 	"pallet-beefy/std",
 	"pallet-beefy-mmr/std",
+	"pallet-evm/std",
 	"bholdus-tokens/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
