@@ -97,9 +97,9 @@ try-runtime = [
     "phoenix-runtime/try-runtime",
 ]
 
-with-ulas-runtime = ["ulas-runtime"]
-with-cygnus-runtime = ["cygnus-runtime"]
-with-phoenix-runtime = ["phoenix-runtime"]
+with-ulas-runtime = ["ulas-runtime", "bholdus-rpc/with-ulas-runtime"]
+with-cygnus-runtime = ["cygnus-runtime", "bholdus-rpc/with-cygnus-runtime"]
+with-phoenix-runtime = ["phoenix-runtime", "bholdus-rpc/with-phoenix-runtime"]
 with-all-runtime = [
     "with-ulas-runtime",
     "with-cygnus-runtime",

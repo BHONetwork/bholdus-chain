@@ -252,7 +252,7 @@ pub fn new_partial(
 
         let rpc_extensions_builder =
             move |deny_unsafe, subscription_executor: bholdus_rpc::SubscriptionTaskExecutor| {
-                let deps = bholdus_rpc::FullDeps {
+                let deps = bholdus_rpc::phoenix::FullDeps {
                     client: client.clone(),
                     pool: pool.clone(),
                     select_chain: select_chain.clone(),
@@ -272,7 +272,7 @@ pub fn new_partial(
                     },
                 };
 
-                bholdus_rpc::create_full(deps).map_err(Into::into)
+                bholdus_rpc::phoenix::create_full(deps).map_err(Into::into)
             };
 
         (rpc_extensions_builder, rpc_setup)

@@ -135,7 +135,6 @@ pub fn run() -> sc_cli::Result<()> {
 
                 if chain_spec.is_ulas() {
                     #[cfg(feature = "with-ulas-runtime")]
-                    #[allow(unused_imports)]
                     {
                         return service::service::ulas::new_full(config)
                             .map_err(sc_cli::Error::Service);
@@ -144,7 +143,6 @@ pub fn run() -> sc_cli::Result<()> {
                     return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
                 } else if chain_spec.is_cygnus() {
                     #[cfg(feature = "with-cygnus-runtime")]
-                    #[allow(unused_imports)]
                     {
                         return service::service::cygnus::new_full(config)
                             .map_err(sc_cli::Error::Service);
@@ -153,12 +151,10 @@ pub fn run() -> sc_cli::Result<()> {
                     return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
                 } else {
                     #[cfg(feature = "with-phoenix-runtime")]
-                    #[allow(unused_imports)]
                     {
                         return service::service::phoenix::new_full(config)
                             .map_err(sc_cli::Error::Service);
                     }
-                    #[cfg(feature = "with-phoenix-runtime")]
                     #[cfg(not(feature = "with-phoenix-runtime"))]
                     return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
                 }
@@ -171,7 +167,6 @@ pub fn run() -> sc_cli::Result<()> {
 
                 if chain_spec.is_ulas() {
                     #[cfg(feature = "with-ulas-runtime")]
-                    #[allow(unused_imports)]
                     {
                         return cmd.run::<service::ulas_runtime::Block, service::ulas_runtime::RuntimeApi, service::service::ulas::ExecutorDispatch>(
                             config,
@@ -181,7 +176,6 @@ pub fn run() -> sc_cli::Result<()> {
                     return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
                 } else if chain_spec.is_cygnus() {
                     #[cfg(feature = "with-cygnus-runtime")]
-                    #[allow(unused_imports)]
                     {
                         return cmd.run::<service::cygnus_runtime::Block, service::cygnus_runtime::RuntimeApi, service::service::cygnus::ExecutorDispatch>(
                             config,
@@ -191,13 +185,11 @@ pub fn run() -> sc_cli::Result<()> {
                     return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
                 } else {
                     #[cfg(feature = "with-phoenix-runtime")]
-                    #[allow(unused_imports)]
                     {
                         return cmd.run::<service::phoenix_runtime::Block, service::phoenix_runtime::RuntimeApi, service::service::phoenix::ExecutorDispatch>(
                             config,
                         )
                     }
-                    #[cfg(feature = "with-phoenix-runtime")]
                     #[cfg(not(feature = "with-phoenix-runtime"))]
                     return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
                 }
@@ -210,7 +202,6 @@ pub fn run() -> sc_cli::Result<()> {
                     let chain_spec = &config.chain_spec;
                     if chain_spec.is_ulas() {
                         #[cfg(feature = "with-ulas-runtime")]
-                        #[allow(unused_imports)]
                         {
                             return cmd.run::<service::ulas_runtime::Block, service::service::ulas::ExecutorDispatch>(config)
                         }
@@ -218,7 +209,6 @@ pub fn run() -> sc_cli::Result<()> {
                         return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
                     } else if chain_spec.is_cygnus() {
                         #[cfg(feature = "with-cygnus-runtime")]
-                        #[allow(unused_imports)]
                         {
                             return cmd.run::<service::cygnus_runtime::Block, service::service::cygnus::ExecutorDispatch>(config)
                         }
@@ -226,11 +216,9 @@ pub fn run() -> sc_cli::Result<()> {
                         return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
                     } else {
                         #[cfg(feature = "with-phoenix-runtime")]
-                        #[allow(unused_imports)]
                         {
                             return cmd.run::<service::phoenix_runtime::Block, service::service::phoenix::ExecutorDispatch>(config)
                         }
-                        #[cfg(feature = "with-phoenix-runtime")]
                         #[cfg(not(feature = "with-phoenix-runtime"))]
                         return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
                     }
@@ -254,7 +242,6 @@ pub fn run() -> sc_cli::Result<()> {
             let chain_spec = &runner.config().chain_spec;
             if chain_spec.is_ulas() {
                 #[cfg(feature = "with-ulas-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -270,7 +257,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
             } else if chain_spec.is_cygnus() {
                 #[cfg(feature = "with-cygnus-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -298,7 +284,6 @@ pub fn run() -> sc_cli::Result<()> {
                         return Ok((cmd.run(client, import_queue), task_manager));
                     });
                 }
-                #[cfg(feature = "with-phoenix-runtime")]
                 #[cfg(not(feature = "with-phoenix-runtime"))]
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
@@ -308,7 +293,6 @@ pub fn run() -> sc_cli::Result<()> {
             let chain_spec = &runner.config().chain_spec;
             if chain_spec.is_ulas() {
                 #[cfg(feature = "with-ulas-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -323,7 +307,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
             } else if chain_spec.is_cygnus() {
                 #[cfg(feature = "with-cygnus-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -349,7 +332,6 @@ pub fn run() -> sc_cli::Result<()> {
                         Ok((cmd.run(client, config.database), task_manager))
                     });
                 }
-                #[cfg(feature = "with-phoenix-runtime")]
                 #[cfg(not(feature = "with-phoenix-runtime"))]
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
@@ -360,7 +342,6 @@ pub fn run() -> sc_cli::Result<()> {
 
             if chain_spec.is_ulas() {
                 #[cfg(feature = "with-ulas-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -375,7 +356,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
             } else if chain_spec.is_cygnus() {
                 #[cfg(feature = "with-cygnus-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -390,7 +370,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
             } else {
                 #[cfg(feature = "with-phoenix-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -401,7 +380,6 @@ pub fn run() -> sc_cli::Result<()> {
                         Ok((cmd.run(client, config.chain_spec), task_manager))
                     });
                 }
-                #[cfg(feature = "with-phoenix-runtime")]
                 #[cfg(not(feature = "with-phoenix-runtime"))]
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
@@ -412,7 +390,6 @@ pub fn run() -> sc_cli::Result<()> {
 
             if chain_spec.is_ulas() {
                 #[cfg(feature = "with-ulas-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -428,7 +405,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
             } else if chain_spec.is_cygnus() {
                 #[cfg(feature = "with-cygnus-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -444,7 +420,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
             } else {
                 #[cfg(feature = "with-phoenix-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -456,7 +431,6 @@ pub fn run() -> sc_cli::Result<()> {
                         Ok((cmd.run(client, import_queue), task_manager))
                     });
                 }
-                #[cfg(feature = "with-phoenix-runtime")]
                 #[cfg(not(feature = "with-phoenix-runtime"))]
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
@@ -471,7 +445,6 @@ pub fn run() -> sc_cli::Result<()> {
 
             if chain_spec.is_ulas() {
                 #[cfg(feature = "with-ulas-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -487,7 +460,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
             } else if chain_spec.is_cygnus() {
                 #[cfg(feature = "with-cygnus-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -503,7 +475,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
             } else {
                 #[cfg(feature = "with-phoenix-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         let PartialComponents {
@@ -515,7 +486,6 @@ pub fn run() -> sc_cli::Result<()> {
                         Ok((cmd.run(client, backend), task_manager))
                     });
                 }
-                #[cfg(feature = "with-phoenix-runtime")]
                 #[cfg(not(feature = "with-phoenix-runtime"))]
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
@@ -527,7 +497,6 @@ pub fn run() -> sc_cli::Result<()> {
 
             if chain_spec.is_ulas() {
                 #[cfg(feature = "with-ulas-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         // we don't need any of the components of new_partial, just a runtime, or a task
@@ -546,7 +515,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
             } else if chain_spec.is_cygnus() {
                 #[cfg(feature = "with-cygnus-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         // we don't need any of the components of new_partial, just a runtime, or a task
@@ -564,7 +532,6 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
             } else {
                 #[cfg(feature = "with-phoenix-runtime")]
-                #[allow(unused_imports)]
                 {
                     return runner.async_run(|config| {
                         // we don't need any of the components of new_partial, just a runtime, or a task
@@ -578,7 +545,6 @@ pub fn run() -> sc_cli::Result<()> {
 
                         Ok((cmd.run::<service::phoenix_runtime::Block, service::service::phoenix::ExecutorDispatch>(config), task_manager))});
                 }
-                #[cfg(feature = "with-phoenix-runtime")]
                 #[cfg(not(feature = "with-phoenix-runtime"))]
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
