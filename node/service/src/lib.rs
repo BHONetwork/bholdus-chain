@@ -3,7 +3,7 @@
 use sc_service::ChainSpec;
 
 pub mod chain_spec;
-pub mod impls;
+pub mod service;
 
 #[cfg(feature = "with-cygnus-runtime")]
 pub use cygnus_runtime;
