@@ -15,8 +15,14 @@ members = [
     'pallets/non-fungible-token',
     # 'pallets/bridge/bsc',
     'pallets/bridge/native-transfer',
+    'pallets/bholdus-smart-contract',
     'primitives/bholdus',
     'primitives/bsc',
 ]
+
+exclude = [
+    'smart-contracts/inkextension'
+]
 [profile.release]
 panic = 'unwind'
+

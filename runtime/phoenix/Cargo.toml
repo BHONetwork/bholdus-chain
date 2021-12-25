@@ -98,6 +98,7 @@ bholdus-support-nft = { package = "support-nft", version = "4.0.0-dev", path = "
 bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", default-features = false }
 bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { version = "4.0.0-dev", path = "../../pallets/bridge/native-transfer", default-features = false }
+bholdus-smart-contract = { version = "4.0.0-dev", path = "../../pallets/bholdus-smart-contract", default-features = false }
 
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
 
@@ -163,6 +164,7 @@ std = [
 	"bholdus-support/std",
 	"bholdus-currencies/std",
 	"bholdus-primitives/std",
+	"bholdus-bridge-native-transfer/std",
 	"bholdus-bridge-native-transfer/std",
 	"sp-api/std",
 	"sp-block-builder/std",
