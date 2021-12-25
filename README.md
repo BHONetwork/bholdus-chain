@@ -88,6 +88,8 @@ cd bholdus-chain
 ```
 You should always use the --release flag to build optimized artifacts.
 
+Use branch `main` for latest development codebase. However, if you want to build production node, please checkout the tagged release commit. For production build, you can put `SKIP_WASM_BUILD=1` env to disable building wasm version of the runtime.
+
 #### Multi-Node Local Testnet
 If you want to start the multi-node consensus with an authority set of private validators, refer to [our Start a Private Network tutorial](https://substrate.dev/docs/en/tutorials/start-a-private-network/).
 
@@ -113,7 +115,8 @@ Example:
     --steps 20 \                # Number of steps across component ranges
     --repeat 10 \               # Number of times we repeat a benchmark
     --raw \                     # Optionally output raw benchmark data to stdout
-    --output ./                 # Output results into a Rust file
+    --output ./pallets/bholdus-tokens/src/weights.rs  # Output results into a Rust file
+    --template ./.maintain/frame-weight-template.hbs  # Template file
 
 ```
 
