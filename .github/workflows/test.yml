@@ -24,7 +24,7 @@ jobs:
         with:
           access_token: ${{ github.token }}
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     env:
       SCCACHE_CACHE_SIZE: "50G"
       CARGO_INCREMENTAL: 0
@@ -54,7 +54,7 @@ jobs:
       - name: Run phoenix-runtime clippy
         run: cargo clippy --features with-phoenix-runtime -- -D warnings
   benchmarking:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     env:
       SCCACHE_CACHE_SIZE: "50G"
       CARGO_INCREMENTAL: 0
@@ -74,7 +74,7 @@ jobs:
       - name: Run benchmarking tests
         run: make test-benchmarking
   checks-and-tests:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     env:
       SCCACHE_CACHE_SIZE: "50G"
       CARGO_INCREMENTAL: 0
