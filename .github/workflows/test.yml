@@ -2,13 +2,13 @@ name: Test
 on:
   pull_request:
     branches:
-      - master
+      - main
       - '**-release'
     paths-ignore:
       - '**/README.md'
   push:
     branches:
-      - master
+      - main
       - '**-release'
     paths-ignore:
       - '**/README.md'
