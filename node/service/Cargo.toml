@@ -11,7 +11,7 @@ version = "4.0.0-dev"
 structopt = "0.3.8"
 rand = "0.8.4"
 
-async-trait = { version = "0.1.48" }
+async-trait = { version = "0.1.52" }
 futures = { version = "0.3.9", features = ["compat"] }
 hex-literal = "0.3.1"
 serde = { version = "1.0.124", features = ["derive"] }
@@ -97,9 +97,9 @@ try-runtime = [
     "phoenix-runtime/try-runtime",
 ]
 
-with-ulas-runtime = ["ulas-runtime"]
-with-cygnus-runtime = ["cygnus-runtime"]
-with-phoenix-runtime = ["phoenix-runtime"]
+with-ulas-runtime = ["ulas-runtime", "bholdus-rpc/with-ulas-runtime"]
+with-cygnus-runtime = ["cygnus-runtime", "bholdus-rpc/with-cygnus-runtime"]
+with-phoenix-runtime = ["phoenix-runtime", "bholdus-rpc/with-phoenix-runtime"]
 with-all-runtime = [
     "with-ulas-runtime",
     "with-cygnus-runtime",
