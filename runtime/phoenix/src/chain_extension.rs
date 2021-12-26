@@ -8,14 +8,14 @@ use pallet_contracts::chain_extension::{
 };
 use sp_runtime::{traits::StaticLookup, DispatchError};
 use crate::{
-	sp_api_hidden_includes_construct_runtime::hidden_include::traits::Get, Encode, TemplateModule,
+	sp_api_hidden_includes_construct_runtime::hidden_include::traits::Get, Encode, SmartContract,
 };
 
 pub struct ExampleExtension;
 
 impl<T> ChainExtension<T> for ExampleExtension
 where
-	T: SysConfig + pallet_contracts::Config + pallet_template::Config + pallet_balances::Config,
+	T: SysConfig + pallet_contracts::Config + bholdus_smart_contract::Config + pallet_balances::Config,
 	<T as SysConfig>::AccountId: UncheckedFrom<<T as SysConfig>::Hash> + AsRef<[u8]>,
 {
 	fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
@@ -36,16 +36,16 @@ where
 		match func_id {
 			// do_store_in_runtime
 			1 => {
-				use pallet_template::WeightInfo;
+				use bholdus_smart_contract::WeightInfo;
 				// retrieve argument that was passed in smart contract invocation
 				let value: u32 = env.read_as()?;
 				// Capture weight for the main action being performed by the extrinsic
 				let base_weight: Weight =
-					<T as pallet_template::Config>::WeightInfo::insert_number(value);
+					<T as bholdus_smart_contract::Config>::WeightInfo::insert_number(value);
 				env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 				let caller = env.ext().caller().clone();
 
-				crate::pallet_template::Pallet::<T>::insert_number(
+				crate::bholdus_smart_contract::Pallet::<T>::insert_number(
 					RawOrigin::Signed(caller).into(),
 					value,
 				)?;
@@ -84,7 +84,7 @@ where
 					},
 					// do_get_from_runtime
 					4 => {
-						let result = TemplateModule::get_value().encode();
+						let result = SmartContract::get_value().encode();
 						env.write(&result, false, None).map_err(|_| {
 							"Encountered an error when retrieving runtime storage value."
 						})?;

@@ -84,6 +84,9 @@ mod voter_bags;
 
 /// Import the template pallet.
 pub use pallet_template;
+pub use bholdus_smart_contract;
+mod chain_extension;
+use chain_extension::ExampleExtension;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -768,7 +771,7 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = ();
+    type ChainExtension = ExampleExtension;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -1095,6 +1098,11 @@ impl pallet_template::Config for Runtime {
     type Event = Event;
 }
 
+impl bholdus_smart_contract::Config for Runtime {
+    type Event = Event;
+    type Currency = Balances;
+	type WeightInfo = bholdus_smart_contract::weights::SubstrateWeight<Runtime>;
+}
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -1147,6 +1155,7 @@ construct_runtime!(
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+        SmartContract: bholdus_smart_contract::{Pallet, Call, Storage, Event<T>},
     }
 );
 

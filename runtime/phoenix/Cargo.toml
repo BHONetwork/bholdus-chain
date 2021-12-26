@@ -166,6 +166,7 @@ std = [
 	"bholdus-primitives/std",
 	"bholdus-bridge-native-transfer/std",
 	"bholdus-bridge-native-transfer/std",
+	"bholdus-smart-contract/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-core/std",

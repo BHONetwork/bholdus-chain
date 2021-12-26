@@ -1,24 +1,23 @@
-use crate::{mock::*, ContractEntry};
-use frame_support::{assert_noop, assert_ok};
+// use crate::{mock::*, Error};
+// use frame_support::{assert_noop, assert_ok};
 
-#[test]
-fn stores_value() {
-	let origin = Origin::signed(ALICE);
-	let chain_extension_input = 5;
-	ExtBuilder::default().build().execute_with(|| {
-		assert_ok!(TemplateModule::insert_number(origin, chain_extension_input));
-		assert_eq!(ContractEntry::<Test>::get(), chain_extension_input);
-	})
-}
+// #[test]
+// fn it_works_for_default_value() {
+//     new_test_ext().execute_with(|| {
+//         // Dispatch a signed extrinsic.
+//         assert_ok!(TemplateModule::do_something(Origin::signed(1), 42));
+//         // Read pallet storage and assert an expected result.
+//         assert_eq!(TemplateModule::something(), Some(42));
+//     });
+// }
 
-#[test]
-fn rejects_large_input() {
-	let origin = Origin::signed(ALICE);
-	let large_selector = [0; crate::MAX_LENGTH].to_vec();
-	ExtBuilder::default().build().execute_with(|| {
-		assert_noop!(
-			TemplateModule::call_smart_contract(origin, ALICE, large_selector, 5, 100000000),
-			crate::Error::<Test>::InputTooLarge
-		);
-	})
-}
+// #[test]
+// fn correct_error_for_none_value() {
+//     new_test_ext().execute_with(|| {
+//         // Ensure the expected error is thrown when no value is present.
+//         assert_noop!(
+//             TemplateModule::cause_error(Origin::signed(1)),
+//             Error::<Test>::NoneValue
+//         );
+//     });
+// }
