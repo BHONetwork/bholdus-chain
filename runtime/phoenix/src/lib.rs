@@ -51,11 +51,11 @@ use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::generic::Era;
 use sp_runtime::traits::{
     self, AccountIdConversion, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys,
-    SaturatedConversion, StaticLookup, Zero,
+    SaturatedConversion, StaticLookup, Zero, PostDispatchInfoOf, Dispatchable,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
-    transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
+    transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError},
     ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill, Perquintill,
 };
 use sp_std::{marker::PhantomData, prelude::*};
@@ -1140,6 +1140,11 @@ impl pallet_evm::Config for Runtime {
     type FindAuthor = FindAuthorTruncated<Aura>;
 }
 
+impl pallet_ethereum::Config for Runtime {
+	type Event = Event;
+	type StateRoot = pallet_ethereum::IntermediateStateRoot;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -1194,6 +1199,8 @@ construct_runtime!(
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
         // Include the pallet-evm in the runtime.
         EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>},
+        // Include the pallet-ethereum in the runtime.
+        Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin},
     }
 );
 
@@ -1218,7 +1225,7 @@ pub type SignedExtra = (
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
-pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+pub type UncheckedExtrinsic = fp_self_contained::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 // /// Extrinsic type that has already been checked.
@@ -1240,6 +1247,53 @@ mod mmr {
     pub type Leaf = <<Runtime as pallet_mmr::Config>::LeafData as LeafDataProvider>::LeafData;
     pub type Hash = <Runtime as pallet_mmr::Config>::Hash;
     pub type Hashing = <Runtime as pallet_mmr::Config>::Hashing;
+}
+
+impl fp_self_contained::SelfContainedCall for Call {
+	type SignedInfo = H160;
+
+	fn is_self_contained(&self) -> bool {
+		match self {
+			Call::Ethereum(call) => call.is_self_contained(),
+			_ => false,
+		}
+	}
+
+	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo, TransactionValidityError>> {
+		match self {
+			Call::Ethereum(call) => call.check_self_contained(),
+			_ => None,
+		}
+	}
+
+	fn validate_self_contained(&self, info: &Self::SignedInfo) -> Option<TransactionValidity> {
+		match self {
+			Call::Ethereum(call) => call.validate_self_contained(info),
+			_ => None,
+		}
+	}
+
+    fn pre_dispatch_self_contained(
+		&self,
+		info: &Self::SignedInfo,
+	) -> Option<Result<(), TransactionValidityError>> {
+		match self {
+			Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
+			_ => None,
+		}
+	}
+
+	fn apply_self_contained(
+		self,
+		info: Self::SignedInfo,
+	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
+		match self {
+			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => Some(call.dispatch(
+				Origin::from(pallet_ethereum::RawOrigin::EthereumTransaction(info)),
+			)),
+			_ => None,
+		}
+	}
 }
 
 impl_runtime_apis! {
