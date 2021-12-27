@@ -26,8 +26,9 @@ use frame_system::{
 };
 use pallet_contracts::weights::WeightInfo;
 use pallet_evm::{
-    EnsureAddressNever, EnsureAddressRoot, HashedAddressMapping, SubstrateBlockHashMapping,
+    EnsureAddressNever, EnsureAddressRoot, HashedAddressMapping,
 };
+use pallet_ethereum::EthereumBlockHashMapping;
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -1125,7 +1126,7 @@ parameter_types! {
 impl pallet_evm::Config for Runtime {
     type FeeCalculator = ();
     type GasWeightMapping = ();
-    type BlockHashMapping = SubstrateBlockHashMapping<Self>;
+    type BlockHashMapping = EthereumBlockHashMapping<Self>;
     type CallOrigin = EnsureAddressRoot<AccountId>;
     type WithdrawOrigin = EnsureAddressNever<AccountId>;
     type AddressMapping = HashedAddressMapping<BlakeTwo256>;
