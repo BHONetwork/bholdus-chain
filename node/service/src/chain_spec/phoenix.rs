@@ -7,7 +7,7 @@ use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use phoenix_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
-    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, GenesisAccount,
+    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig, GenesisAccount,
     GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus,
     StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS,
     TOKEN_SYMBOL, WASM_BINARY,
@@ -413,6 +413,7 @@ fn testnet_genesis(
                 accounts
             },
         },
+        ethereum: EthereumConfig{},
         /* dex: DexConfig {
             initial_provisioning_trading_pairs: vec![],
             initial_enabled_trading_pairs: initial_dex_liquidity_pairs
