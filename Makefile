@@ -55,20 +55,44 @@ test-cygnus:
 test-phoenix:
 	SKIP_WASM_BUILD= cargo test --features with-phoenix-runtime --release -- --nocapture
 
+# For CI
 .PHONY: test-runtimes
 test-runtimes:
 	SKIP_WASM_BUILD= cargo test --all --features with-all-runtime
-
 .PHONY: test-benchmarking
 test-benchmarking:
 	cargo test --features runtime-benchmarks --features with-all-runtime --features --all benchmarking
-
 .PHONY: check-benchmarks
 check-benchmarks:
 	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p ulas-runtime
 	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p cygnus-runtime
 	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p phoenix-runtime
-
 .PHONY: check-try-runtime
 check-try-runtime:
 	SKIP_WASM_BUILD= cargo check --features try-runtime --features with-all-runtime
+
+# Run the try-runtime
+.PHONY: run-ulas-try-runtime
+run-ulas-try-runtime:
+	RUST_LOG=runtime=trace,try-runtime::cli=trace,executor=trace \
+    cargo run --features try-runtime,with-ulas-runtime try-runtime \
+    --chain ulas-dev \
+    on-runtime-upgrade \
+    live \
+    --uri wss://blockchain-wss-0.bho.network/ \
+.PHONY: run-cygnus-try-runtime
+run-cygnus-try-runtime:
+	RUST_LOG=runtime=trace,try-runtime::cli=trace,executor=trace \
+    cargo run --features try-runtime,with-cygnus-runtime try-runtime \
+    --chain cygnus-dev \
+    on-runtime-upgrade \
+    live \
+    --uri wss://blockchain-wss-0.testnet.bholdus.net/ \
+.PHONY: run-phoenix-try-runtime
+run-phoenix-try-runtime:
+	RUST_LOG=runtime=trace,try-runtime::cli=trace,executor=trace \
+    cargo run --features try-runtime,with-phoenix-runtime try-runtime \
+    --chain phoenix-dev \
+    on-runtime-upgrade \
+    live \
+    --uri wss://blockchain-wss-0.dev.bholdus.net/ \
