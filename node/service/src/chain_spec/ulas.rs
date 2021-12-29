@@ -84,6 +84,10 @@ fn session_keys(
     }
 }
 
+pub fn config() -> Result<ChainSpec, String> {
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/ulas/ulas.json")[..])
+}
+
 pub fn development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
     let constants = Constants::new();
