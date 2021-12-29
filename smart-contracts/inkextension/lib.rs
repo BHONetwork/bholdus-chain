@@ -136,6 +136,7 @@ mod contract_with_extension {
 		pub fn get_balance(&mut self, account: AccountId) -> Result<u32, ContractError> {
 			let value = self.env().extension().do_get_balance(account);
 			self.env().emit_event(ResultNum { number: value? });
+			ink_env::debug_println!("{:?}", &value);
 			value
 		}
 

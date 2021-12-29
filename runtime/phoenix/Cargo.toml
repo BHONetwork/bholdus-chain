@@ -119,6 +119,11 @@ runtime-benchmarks = [
 	"bholdus-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
 ]
+
+contracts-unstable-interface = [
+	"pallet-contracts/unstable-interface"
+]
+
 std = [
 	"codec/std",
 	"scale-info/std",
