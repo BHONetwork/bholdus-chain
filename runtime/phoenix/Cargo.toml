@@ -73,7 +73,9 @@ pallet-beefy = { version = "4.0.0-dev", git = "https://github.com/bholdus/substr
 pallet-beefy-mmr = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 pallet-evm = { default-features = false, version = "6.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 pallet-ethereum = { default-features = false, version = "4.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+pallet-base-fee = { default-features = false, version = "1.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 fp-self-contained = { default-features = false, version = "1.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fp-rpc = { default-features = false, version = "3.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 
 # Substrate primitives
 sp-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
@@ -163,6 +165,7 @@ std = [
 	"pallet-beefy-mmr/std",
 	"pallet-evm/std",
 	"pallet-ethereum/std",
+	"pallet-base-fee/std",
 	"bholdus-tokens/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
@@ -186,6 +189,7 @@ std = [
 	"sp-consensus-aura/std",
 	"sp-io/std",
 	"fp-self-contained/std",
+	'fp-rpc/std',
 ]
 try-runtime = [
 	"frame-try-runtime",
