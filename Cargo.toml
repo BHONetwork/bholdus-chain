@@ -4,6 +4,7 @@ members = [
     'node/cli',
     'node/service',
     'rpc',
+    'runtime/chain-extension',
     'runtime/ulas',
     'runtime/cygnus',
     'runtime/phoenix',
@@ -14,10 +15,11 @@ members = [
     'pallets/tokens',
     'pallets/non-fungible-token',
     # 'pallets/bridge/bsc',
-    'pallets/bridge/native-transfer',
-    'pallets/bholdus-smart-contract',
-    'primitives/bholdus',
-    'primitives/bsc',
+     'pallets/bridge/native-transfer',
+     'pallets/pallet-integration',
+     'pallets/pallet-integration/bholdus-smart-contract',
+     'primitives/bholdus',
+     'primitives/bsc',
 ]
 
 exclude = [

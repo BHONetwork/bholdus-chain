@@ -71,6 +71,7 @@ use bholdus_currencies::BasicCurrencyAdapter;
 pub use bholdus_primitives::*;
 use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
+pub use runtime_chain_extension::IntegrationExtensions;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -82,11 +83,9 @@ pub mod weights;
 pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
 
+pub use bholdus_smart_contract;
 /// Import the template pallet.
 pub use pallet_template;
-pub use bholdus_smart_contract;
-mod chain_extension;
-use chain_extension::ExampleExtension;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -771,7 +770,7 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = ExampleExtension;
+    type ChainExtension = IntegrationExtensions;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -1101,7 +1100,7 @@ impl pallet_template::Config for Runtime {
 impl bholdus_smart_contract::Config for Runtime {
     type Event = Event;
     type Currency = Balances;
-	type WeightInfo = bholdus_smart_contract::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = bholdus_smart_contract::weights::SubstrateWeight<Runtime>;
 }
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(

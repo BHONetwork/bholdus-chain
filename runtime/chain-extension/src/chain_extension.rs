@@ -1,7 +1,6 @@
-use crate::{
-    sp_api_hidden_includes_construct_runtime::hidden_include::traits::Get, Balance, Encode,
-    SmartContract,
-};
+use codec::{Decode, Encode, MaxEncodedLen};
+use frame_support::traits::Get;
+
 use frame_support::{
     log::error,
     weights::{constants::RocksDbWeight, Weight},
@@ -12,9 +11,9 @@ use pallet_contracts::chain_extension::{
 };
 use sp_runtime::{traits::StaticLookup, DispatchError};
 
-pub struct ExampleExtension;
+pub struct IntegrationExtensions;
 
-impl<T> ChainExtension<T> for ExampleExtension
+impl<T> ChainExtension<T> for IntegrationExtensions
 where
     T: SysConfig
         + pallet_contracts::Config
@@ -48,9 +47,8 @@ where
                 let base_weight: Weight =
                     <T as bholdus_smart_contract::Config>::WeightInfo::insert_number(value);
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
-                let caller = env.ext().caller().clone();
-
-                crate::bholdus_smart_contract::Pallet::<T>::insert_number(
+                let caller: T::AccountId = env.ext().caller().clone();
+                bholdus_smart_contract::Pallet::<T>::insert_number(
                     RawOrigin::Signed(caller).into(),
                     value,
                 )?;
@@ -67,7 +65,6 @@ where
                     env.read_as()?;
                 let recipient = T::Lookup::unlookup(recipient_account);
                 let caller = env.ext().caller().clone();
-                // let origin = ensure_signed(caller)?;
 
                 pallet_balances::Pallet::<T>::transfer(
                     RawOrigin::Signed(caller).into(),
@@ -91,7 +88,7 @@ where
                     }
                     // do_get_from_runtime
                     4 => {
-                        let result = SmartContract::get_value().encode();
+                        let result = bholdus_smart_contract::Pallet::<T>::get_value().encode();
                         env.write(&result, false, None).map_err(|_| {
                             "Encountered an error when retrieving runtime storage value."
                         })?;
