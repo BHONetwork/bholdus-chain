@@ -7,7 +7,8 @@ run-cygnus:
 .PHONY: run-phoenix
 run-phoenix:
 	cargo +nightly run --features with-phoenix-runtime --release -- --alice --chain=phoenix-dev --tmp -lruntime=debug --ws-external --rpc-external --rpc-cors all --ws-port 9944 
-
+debug-phoenix:
+	cargo +nightly run --features with-phoenix-runtime --release -- --alice --chain=phnix-dev --tmp -lruntime=debug --ws-external --rpc-external --rpc-cors all --ws-port 9944 -lerror,runtime::contracts=debug
 .PHONY: run-benchmark-ulas
 run-benchmark-ulas:
 	cargo run --features with-ulas-runtime --features runtime-benchmarks --release -- --alice --chain=ulas-dev --tmp -lruntime=debug
@@ -31,6 +32,9 @@ build-cygnus:
 .PHONY: build-phoenix
 build-phoenix:
 	SKIP_WASM_BUILD= cargo build --features with-phoenix-runtime --release
+.PHONY: build-all
+build-all:
+	cargo build --locked --features with-all-runtime
 
 .PHONY: check-debug-ulas
 check-debug-ulas:
@@ -51,3 +55,21 @@ test-cygnus:
 .PHONY: test-phoenix
 test-phoenix:
 	SKIP_WASM_BUILD= cargo test --features with-phoenix-runtime --release -- --nocapture
+
+.PHONY: test-runtimes
+test-runtimes:
+	SKIP_WASM_BUILD= cargo test --all --features with-all-runtime
+
+.PHONY: test-benchmarking
+test-benchmarking:
+	cargo test --features runtime-benchmarks --features with-all-runtime --features --all benchmarking
+
+.PHONY: check-benchmarks
+check-benchmarks:
+	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p ulas-runtime
+	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p cygnus-runtime
+	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p phoenix-runtime
+
+.PHONY: check-try-runtime
+check-try-runtime:
+	SKIP_WASM_BUILD= cargo check --features try-runtime --features with-all-runtime

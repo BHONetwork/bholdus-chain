@@ -39,3 +39,13 @@ pallet-contracts-rpc = { version = '4.0.0-dev', git = 'https://github.com/bholdu
 pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 
 bholdus-primitives = { version = '4.0.0-dev', path = '../primitives/bholdus/' }
+
+[features]
+with-ulas-runtime = []
+with-cygnus-runtime = []
+with-phoenix-runtime = []
+with-all-runtime = [
+    "with-ulas-runtime",
+    "with-cygnus-runtime",
+    "with-phoenix-runtime",
+]
