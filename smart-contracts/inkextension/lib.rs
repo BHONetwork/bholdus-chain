@@ -157,4 +157,37 @@ mod contract_with_extension {
             value
         }
     }
+
+     /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
+     #[cfg(test)]
+     mod tests {
+         /// Imports all the definitions from the outer scope so we can use them here.
+         use super::*;
+         use ink_lang as ink;
+ 
+         #[ink::test]
+         fn chain_extension_works() {
+             // given
+             struct MockedExtension;
+             impl ink_env::test::ChainExtension for MockedExtension {
+                 /// The static function id of the chain extension.
+                 fn func_id(&self) -> u32 {
+                     2
+                 }
+ 
+                 /// The chain extension is called with the given input.
+                 ///
+                 /// Returns an error code and may fill the `output` buffer with a
+                 /// SCALE encoded result. The error code is taken from the
+                 /// `ink_env::chain_extension::FromStatusCode` implementation for
+                 /// `RandomReadErr`.
+                 fn call(&mut self, _input: &[u8], output: &mut Vec<u8>) -> u32 {
+                     let ret: [u8; 32] = [1; 32];
+                     scale::Encode::encode_to(&ret, output);
+                     0
+                 }
+             }
+             ink_env::test::register_chain_extension(MockedExtension);
+         }
+     }
 }
