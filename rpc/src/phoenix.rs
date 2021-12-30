@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use crate::{BeefyDeps, GrandpaDeps};
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use sc_client_api::backend::{Backend, StorageProvider};
 use sc_client_api::AuxStore;
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 pub use sc_rpc::SubscriptionTaskExecutor;
@@ -13,6 +14,7 @@ use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
+use sc_network::NetworkService;
 
 /// Full client dependencies.
 pub struct FullDeps<C, P, SC, B> {
@@ -30,6 +32,8 @@ pub struct FullDeps<C, P, SC, B> {
     pub grandpa: GrandpaDeps<B>,
     /// BEEFY specific dependencies
     pub beefy: BeefyDeps,
+    /// Network service
+	pub network: Arc<NetworkService<Block, Hash>>,
 }
 
 /// Light client extra dependencies.
@@ -59,16 +63,19 @@ where
         + Sync
         + Send
         + 'static,
+    C: StorageProvider<Block, B>,
     C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
     C::Api: pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>,
     C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
     C::Api: BlockBuilder<Block>,
+    C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
     P: TransactionPool + 'static,
     SC: SelectChain<Block> + 'static,
     B: sc_client_api::Backend<Block> + Send + Sync + 'static,
     B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
 {
+    use fc_rpc::{NetApi, NetApiServer};
     use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_mmr_rpc::{Mmr, MmrApi};
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
@@ -83,6 +90,7 @@ where
         deny_unsafe,
         grandpa,
         beefy,
+        network,
     } = deps;
 
     let GrandpaDeps {
@@ -124,6 +132,13 @@ where
             beefy.subscription_executor,
         ),
     ));
+
+    io.extend_with(NetApiServer::to_delegate(NetApi::new(
+		client.clone(),
+		network.clone(),
+		// Whether to format the `peer_count` response as Hex (default) or not.
+		true,
+	)));
 
     Ok(io)
 }

@@ -29,6 +29,7 @@ sc-consensus-epochs = { version = '0.10.0-dev', git = 'https://github.com/bholdu
 sc-finality-grandpa = { version = '0.10.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 sc-finality-grandpa-rpc = { version = '0.10.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 sc-consensus-uncles = { version = '0.10.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+sc-network = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 beefy-gadget = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
 beefy-gadget-rpc = { version = '4.0.0-dev', git = "https://github.com/bholdus/substrate", branch = 'bholdus-monthly-2021-11' }
 
@@ -37,6 +38,8 @@ pallet-im-online = { version = '4.0.0-dev', git = 'https://github.com/bholdus/su
 pallet-contracts = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 pallet-contracts-rpc = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+fp-rpc = { default-features = false, version = "3.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fc-rpc = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 
 bholdus-primitives = { version = '4.0.0-dev', path = '../primitives/bholdus/' }
 
