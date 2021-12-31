@@ -987,11 +987,11 @@ parameter_type_with_key! {
     };
 }
 
-// impl bholdus_currencies::Config for Runtime {
-//     type Event = Event;
-//     type MultiCurrency = Tokens;
-//     type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
-// }
+impl bholdus_currencies::Config for Runtime {
+    type Event = Event;
+    type MultiCurrency = Tokens;
+    type WeightInfo = ();
+}
 
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
@@ -1142,12 +1142,11 @@ construct_runtime!(
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
+        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
+        SupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
         // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
-        // Bholdus Support
-        BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        // BholdusSupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
-        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        // SupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.

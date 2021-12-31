@@ -13,6 +13,7 @@ use pallet_contracts::chain_extension::{
 };
 
 mod sample;
+pub use sample::SampleExtensions;
 
 use sp_runtime::{traits::StaticLookup, DispatchError};
 pub struct IntegrationExtensions;

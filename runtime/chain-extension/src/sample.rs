@@ -1,5 +1,4 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::traits::Get;
 
@@ -11,7 +10,6 @@ use frame_system::RawOrigin;
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
 };
-
 use sp_runtime::{traits::StaticLookup, DispatchError};
 
 pub struct SampleExtensions;
@@ -38,24 +36,63 @@ where
 
         // Match on function id assigned in the contract
         match func_id {
-            // ToDo: call transfer native
+            // do_store_in_runtime
             1 => {
+                use sample_extension::WeightInfo;
+                // retrieve argument that was passed in smart contract invocation
+                let value: u32 = env.read_as()?;
+                // Capture weight for the main action being performed by the extrinsic
+                let base_weight: Weight =
+                    <T as sample_extension::Config>::WeightInfo::insert_number(value);
+                env.charge_weight(base_weight.saturating_add(extension_overhead))?;
+                let caller: T::AccountId = env.ext().caller().clone();
+                sample_extension::Pallet::<T>::insert_number(
+                    RawOrigin::Signed(caller).into(),
+                    value,
+                )?;
+            }
+            // do_balance_transfer
+            2 => {
                 // Retrieve arguments
                 let base_weight = <T as pallet_contracts::Config>::Schedule::get()
                     .host_fn_weights
                     .call_transfer_surcharge;
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 
-                let (amount, target): (T::Balance, T::AccountId) = env.read_as()?;
+                let (transfer_amount, recipient_account): (T::Balance, T::AccountId) =
+                    env.read_as()?;
+                let recipient = T::Lookup::unlookup(recipient_account);
                 let caller = env.ext().caller().clone();
-                let dest = T::Lookup::unlookup(target);
 
                 pallet_balances::Pallet::<T>::transfer(
                     RawOrigin::Signed(caller).into(),
-                    dest,
-                    amount,
+                    recipient,
+                    transfer_amount,
                 )
                 .map_err(|d| d.error)?;
+            }
+            3 | 4 => {
+                let base_weight = RocksDbWeight::get().reads(1);
+                env.charge_weight(base_weight.saturating_add(extension_overhead))?;
+
+                match func_id {
+                    // do_get_balance
+                    3 => {
+                        let account: T::AccountId = env.read_as()?;
+                        let result = pallet_balances::Pallet::<T>::free_balance(account).encode();
+
+                        env.write(&result, false, None)
+                            .map_err(|_| "Encountered an error when querying balance.")?;
+                    }
+                    // do_get_from_runtime
+                    4 => {
+                        let result = sample_extension::Pallet::<T>::get_value().encode();
+                        env.write(&result, false, None).map_err(|_| {
+                            "Encountered an error when retrieving runtime storage value."
+                        })?;
+                    }
+                    _ => unreachable!(),
+                }
             }
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);
