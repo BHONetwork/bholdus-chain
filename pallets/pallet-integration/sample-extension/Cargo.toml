@@ -1,5 +1,5 @@
 [package]
-name = "bholdus-smart-contract"
+name = "sample-extension"
 version = "4.0.0-dev"
 authors = ["Vu hoang <vuhoang2119@gmail.com>"]
 edition = "2018"

@@ -82,8 +82,6 @@ pub mod constants;
 pub mod weights;
 pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
-
-pub use bholdus_smart_contract;
 /// Import the template pallet.
 pub use pallet_template;
 
@@ -1097,10 +1095,10 @@ impl pallet_template::Config for Runtime {
     type Event = Event;
 }
 
-impl bholdus_smart_contract::Config for Runtime {
+impl sample_extension::Config for Runtime {
     type Event = Event;
     type Currency = Balances;
-    type WeightInfo = bholdus_smart_contract::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = sample_extension::weights::SubstrateWeight<Runtime>;
 }
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -1154,7 +1152,7 @@ construct_runtime!(
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
-        SmartContract: bholdus_smart_contract::{Pallet, Call, Storage, Event<T>},
+        SampleExtension: sample_extension::{Pallet, Call, Storage, Event<T>},
     }
 );
 

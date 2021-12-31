@@ -73,9 +73,9 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
-[dependencies.bholdus-smart-contract]
+[dependencies.sample-extension]
 default-features = false
-path = "../../pallets/pallet-integration/bholdus-smart-contract"
+path = "../../pallets/pallet-integration/sample-extension"
 version = '4.0.0-dev'
 
 [features]
@@ -90,7 +90,7 @@ std = [
 	'sp-runtime/std',
 	'pallet-contracts/std',
 	'pallet-balances/std',
-	'bholdus-smart-contract/std',
+	'sample-extension/std',
 ]
 runtime-benchmarks = [
 	'frame-benchmarking',

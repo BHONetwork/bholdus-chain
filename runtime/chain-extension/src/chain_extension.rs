@@ -15,10 +15,7 @@ pub struct IntegrationExtensions;
 
 impl<T> ChainExtension<T> for IntegrationExtensions
 where
-    T: SysConfig
-        + pallet_contracts::Config
-        + bholdus_smart_contract::Config
-        + pallet_balances::Config,
+    T: SysConfig + pallet_contracts::Config + sample_extension::Config + pallet_balances::Config,
     <T as SysConfig>::AccountId: UncheckedFrom<<T as SysConfig>::Hash> + AsRef<[u8]>,
 {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
@@ -40,15 +37,15 @@ where
         match func_id {
             // do_store_in_runtime
             1 => {
-                use bholdus_smart_contract::WeightInfo;
+                use sample_extension::WeightInfo;
                 // retrieve argument that was passed in smart contract invocation
                 let value: u32 = env.read_as()?;
                 // Capture weight for the main action being performed by the extrinsic
                 let base_weight: Weight =
-                    <T as bholdus_smart_contract::Config>::WeightInfo::insert_number(value);
+                    <T as sample_extension::Config>::WeightInfo::insert_number(value);
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
                 let caller: T::AccountId = env.ext().caller().clone();
-                bholdus_smart_contract::Pallet::<T>::insert_number(
+                sample_extension::Pallet::<T>::insert_number(
                     RawOrigin::Signed(caller).into(),
                     value,
                 )?;
@@ -88,7 +85,7 @@ where
                     }
                     // do_get_from_runtime
                     4 => {
-                        let result = bholdus_smart_contract::Pallet::<T>::get_value().encode();
+                        let result = sample_extension::Pallet::<T>::get_value().encode();
                         env.write(&result, false, None).map_err(|_| {
                             "Encountered an error when retrieving runtime storage value."
                         })?;

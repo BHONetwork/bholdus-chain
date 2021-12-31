@@ -1,10 +1,10 @@
 [package]
 authors = ["Bholdus Technologies"]
-description = "FRAME pallets integrate with smart contracts"
+description = "Integrate tokens pallet provides basic functions to interact with smart contract"
 edition = '2018'
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
-name = "pallet-integration"
+name = "integration-tokens"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
 version = '4.0.0-dev'
