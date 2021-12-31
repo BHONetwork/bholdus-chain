@@ -107,6 +107,12 @@ mod contract_with_extension {
             self.stored_number
         }
 
+        /// Simply returns the current value.
+        #[ink(message)]
+        pub fn get(&self) -> u32 {
+            self.stored_number
+        }
+
         /// A simple storage function meant to demonstrate calling a smart contract from a custom
         /// pallet. Here, we've set the `selector` explicitly to make it simpler to target this
         /// function.
@@ -123,6 +129,7 @@ mod contract_with_extension {
         pub fn store_in_runtime(&mut self, value: u32) -> Result<(), ContractError> {
             self.env().extension().do_store_in_runtime(value)?;
             self.env().emit_event(ResultNum { number: value });
+            self.stored_number = value;
             Ok(())
         }
 
@@ -137,6 +144,7 @@ mod contract_with_extension {
             self.env()
                 .extension()
                 .do_balance_transfer(amount, recipient)?;
+            self.stored_number = 100;
             Ok(())
         }
 
@@ -145,6 +153,7 @@ mod contract_with_extension {
         pub fn get_balance(&mut self, account: AccountId) -> Result<u32, ContractError> {
             let value = self.env().extension().do_get_balance(account);
             self.env().emit_event(ResultNum { number: value? });
+            self.stored_number = 75;
             ink_env::debug_println!("{:?}", &value);
             value
         }
@@ -154,40 +163,156 @@ mod contract_with_extension {
         pub fn get_runtime_storage_value(&mut self) -> Result<u32, ContractError> {
             let value = self.env().extension().do_get_from_runtime();
             self.env().emit_event(ResultNum { number: value? });
+            self.stored_number = 50;
             value
         }
     }
 
-     /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
-     #[cfg(test)]
-     mod tests {
-         /// Imports all the definitions from the outer scope so we can use them here.
-         use super::*;
-         use ink_lang as ink;
- 
-         #[ink::test]
-         fn chain_extension_works() {
-             // given
-             struct MockedExtension;
-             impl ink_env::test::ChainExtension for MockedExtension {
-                 /// The static function id of the chain extension.
-                 fn func_id(&self) -> u32 {
-                     2
-                 }
- 
-                 /// The chain extension is called with the given input.
-                 ///
-                 /// Returns an error code and may fill the `output` buffer with a
-                 /// SCALE encoded result. The error code is taken from the
-                 /// `ink_env::chain_extension::FromStatusCode` implementation for
-                 /// `RandomReadErr`.
-                 fn call(&mut self, _input: &[u8], output: &mut Vec<u8>) -> u32 {
-                     let ret: [u8; 32] = [1; 32];
-                     scale::Encode::encode_to(&ret, output);
-                     0
-                 }
-             }
-             ink_env::test::register_chain_extension(MockedExtension);
-         }
-     }
+    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
+    #[cfg(test)]
+    mod tests {
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
+        use ink_lang as ink;
+
+        #[ink::test]
+        fn chain_extension_store_in_runtime_works() {
+            // given
+            struct MockedExtension;
+            impl ink_env::test::ChainExtension for MockedExtension {
+                /// The static function id of the chain extension.
+                fn func_id(&self) -> u32 {
+                    1
+                }
+
+                /// The chain extension is called with the given input.
+                ///
+                /// Returns an error code and may fill the `output` buffer with a
+                /// SCALE encoded result. The error code is taken from the
+                /// `ink_env::chain_extension::FromStatusCode` implementation for
+                /// `RandomReadErr`.
+                fn call(&mut self, _input: &[u8], output: &mut Vec<u8>) -> u32 {
+                    let ret: [u8; 32] = [1; 32];
+                    scale::Encode::encode_to(&ret, output);
+                    0
+                }
+            }
+            ink_env::test::register_chain_extension(MockedExtension);
+            let mut runtime_interface = RuntimeInterface::default();
+            assert_eq!(runtime_interface.get(), 0);
+
+            //when
+            runtime_interface
+                .store_in_runtime(32)
+                .expect("update must work");
+
+            // // then
+            assert_eq!(runtime_interface.get(), 32);
+        }
+
+        #[ink::test]
+        fn chain_extension_extended_transfer_works() {
+            // given
+            struct MockedExtension;
+            impl ink_env::test::ChainExtension for MockedExtension {
+                /// The static function id of the chain extension.
+                fn func_id(&self) -> u32 {
+                    2
+                }
+
+                /// The chain extension is called with the given input.
+                ///
+                /// Returns an error code and may fill the `output` buffer with a
+                /// SCALE encoded result. The error code is taken from the
+                /// `ink_env::chain_extension::FromStatusCode` implementation for
+                /// `RandomReadErr`.
+                fn call(&mut self, _input: &[u8], output: &mut Vec<u8>) -> u32 {
+                    let ret: [u8; 32] = [1; 32];
+                    scale::Encode::encode_to(&ret, output);
+                    0
+                }
+            }
+            ink_env::test::register_chain_extension(MockedExtension);
+            let mut runtime_interface = RuntimeInterface::default();
+            assert_eq!(runtime_interface.get(), 0);
+
+            //when
+            runtime_interface
+                .extended_transfer(100, AccountId::from([0x1; 32]))
+                .expect("update must work");
+
+            // // then
+            assert_eq!(runtime_interface.get(), 100);
+        }
+
+        #[ink::test]
+        fn chain_extension_get_balance_works() {
+            // given
+            struct MockedExtension;
+            impl ink_env::test::ChainExtension for MockedExtension {
+                /// The static function id of the chain extension.
+                fn func_id(&self) -> u32 {
+                    3
+                }
+
+                /// The chain extension is called with the given input.
+                ///
+                /// Returns an error code and may fill the `output` buffer with a
+                /// SCALE encoded result. The error code is taken from the
+                /// `ink_env::chain_extension::FromStatusCode` implementation for
+                /// `RandomReadErr`.
+                fn call(&mut self, _input: &[u8], output: &mut Vec<u8>) -> u32 {
+                    let ret: [u8; 32] = [1; 32];
+                    scale::Encode::encode_to(&ret, output);
+                    0
+                }
+            }
+            ink_env::test::register_chain_extension(MockedExtension);
+            let mut runtime_interface = RuntimeInterface::default();
+            assert_eq!(runtime_interface.get(), 0);
+
+            //when
+            runtime_interface
+                .get_balance(AccountId::from([0x1; 32]))
+                .expect("update must work");
+
+            // // then
+            assert_eq!(runtime_interface.get(), 75);
+        }
+
+        #[ink::test]
+        fn chain_extension_get_runtime_storage_value_works() {
+            // given
+            struct MockedExtension;
+            impl ink_env::test::ChainExtension for MockedExtension {
+                /// The static function id of the chain extension.
+                fn func_id(&self) -> u32 {
+                    4
+                }
+
+                /// The chain extension is called with the given input.
+                ///
+                /// Returns an error code and may fill the `output` buffer with a
+                /// SCALE encoded result. The error code is taken from the
+                /// `ink_env::chain_extension::FromStatusCode` implementation for
+                /// `RandomReadErr`.
+                fn call(&mut self, _input: &[u8], output: &mut Vec<u8>) -> u32 {
+                    let ret: [u8; 32] = [1; 32];
+                    scale::Encode::encode_to(&ret, output);
+                    0
+                }
+            }
+            ink_env::test::register_chain_extension(MockedExtension);
+            let mut runtime_interface = RuntimeInterface::default();
+            assert_eq!(runtime_interface.get(), 0);
+
+            //when
+            runtime_interface
+                .get_runtime_storage_value()
+                .expect("update must work");
+
+            // // then
+            assert_eq!(runtime_interface.get(), 50);
+        }
+    }
 }
