@@ -1,5 +1,5 @@
 [package]
-name = "inkextension"
+name = "sample"
 version = "0.1.0"
 authors = ["Vu Hoang <vuhoang2119@gmail.com>"]
 edition = "2018"

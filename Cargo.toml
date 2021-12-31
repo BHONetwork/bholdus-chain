@@ -17,13 +17,13 @@ members = [
     # 'pallets/bridge/bsc',
      'pallets/bridge/native-transfer',
      'pallets/pallet-integration',
-     'pallets/pallet-integration/bholdus-smart-contract',
+     'pallets/pallet-integration/sample-extension',
      'primitives/bholdus',
      'primitives/bsc',
 ]
 
 exclude = [
-    'smart-contracts/inkextension'
+    'smart-contracts/tokens'
 ]
 [profile.release]
 panic = 'unwind'
