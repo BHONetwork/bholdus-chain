@@ -22,19 +22,6 @@ run-benchmark-phoenix:
 toolchain:
 	./scripts/init.sh
 
-.PHONY: build-ulas
-build-ulas:
-	SKIP_WASM_BUILD= cargo build --features with-ulas-runtime --release
-.PHONY: build-cygnus
-build-cygnus:
-	SKIP_WASM_BUILD= cargo build --features with-cygnus-runtime --release
-.PHONY: build-phoenix
-build-phoenix:
-	SKIP_WASM_BUILD= cargo build --features with-phoenix-runtime --release
-.PHONY: build-all
-build-all:
-	cargo build --locked --features with-all-runtime
-
 .PHONY: check-debug-ulas
 check-debug-ulas:
 	RUSTFLAGS="-Z macro-backtrace" SKIP_WASM_BUILD= cargo +nightly check --features with-ulas-runtime --release
@@ -96,3 +83,14 @@ run-phoenix-try-runtime:
     on-runtime-upgrade \
     live \
     --uri wss://blockchain-wss-0.dev.bholdus.net/ \
+
+# Build WASM runtime only
+.PHONY: build-ulas-runtime-wasm
+build-ulas-runtime-wasm:
+	PACKAGE=ulas-runtime ./scripts/srtool_build.sh
+.PHONY: build-cygnus-runtime-wasm
+build-cygnus-runtime-wasm:
+	PACKAGE=cygnus-runtime ./scripts/srtool_build.sh
+.PHONY: build-phoenix-runtime-wasm
+build-phoenix-runtime-wasm:
+	PACKAGE=phoenix-runtime ./scripts/srtool_build.sh

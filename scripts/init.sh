@@ -10,3 +10,5 @@ if [ -z $CI_PROJECT_NAME ] ; then
 fi
 
 rustup target add wasm32-unknown-unknown --toolchain nightly
+
+cargo install --git https://github.com/chevdor/srtool-cli
