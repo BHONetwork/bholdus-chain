@@ -14,6 +14,9 @@ pub mod cygnus;
 #[cfg(feature = "with-ulas-runtime")]
 pub mod ulas;
 
+#[cfg(feature = "with-phoenix-runtime")]
+pub use phoenix_runtime;
+
 use std::sync::Arc;
 
 use bholdus_primitives::{Block, BlockNumber, Hash};

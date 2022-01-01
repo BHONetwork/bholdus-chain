@@ -400,7 +400,7 @@ fn testnet_genesis(
                 let mut accounts = std::collections::BTreeMap::new();
                 accounts.insert(
                     H160::from_slice(&hex_literal::hex!(
-                        "6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b"
+                        "fF6a5C321D1AB7B48a39E62cE5de4b0E87EDc828"
                     )),
                     GenesisAccount {
                         nonce: U256::zero(),

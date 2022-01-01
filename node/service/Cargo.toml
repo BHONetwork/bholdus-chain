@@ -17,7 +17,7 @@ hex-literal = "0.3.1"
 serde = { version = "1.0.124", features = ["derive"] }
 serde_json = "1.0.68"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
-jsonrpc-core = "15.1.0"
+jsonrpc-core = "18.0.0"
 
 beefy-gadget = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
 beefy-gadget-rpc = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
@@ -30,6 +30,8 @@ substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/
 pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
+fc-mapping-sync = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fc-db = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-cli = { version = "0.10.0-dev", features = [
     "wasmtime",

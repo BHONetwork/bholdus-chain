@@ -1,6 +1,6 @@
 //! Phoenix-specific RPCs implementation.
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use crate::{BeefyDeps, GrandpaDeps};
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
@@ -10,6 +10,13 @@ use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 pub use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
 use sc_transaction_pool_api::TransactionPool;
+use sc_transaction_pool::{ChainApi, Pool};
+use std::collections::BTreeMap;
+use fc_rpc::{
+	EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride,
+};
+use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
+use sp_runtime::traits::BlakeTwo256;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
@@ -17,11 +24,13 @@ use sp_consensus::SelectChain;
 use sc_network::NetworkService;
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B> {
+pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     /// The client instance to use.
     pub client: Arc<C>,
     /// Transaction pool instance.
     pub pool: Arc<P>,
+    /// Graph pool instance.
+	pub graph: Arc<Pool<A>>,
     /// The SelectChain Strategy
     pub select_chain: SC,
     /// A copy of the chain spec.
@@ -32,8 +41,12 @@ pub struct FullDeps<C, P, SC, B> {
     pub grandpa: GrandpaDeps<B>,
     /// BEEFY specific dependencies
     pub beefy: BeefyDeps,
+    /// The Node authority flag
+    pub is_authority: bool,
     /// Network service
 	pub network: Arc<NetworkService<Block, Hash>>,
+    /// Backend.
+	pub backend: Arc<fc_db::Backend<Block>>,
 }
 
 /// Light client extra dependencies.
@@ -52,8 +65,8 @@ pub struct LightDeps<C, F, P> {
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B>(
-    deps: FullDeps<C, P, SC, B>,
+pub fn create_full<C, P, SC, B, A>(
+    deps: FullDeps<C, P, SC, B, A>,
 ) -> Result<jsonrpc_core::IoHandler<sc_rpc_api::Metadata>, Box<dyn std::error::Error + Send + Sync>>
 where
     C: ProvideRuntimeApi<Block>
@@ -70,12 +83,17 @@ where
     C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
     C::Api: BlockBuilder<Block>,
     C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
-    P: TransactionPool + 'static,
+    P: TransactionPool<Block = Block> + 'static,
     SC: SelectChain<Block> + 'static,
     B: sc_client_api::Backend<Block> + Send + Sync + 'static,
     B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+    A: ChainApi<Block = Block> + 'static,
 {
-    use fc_rpc::{NetApi, NetApiServer};
+    use fc_rpc::{
+		EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi,
+		EthPubSubApiServer, EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api,
+		Web3ApiServer,
+	};
     use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_mmr_rpc::{Mmr, MmrApi};
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
@@ -85,12 +103,15 @@ where
     let FullDeps {
         client,
         pool,
+        graph,
         select_chain,
         chain_spec,
         deny_unsafe,
         grandpa,
         beefy,
+        is_authority,
         network,
+        backend,
     } = deps;
 
     let GrandpaDeps {
@@ -103,7 +124,7 @@ where
 
     io.extend_with(SystemApi::to_delegate(FullSystem::new(
         client.clone(),
-        pool,
+        pool.clone(),
         deny_unsafe,
     )));
 
@@ -138,6 +159,42 @@ where
 		network.clone(),
 		// Whether to format the `peer_count` response as Hex (default) or not.
 		true,
+	)));
+
+    let overrides = Arc::new(OverrideHandle {
+		schemas: BTreeMap::new(),
+		fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
+	});
+
+	// Nor any signers
+	let signers = Vec::new();
+
+	// Limit the number of queryable logs. In a production chain, this
+	// could be extended back to the CLI. See Moonbeam for example.
+	let max_past_logs = 1024;
+
+    /// Maximum fee history cache size.
+	let fee_history_limit = 1000000;
+	/// Fee history cache.
+	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
+
+	// Reasonable default caching inspired by the frontier template
+	let block_data_cache = Arc::new(EthBlockDataCache::new(50, 50));
+
+	io.extend_with(EthApiServer::to_delegate(EthApi::new(
+		client.clone(),
+		pool.clone(),
+		graph,
+		phoenix_runtime::TransactionConverter,
+		network.clone(),
+		signers,
+		overrides.clone(),
+		backend.clone(),
+		is_authority,
+		max_past_logs,
+		block_data_cache.clone(),
+        fee_history_limit,
+		fee_history_cache,
 	)));
 
     Ok(io)

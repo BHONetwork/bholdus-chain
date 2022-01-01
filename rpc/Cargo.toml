@@ -40,13 +40,16 @@ pallet-contracts-rpc = { version = '4.0.0-dev', git = 'https://github.com/bholdu
 pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 fp-rpc = { default-features = false, version = "3.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 fc-rpc = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fc-rpc-core = { default-features = false, version = "1.1.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fc-db = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
 
+phoenix-runtime = { version = "1.0.10", optional = true, path = "../runtime/phoenix" }
 bholdus-primitives = { version = '4.0.0-dev', path = '../primitives/bholdus/' }
 
 [features]
 with-ulas-runtime = []
 with-cygnus-runtime = []
-with-phoenix-runtime = []
+with-phoenix-runtime = ["phoenix-runtime"]
 with-all-runtime = [
     "with-ulas-runtime",
     "with-cygnus-runtime",
