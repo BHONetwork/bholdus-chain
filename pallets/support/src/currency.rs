@@ -398,6 +398,19 @@ pub trait OnDust<AccountId, CurrencyId, Balance> {
     fn on_dust(who: &AccountId, currency_id: CurrencyId, amount: Balance);
 }
 
+pub trait CurrencyDetails<AccountId> {
+    /// The currency identifier.
+    type CurrencyId: FullCodec
+        + Eq
+        + PartialEq
+        + Copy
+        + MaybeSerializeDeserialize
+        + Debug
+        + TypeInfo;
+    fn is_owner(who: &AccountId, currency_id: Self::CurrencyId) -> bool;
+    fn is_verifiable(currency_id: Self::CurrencyId) -> bool;
+}
+
 impl<AccountId, CurrencyId, Balance> OnDust<AccountId, CurrencyId, Balance> for () {
     fn on_dust(_: &AccountId, _: CurrencyId, _: Balance) {}
 }

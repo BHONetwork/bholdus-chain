@@ -44,6 +44,12 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
+# Local dependencies
+[dependencies.bholdus-primitives]
+default-features = false
+version = '4.0.0-dev'
+path = '../../primitives/bholdus'
+
 [features]
 default = ["std"]
 std = [
@@ -55,4 +61,5 @@ std = [
 	'sp-std/std',
 	'num-traits/std',
 	'frame-support/std',
+	'bholdus-primitives/std',
 ]

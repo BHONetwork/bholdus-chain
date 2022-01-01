@@ -1,0 +1,112 @@
+[package]
+authors = ['Bholdus <https://github.com/bholdus>']
+description = "Store and manage shares and rewards"
+edition = '2018'
+homepage = 'https://bholdus.com'
+name = 'support-rewards'
+license = "Apache-2.0"
+readme = 'README.md'
+repository = 'https://github.com/bholdus/bholdus-chain'
+version = '4.0.0-dev'
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.124", optional = true }
+
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+[dependencies.codec]
+default-features = false
+features = ['derive', 'max-encoded-len']
+package = 'parity-scale-codec'
+version = '2.2.0'
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
+# Substrate dependencies
+
+
+[dependencies.frame-support]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+[dependencies.frame-system]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+[dependencies.sp-runtime]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+[dependencies.sp-core]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+[dependencies.sp-std]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+# Local dependencies
+[dependencies.bholdus-primitives]
+default-features = false
+version = '4.0.0-dev'
+path = '../../../primitives/bholdus'
+
+[dependencies.bholdus-support]
+default-features = false
+version = '4.0.0-dev'
+path = '../../support'
+
+[dev-dependencies.sp-core]
+version = "4.0.0-dev"
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+[dev-dependencies.sp-io]
+version = "4.0.0-dev"
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+
+# [dev-dependencies.pallet-balances]
+# version = "4.0.0-dev"
+# git = 'https://github.com/bholdus/substrate.git'
+# branch = 'bholdus-monthly-2021-11'
+
+# [dev-dependencies.bholdus-tokens]
+# version = '4.0.0-dev'
+# path = '../tokens'
+
+# [dev-dependencies.bholdus-currencies]
+# version = '4.0.0-dev'
+# path = '../currencies'
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	'scale-info/std',
+	"frame-support/std",
+	"frame-system/std",
+	"sp-runtime/std",
+	"sp-std/std",
+	"bholdus-support/std",
+	"bholdus-primitives/std",
+]
+try-runtime = ["frame-support/try-runtime"]
+

@@ -711,8 +711,10 @@ fn lifecycle_should_work() {
         assert!(IdentityOf::<Runtime>::contains_key(1));
         assert_eq!(BholdusTokens::identity(1).unwrap().info, ten());
         assert!(!BholdusTokens::identity(1).unwrap().is_verifiable);
+        assert_eq!(BholdusTokens::is_verifiable(1), false);
         assert_ok!(BholdusTokens::verify_asset(Origin::root(), 1));
         assert!(BholdusTokens::identity(1).unwrap().is_verifiable);
+        assert_eq!(BholdusTokens::is_verifiable(1), true);
 
         let w = Asset::<Runtime>::get(1).unwrap().destroy_witness();
         assert_ok!(BholdusTokens::destroy(Origin::root(), 1, w));

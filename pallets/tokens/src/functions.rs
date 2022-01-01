@@ -23,6 +23,17 @@ use sp_std::if_std;
 
 // The main implementation block for the module.
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
+    pub fn is_owner(account_id: &T::AccountId, asset_id: T::AssetId) -> bool {
+        TokensByOwner::<T, I>::contains_key((account_id, asset_id))
+    }
+
+    pub fn is_verifiable(id: T::AssetId) -> bool {
+        match <IdentityOf<T, I>>::get(&id) {
+            Some(identity) => identity.is_verifiable,
+            _ => false,
+        }
+    }
+
     pub fn is_valid_symbol(symbol: Vec<u8>) -> bool {
         let str_trim = String::from_utf8(symbol.clone()).unwrap().replace(" ", "");
         let val: Vec<u8> = str_trim.into_bytes();
@@ -203,7 +214,8 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 
                 match action {
                     Action::Burn => ReducedToZero(rest),
-                    Action::Transfer => NoFunds,
+                    Action::Transfer => ReducedToZero(rest),
+                    // Action::Transfer => NoFunds,
                     _ => ReducedToZero(rest),
                 }
             } else {

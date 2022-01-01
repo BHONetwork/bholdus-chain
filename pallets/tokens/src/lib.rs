@@ -138,7 +138,7 @@ use frame_system::{ensure_signed, pallet_prelude::*, Config as SystemConfig};
 use bholdus_support::{
     arithmetic::{self, Signed},
     currency::TransferAll,
-    BalanceStatus, GetByKey, LockIdentifier, MultiCurrency, MultiCurrencyExtended,
+    BalanceStatus, CurrencyDetails, GetByKey, LockIdentifier, MultiCurrency, MultiCurrencyExtended,
     MultiLockableCurrency, MultiReservableCurrency, OnDust,
 };
 
@@ -292,6 +292,18 @@ pub mod pallet {
         /// The minimum amount required to keep an account.
         type ExistentialDeposits: GetByKey<Self::AssetId, Self::Balance>;
     }
+
+    #[pallet::storage]
+    #[pallet::getter(fn tokens_owner)]
+    pub(super) type TokensByOwner<T: Config<I>, I: 'static = ()> = StorageNMap<
+        _,
+        (
+            NMapKey<Blake2_128Concat, T::AccountId>, // owner
+            NMapKey<Blake2_128Concat, T::AssetId>,
+        ),
+        (),
+        ValueQuery,
+    >;
 
     #[pallet::storage]
     #[pallet::getter(fn assets_blacklist)]
@@ -633,6 +645,7 @@ pub mod pallet {
                     is_frozen: false,
                 };
                 Asset::<T, I>::insert(token_id, details);
+                TokensByOwner::<T, I>::insert((owner.clone(), token_id), ());
 
                 let new_deposit = T::MetadataDepositPerByte::get()
                     .saturating_mul(((name.len() + symbol.len()) as u32).into())
@@ -717,6 +730,7 @@ pub mod pallet {
                     is_frozen: false,
                 },
             );
+            TokensByOwner::<T, I>::insert((owner.clone(), id), ());
             Self::deposit_event(Event::ForceCreated(id, owner));
             Ok(())
         }
@@ -1333,6 +1347,17 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         amount: T::Balance,
     ) {
         Self::mutate_account(who, currency_id, |account, _| account.reserved = amount);
+    }
+}
+
+impl<T: Config<I>, I: 'static> CurrencyDetails<T::AccountId> for Pallet<T, I> {
+    type CurrencyId = T::AssetId;
+    fn is_owner(who: &T::AccountId, currency_id: Self::CurrencyId) -> bool {
+        Self::is_owner(who, currency_id)
+    }
+
+    fn is_verifiable(currency_id: Self::CurrencyId) -> bool {
+        Self::is_verifiable(currency_id)
     }
 }
 
