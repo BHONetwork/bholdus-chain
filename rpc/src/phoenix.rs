@@ -2,10 +2,14 @@
 
 use std::sync::{Arc, Mutex};
 
-use crate::{BeefyDeps, GrandpaDeps};
+use crate::{BeefyDeps, GrandpaDeps, RpcConfig};
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-use fc_rpc::{EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride};
+use fc_rpc::{
+    EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
+    SchemaV2Override, StorageOverride,
+};
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
+use pallet_ethereum::EthereumStorageSchema;
 use sc_client_api::backend::{Backend, StorageProvider};
 use sc_client_api::AuxStore;
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
@@ -18,7 +22,6 @@ use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
-use sp_runtime::traits::BlakeTwo256;
 use std::collections::BTreeMap;
 
 /// Full client dependencies.
@@ -43,8 +46,10 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub is_authority: bool,
     /// Network service
     pub network: Arc<NetworkService<Block, Hash>>,
-    /// Backend.
-    pub backend: Arc<fc_db::Backend<Block>>,
+    /// Frontier Backend.
+    pub frontier_backend: Arc<fc_db::Backend<Block>>,
+    /// RPC Config
+    pub rpc_config: RpcConfig,
 }
 
 /// Light client extra dependencies.
@@ -109,7 +114,8 @@ where
         beefy,
         is_authority,
         network,
-        backend,
+        frontier_backend,
+        rpc_config,
     } = deps;
 
     let GrandpaDeps {
@@ -159,25 +165,33 @@ where
         true,
     )));
 
+    let mut overrides_map = BTreeMap::new();
+    overrides_map.insert(
+        EthereumStorageSchema::V1,
+        Box::new(SchemaV1Override::new(client.clone()))
+            as Box<dyn StorageOverride<_> + Send + Sync>,
+    );
+    overrides_map.insert(
+        EthereumStorageSchema::V2,
+        Box::new(SchemaV2Override::new(client.clone()))
+            as Box<dyn StorageOverride<_> + Send + Sync>,
+    );
+
     let overrides = Arc::new(OverrideHandle {
-        schemas: BTreeMap::new(),
+        schemas: overrides_map,
         fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
     });
 
     // Nor any signers
     let signers = Vec::new();
 
-    // Limit the number of queryable logs. In a production chain, this
-    // could be extended back to the CLI. See Moonbeam for example.
-    let max_past_logs = 1024;
-
-    /// Maximum fee history cache size.
-    let fee_history_limit = 1000000;
-    /// Fee history cache.
-    let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-
     // Reasonable default caching inspired by the frontier template
-    let block_data_cache = Arc::new(EthBlockDataCache::new(50, 50));
+    let block_data_cache = Arc::new(EthBlockDataCache::new(
+        rpc_config.eth_log_block_cache,
+        rpc_config.eth_log_block_cache,
+    ));
+
+    let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 
     io.extend_with(EthApiServer::to_delegate(EthApi::new(
         client.clone(),
@@ -187,11 +201,11 @@ where
         network.clone(),
         signers,
         overrides.clone(),
-        backend.clone(),
+        frontier_backend.clone(),
         is_authority,
-        max_past_logs,
+        rpc_config.max_past_logs,
         block_data_cache.clone(),
-        fee_history_limit,
+        rpc_config.fee_history_limit,
         fee_history_cache,
     )));
 

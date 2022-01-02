@@ -1,4 +1,4 @@
-use sc_cli::{KeySubcommand, RunCmd, SignCmd, VanityCmd, VerifyCmd};
+use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
 
 /// An overarching CLI command definition.
@@ -10,6 +10,30 @@ pub struct Cli {
     #[allow(missing_docs)]
     #[structopt(flatten)]
     pub run: RunCmd,
+}
+
+#[allow(missing_docs)]
+#[derive(Debug, StructOpt)]
+pub struct RunCmd {
+    #[allow(missing_docs)]
+    #[structopt(flatten)]
+    pub base: sc_cli::RunCmd,
+
+    /// Maximum number of logs in a query.
+    #[structopt(long, default_value = "10000")]
+    pub max_past_logs: u32,
+
+    /// Maximum fee history cache size.
+    #[structopt(long, default_value = "2048")]
+    pub fee_history_limit: u64,
+
+    /// The dynamic-fee pallet target gas price set by block author
+    #[structopt(long, default_value = "1")]
+    pub target_gas_price: u64,
+
+    /// Ethereum log block cache
+    #[structopt(long, default_value = "50")]
+    pub eth_log_block_cache: usize,
 }
 
 /// Possible subcommands of the main binary.

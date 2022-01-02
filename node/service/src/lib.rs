@@ -2,6 +2,8 @@
 
 use sc_service::ChainSpec;
 
+pub use bholdus_rpc::RpcConfig;
+
 pub mod chain_spec;
 pub mod service;
 

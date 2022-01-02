@@ -38,10 +38,12 @@ pallet-im-online = { version = '4.0.0-dev', git = 'https://github.com/bholdus/su
 pallet-contracts = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 pallet-contracts-rpc = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
-fp-rpc = { default-features = false, version = "3.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
-fc-rpc = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
-fc-rpc-core = { default-features = false, version = "1.1.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
-fc-db = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+
+pallet-ethereum = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+fp-rpc = { version = "3.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-rpc = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-rpc-core = { version = "1.1.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-db = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
 
 phoenix-runtime = { version = "1.0.10", optional = true, path = "../runtime/phoenix" }
 bholdus-primitives = { version = '4.0.0-dev', path = '../primitives/bholdus/' }

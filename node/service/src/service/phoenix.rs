@@ -3,13 +3,11 @@
 pub use phoenix_runtime::RuntimeApi;
 
 use bholdus_primitives::{Block, Hash};
-use bholdus_rpc::DenyUnsafe;
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
 use futures::StreamExt;
 use jsonrpc_core::{MetaIoHandler, Metadata};
-use sc_cli::SubstrateCli;
 use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider, RemoteBackend};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 pub use sc_executor::NativeElseWasmExecutor;
@@ -17,9 +15,7 @@ use sc_finality_grandpa::{self as grandpa};
 use sc_keystore::LocalKeystore;
 use sc_network::{Event, NetworkService};
 use sc_rpc::RpcExtension;
-use sc_service::{
-    config::Configuration, error::Error as ServiceError, BasePath, RpcHandlers, TaskManager,
-};
+use sc_service::{config::Configuration, error::Error as ServiceError, BasePath, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_api::ProvideRuntimeApi;
 use sp_consensus::SlotData;
@@ -28,6 +24,7 @@ use sp_core::{Encode, Pair};
 use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
 use std::sync::Arc;
 use std::time::Duration;
+
 pub struct IoHandler<M: Metadata = ()>(MetaIoHandler<M>);
 type RpcResult = Result<jsonrpc_core::IoHandler<sc_rpc_api::Metadata>, ServiceError>;
 
@@ -169,13 +166,6 @@ pub fn new_partial(
         sc_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
-            impl Fn(
-                DenyUnsafe,
-                bool,
-                Arc<NetworkService<Block, Hash>>,
-                bholdus_rpc::SubscriptionTaskExecutor,
-            ) -> RpcResult,
-            (sc_finality_grandpa::SharedVoterState,),
             (
                 sc_finality_grandpa::GrandpaBlockImport<
                     FullBackend,
@@ -185,6 +175,7 @@ pub fn new_partial(
                 >,
                 sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
                 beefy_gadget::notification::BeefySignedCommitmentSender<Block>,
+                beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
             ),
             Arc<fc_db::Backend<Block>>,
             Option<Telemetry>,
@@ -271,62 +262,12 @@ pub fn new_partial(
     let (beefy_link, beefy_commitment_stream) =
         beefy_gadget::notification::BeefySignedCommitmentStream::channel();
 
-    let import_setup = (grandpa_block_import.clone(), grandpa_link, beefy_link);
-
-    let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
-    let (rpc_extensions_builder, rpc_setup) = {
-        let (_, grandpa_link, _) = &import_setup;
-        let justification_stream = grandpa_link.justification_stream();
-        let shared_authority_set = grandpa_link.shared_authority_set().clone();
-        let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
-        let finality_proof_provider = sc_finality_grandpa::FinalityProofProvider::new_for_service(
-            backend.clone(),
-            Some(shared_authority_set.clone()),
-        );
-
-        let rpc_setup = (shared_voter_state.clone(),);
-        let client = client.clone();
-        let pool = transaction_pool.clone();
-        let select_chain = select_chain.clone();
-        let _keystore = keystore_container.sync_keystore();
-        let chain_spec = config.chain_spec.cloned_box();
-        let frontier_backend = frontier_backend.clone();
-
-        let rpc_extensions_builder =
-            move |deny_unsafe,
-                  is_authority,
-                  network,
-                  subscription_executor: bholdus_rpc::SubscriptionTaskExecutor|
-                  -> RpcResult {
-                let deps = bholdus_rpc::phoenix::FullDeps {
-                    client: client.clone(),
-                    pool: pool.clone(),
-                    graph: pool.pool().clone(),
-                    select_chain: select_chain.clone(),
-                    deny_unsafe,
-                    chain_spec: chain_spec.cloned_box(),
-                    is_authority,
-                    network,
-                    // Grandpa
-                    grandpa: bholdus_rpc::GrandpaDeps {
-                        shared_voter_state: shared_voter_state.clone(),
-                        shared_authority_set: shared_authority_set.clone(),
-                        justification_stream: justification_stream.clone(),
-                        subscription_executor: subscription_executor.clone(),
-                        finality_provider: finality_proof_provider.clone(),
-                    },
-                    beefy: bholdus_rpc::BeefyDeps {
-                        beefy_commitment_stream: beefy_commitment_stream.clone(),
-                        subscription_executor,
-                    },
-                    backend: frontier_backend.clone(),
-                };
-
-                bholdus_rpc::phoenix::create_full(deps).map_err(Into::into)
-            };
-
-        (rpc_extensions_builder, rpc_setup)
-    };
+    let import_setup = (
+        grandpa_block_import.clone(),
+        grandpa_link,
+        beefy_link,
+        beefy_commitment_stream,
+    );
 
     Ok(sc_service::PartialComponents {
         client,
@@ -336,13 +277,7 @@ pub fn new_partial(
         keystore_container,
         select_chain,
         transaction_pool,
-        other: (
-            rpc_extensions_builder,
-            rpc_setup,
-            import_setup,
-            frontier_backend,
-            telemetry,
-        ),
+        other: (import_setup, frontier_backend, telemetry),
     })
 }
 
@@ -361,7 +296,10 @@ fn remote_keystore(_url: &String) -> Result<Arc<LocalKeystore>, &'static str> {
 }
 
 /// Creates a full service from the configuration.
-pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceError> {
+pub fn new_full_base(
+    mut config: Configuration,
+    rpc_config: bholdus_rpc::RpcConfig,
+) -> Result<NewFullBase, ServiceError> {
     let sc_service::PartialComponents {
         client,
         backend,
@@ -370,7 +308,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         mut keystore_container,
         select_chain,
         transaction_pool,
-        other: (rpc_extensions_builder, rpc_setup, import_setup, frontier_backend, mut telemetry),
+        other: (import_setup, frontier_backend, mut telemetry),
     } = new_partial(&config)?;
 
     if let Some(url) = &config.keystore_remote {
@@ -395,7 +333,12 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         .extra_sets
         .push(beefy_gadget::beefy_peers_set_config());
 
-    let (grandpa_block_import, grandpa_link, beefy_signed_commitment_sender) = import_setup;
+    let (
+        grandpa_block_import,
+        grandpa_link,
+        beefy_signed_commitment_sender,
+        beefy_commitment_stream,
+    ) = import_setup;
 
     let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
         backend.clone(),
@@ -432,6 +375,59 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
     let enable_grandpa = !config.disable_grandpa;
     let prometheus_registry = config.prometheus_registry().cloned();
 
+    let (rpc_extensions_builder, rpc_setup) = {
+        let justification_stream = grandpa_link.justification_stream();
+        let shared_authority_set = grandpa_link.shared_authority_set().clone();
+        let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
+        let finality_proof_provider = sc_finality_grandpa::FinalityProofProvider::new_for_service(
+            backend.clone(),
+            Some(shared_authority_set.clone()),
+        );
+
+        let rpc_setup = (shared_voter_state.clone(),);
+        let client = client.clone();
+        let pool = transaction_pool.clone();
+        let select_chain = select_chain.clone();
+        let _keystore = keystore_container.sync_keystore();
+        let chain_spec = config.chain_spec.cloned_box();
+        let frontier_backend = frontier_backend.clone();
+        let network = network.clone();
+
+        let rpc_extensions_builder =
+            move |deny_unsafe,
+                  subscription_executor: bholdus_rpc::SubscriptionTaskExecutor|
+                  -> RpcResult {
+                let deps = bholdus_rpc::phoenix::FullDeps {
+                    client: client.clone(),
+                    pool: pool.clone(),
+                    graph: pool.pool().clone(),
+                    select_chain: select_chain.clone(),
+                    deny_unsafe,
+                    chain_spec: chain_spec.cloned_box(),
+                    is_authority,
+                    network: network.clone(),
+                    // Grandpa
+                    grandpa: bholdus_rpc::GrandpaDeps {
+                        shared_voter_state: shared_voter_state.clone(),
+                        shared_authority_set: shared_authority_set.clone(),
+                        justification_stream: justification_stream.clone(),
+                        subscription_executor: subscription_executor.clone(),
+                        finality_provider: finality_proof_provider.clone(),
+                    },
+                    beefy: bholdus_rpc::BeefyDeps {
+                        beefy_commitment_stream: beefy_commitment_stream.clone(),
+                        subscription_executor,
+                    },
+                    frontier_backend: frontier_backend.clone(),
+                    rpc_config: rpc_config.clone(),
+                };
+
+                bholdus_rpc::phoenix::create_full(deps).map_err(Into::into)
+            };
+
+        (rpc_extensions_builder, rpc_setup)
+    };
+
     let (shared_voter_state,) = rpc_setup;
 
     let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
@@ -440,22 +436,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         client: client.clone(),
         keystore: keystore_container.sync_keystore(),
         network: network.clone(),
-        rpc_extensions_builder: {
-            let wrap_rpc_extensions_builder = {
-                let network = network.clone();
-
-                move |deny_unsafe, subscription_executor| -> RpcResult {
-                    rpc_extensions_builder(
-                        deny_unsafe,
-                        is_authority,
-                        network.clone(),
-                        subscription_executor,
-                    )
-                }
-            };
-
-            Box::new(wrap_rpc_extensions_builder)
-        },
+        rpc_extensions_builder: Box::new(rpc_extensions_builder),
         transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
         on_demand: None,
@@ -622,6 +603,9 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
-    new_full_base(config).map(|NewFullBase { task_manager, .. }| task_manager)
+pub fn new_full(
+    config: Configuration,
+    rpc_config: bholdus_rpc::RpcConfig,
+) -> Result<TaskManager, ServiceError> {
+    new_full_base(config, rpc_config).map(|NewFullBase { task_manager, .. }| task_manager)
 }

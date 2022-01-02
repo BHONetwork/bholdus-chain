@@ -129,9 +129,14 @@ pub fn run() -> sc_cli::Result<()> {
 
     match &cli.subcommand {
         None => {
-            let runner = cli.create_runner(&cli.run)?;
+            let runner = cli.create_runner(&cli.run.base)?;
             runner.run_node_until_exit(|config| async move {
                 let chain_spec = &config.chain_spec;
+                let rpc_config = service::RpcConfig {
+                    eth_log_block_cache: cli.run.eth_log_block_cache,
+                    fee_history_limit: cli.run.fee_history_limit,
+                    max_past_logs: cli.run.max_past_logs,
+                };
 
                 if chain_spec.is_ulas() {
                     #[cfg(feature = "with-ulas-runtime")]
@@ -152,7 +157,7 @@ pub fn run() -> sc_cli::Result<()> {
                 } else {
                     #[cfg(feature = "with-phoenix-runtime")]
                     {
-                        return service::service::phoenix::new_full(config)
+                        return service::service::phoenix::new_full(config, rpc_config)
                             .map_err(sc_cli::Error::Service);
                     }
                     #[cfg(not(feature = "with-phoenix-runtime"))]

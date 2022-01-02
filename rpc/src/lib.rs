@@ -20,6 +20,7 @@ pub use phoenix_runtime;
 use std::sync::Arc;
 
 use bholdus_primitives::{Block, BlockNumber, Hash};
+use fc_rpc_core::types::FeeHistoryCache;
 use sc_finality_grandpa::{
     FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -46,4 +47,19 @@ pub struct BeefyDeps {
     pub beefy_commitment_stream: beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
     /// Executor to drive the subscription manager in the BEEFY RPC handler.
     pub subscription_executor: sc_rpc::SubscriptionTaskExecutor,
+}
+
+/// Configurations of RPC
+#[derive(Clone)]
+pub struct RpcConfig {
+    // pub ethapi: Vec<EthApiCmd>,
+    // pub ethapi_max_permits: u32,
+    // pub ethapi_trace_max_count: u32,
+    // pub ethapi_trace_cache_duration: u64,
+    /// Ethereum log block cache
+    pub eth_log_block_cache: usize,
+    /// Maximum number of logs in a query.
+    pub max_past_logs: u32,
+    /// Maximum fee history cache size.
+    pub fee_history_limit: u64,
 }

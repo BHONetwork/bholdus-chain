@@ -30,8 +30,9 @@ substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/
 pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
-fc-mapping-sync = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
-fc-db = { default-features = false, version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11"}
+fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-db = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-rpc-core = { git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-cli = { version = "0.10.0-dev", features = [
     "wasmtime",
