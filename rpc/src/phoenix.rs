@@ -236,6 +236,8 @@ where
         )));
     }
 
+    io.extend_with(Web3ApiServer::to_delegate(Web3Api::new(client.clone())));
+
     Ok(io)
 }
 
