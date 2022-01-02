@@ -597,6 +597,60 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-evm-precompile-template"
+version = "1.0.10"
+dependencies = [
+ "bholdus-evm-precompile-utils",
+ "derive_more",
+ "fp-evm",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "log",
+ "num_enum",
+ "pallet-evm",
+ "pallet-template",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sha3 0.8.2",
+ "slices",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
+name = "bholdus-evm-precompile-utils"
+version = "1.0.10"
+dependencies = [
+ "bholdus-evm-precompile-utils-macro",
+ "fp-evm",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "hex-literal",
+ "log",
+ "num_enum",
+ "pallet-evm",
+ "parity-scale-codec",
+ "sha3 0.9.1",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
+name = "bholdus-evm-precompile-utils-macro"
+version = "1.0.10"
+dependencies = [
+ "num_enum",
+ "proc-macro2",
+ "quote",
+ "sha3 0.8.2",
+ "syn",
+]
+
+[[package]]
 name = "bholdus-nft"
 version = "4.0.0-dev"
 dependencies = [
@@ -1968,6 +2022,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4443176a9f2c162692bd3d352d745ef9413eec5782a80d8fd6f8a1ac692a07f7"
 
 [[package]]
+name = "faster-hex"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51e2ce894d53b295cf97b05685aa077950ff3e8541af83217fc720a6437169f8"
+
+[[package]]
 name = "fastrand"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1979,7 +2039,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2005,7 +2065,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "2.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "fp-storage",
  "kvdb",
@@ -2021,7 +2081,7 @@ dependencies = [
 [[package]]
 name = "fc-mapping-sync"
 version = "2.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "fc-consensus",
  "fc-db",
@@ -2039,7 +2099,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2085,7 +2145,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2193,7 +2253,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -2207,7 +2267,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "3.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "evm",
  "parity-scale-codec",
@@ -2219,7 +2279,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "3.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2236,7 +2296,7 @@ dependencies = [
 [[package]]
 name = "fp-self-contained"
 version = "1.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "ethereum",
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -2253,7 +2313,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "2.0.0"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 
 [[package]]
 name = "frame-benchmarking"
@@ -4712,6 +4772,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "num_enum"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "720d3ea1055e4e4574c0c0b0f8c3fd4f24c4cdaf465948206dea090b57b526ad"
+dependencies = [
+ "num_enum_derive",
+]
+
+[[package]]
+name = "num_enum_derive"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0d992b768490d7fe0d8586d9b5745f6c49f557da6d81dc982b1d167ad4edbb21"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "object"
 version = "0.26.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4877,7 +4957,7 @@ dependencies = [
 [[package]]
 name = "pallet-base-fee"
 version = "1.0.0"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -5070,7 +5150,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "4.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -5099,7 +5179,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "6.0.0-dev"
-source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#6b4fd31e5461f7d177566fea4c554f20c2980930"
+source = "git+https://github.com/Bholdus/frontier.git?branch=bholdus-monthly-2021-11#cb6846481cafccab1d493acea5ebdc093678f9c1"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -7784,6 +7864,18 @@ name = "slab"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9def91fd1e018fe007022791f865d0ccc9b3a0d5001e01aabb8b40e46000afb5"
+
+[[package]]
+name = "slices"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2086e458a369cdca838e9f6ed04b4cc2e3ce636d99abb80c9e2eada107749cf"
+dependencies = [
+ "faster-hex",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "smallvec"
