@@ -1126,9 +1126,13 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
     }
 }
 
+mod precompiles;
+pub use precompiles::*;
+
 parameter_types! {
     pub const ChainId: u64 = SS58Prefix::get() as u64;
     pub BlockGasLimit: U256 = U256::from(u32::max_value());
+    pub PrecompilesValue: PhoenixPrecompiles<Runtime> = PhoenixPrecompiles::<_>::new();
 }
 
 /// Configure the EVM pallet
@@ -1142,8 +1146,8 @@ impl pallet_evm::Config for Runtime {
     type Currency = Balances;
     type Event = Event;
     type Runner = pallet_evm::runner::stack::Runner<Self>;
-    type PrecompilesType = ();
-    type PrecompilesValue = ();
+    type PrecompilesType = PhoenixPrecompiles<Self>;
+    type PrecompilesValue = PrecompilesValue;
     type ChainId = ChainId;
     type BlockGasLimit = BlockGasLimit;
     type OnChargeTransaction = ();
