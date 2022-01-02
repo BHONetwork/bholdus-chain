@@ -427,13 +427,14 @@ pub fn new_full_base(
                     },
                     beefy: bholdus_rpc::BeefyDeps {
                         beefy_commitment_stream: beefy_commitment_stream.clone(),
-                        subscription_executor,
+                        subscription_executor: subscription_executor.clone(),
                     },
                     frontier_backend: frontier_backend.clone(),
                     rpc_config: rpc_config.clone(),
                     fee_history_cache: fee_history_cache.clone(),
                     overrides: overrides.clone(),
                     filter_pool: filter_pool.clone(),
+                    subscription_executor: subscription_executor.clone(),
                 };
 
                 bholdus_rpc::phoenix::create_full(deps).map_err(Into::into)

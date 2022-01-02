@@ -698,6 +698,7 @@ dependencies = [
  "fc-rpc-core",
  "fp-rpc",
  "jsonrpc-core",
+ "jsonrpc-pubsub",
  "pallet-contracts",
  "pallet-contracts-rpc",
  "pallet-ethereum",

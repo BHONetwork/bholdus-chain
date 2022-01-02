@@ -9,8 +9,10 @@ use fc_rpc::{
     SchemaV2Override, StorageOverride,
 };
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
+use jsonrpc_pubsub::manager::SubscriptionManager;
 use pallet_ethereum::EthereumStorageSchema;
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
+use sc_client_api::client::BlockchainEvents;
 use sc_client_api::AuxStore;
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
@@ -57,6 +59,8 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub overrides: Arc<OverrideHandle<Block>>,
     /// EthFilterApi pool.
     pub filter_pool: Option<FilterPool>,
+    /// Subscription Task Executor
+    pub subscription_executor: SubscriptionTaskExecutor,
 }
 
 /// Light client extra dependencies.
@@ -111,6 +115,7 @@ where
         + Send
         + 'static,
     C: StorageProvider<Block, B>,
+    C: BlockchainEvents<Block>,
     C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
     C::Api: pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>,
@@ -150,6 +155,7 @@ where
         rpc_config,
         overrides,
         filter_pool,
+        ..
     } = deps;
 
     let GrandpaDeps {
@@ -237,6 +243,17 @@ where
     }
 
     io.extend_with(Web3ApiServer::to_delegate(Web3Api::new(client.clone())));
+
+    io.extend_with(EthPubSubApiServer::to_delegate(EthPubSubApi::new(
+        pool.clone(),
+        client.clone(),
+        network.clone(),
+        SubscriptionManager::<HexEncodedIdProvider>::with_id_provider(
+            HexEncodedIdProvider::default(),
+            Arc::new(deps.subscription_executor.clone()),
+        ),
+        overrides,
+    )));
 
     Ok(io)
 }
