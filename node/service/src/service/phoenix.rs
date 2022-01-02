@@ -4,6 +4,8 @@ pub use phoenix_runtime::RuntimeApi;
 
 use bholdus_primitives::{Block, Hash};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+use fc_rpc::EthTask;
+use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
 use futures::StreamExt;
@@ -22,13 +24,14 @@ use sp_consensus::SlotData;
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sp_core::{Encode, Pair};
 use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
-use std::sync::Arc;
+use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
+
+use bholdus_rpc;
 
 pub struct IoHandler<M: Metadata = ()>(MetaIoHandler<M>);
 type RpcResult = Result<jsonrpc_core::IoHandler<sc_rpc_api::Metadata>, ServiceError>;
-
-use bholdus_rpc;
 
 // Our native executor instance.
 pub struct ExecutorDispatch;
@@ -140,7 +143,7 @@ pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
         .as_ref()
         .map(|base_path| base_path.config_dir(config.chain_spec.id()))
         .unwrap_or_else(|| {
-            BasePath::from_project("", "", "phonenix").config_dir(config.chain_spec.id())
+            BasePath::from_project("", "", "phoenix").config_dir(config.chain_spec.id())
         });
     config_dir.join("frontier").join("db")
 }
@@ -375,6 +378,9 @@ pub fn new_full_base(
     let enable_grandpa = !config.disable_grandpa;
     let prometheus_registry = config.prometheus_registry().cloned();
 
+    let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
+    let overrides = bholdus_rpc::phoenix::overrides_handle(client.clone());
+
     let (rpc_extensions_builder, rpc_setup) = {
         let justification_stream = grandpa_link.justification_stream();
         let shared_authority_set = grandpa_link.shared_authority_set().clone();
@@ -392,6 +398,9 @@ pub fn new_full_base(
         let chain_spec = config.chain_spec.cloned_box();
         let frontier_backend = frontier_backend.clone();
         let network = network.clone();
+        let fee_history_cache = fee_history_cache.clone();
+        let overrides = overrides.clone();
+        let rpc_config = rpc_config.clone();
 
         let rpc_extensions_builder =
             move |deny_unsafe,
@@ -420,6 +429,8 @@ pub fn new_full_base(
                     },
                     frontier_backend: frontier_backend.clone(),
                     rpc_config: rpc_config.clone(),
+                    fee_history_cache: fee_history_cache.clone(),
+                    overrides: overrides.clone(),
                 };
 
                 bholdus_rpc::phoenix::create_full(deps).map_err(Into::into)
@@ -456,6 +467,22 @@ pub fn new_full_base(
             SyncStrategy::Normal,
         )
         .for_each(|()| futures::future::ready(())),
+    );
+
+    // Spawn Frontier FeeHistory cache maintenance task.
+    task_manager.spawn_essential_handle().spawn(
+        "frontier-fee-history",
+        EthTask::fee_history_task(
+            Arc::clone(&client),
+            Arc::clone(&overrides),
+            fee_history_cache,
+            rpc_config.fee_history_limit,
+        ),
+    );
+
+    task_manager.spawn_essential_handle().spawn(
+        "frontier-schema-cache-task",
+        EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
     );
 
     if let sc_service::config::Role::Authority { .. } = &role {

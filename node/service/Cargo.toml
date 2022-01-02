@@ -30,9 +30,7 @@ substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/
 pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
-fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
-fc-db = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
-fc-rpc-core = { git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-cli = { version = "0.10.0-dev", features = [
     "wasmtime",
@@ -79,6 +77,11 @@ sp-offchain = { version = "4.0.0-dev", git = "https://github.com/bholdus/substra
 sp-session = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sp-storage = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sp-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
+
+fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-db = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-rpc-core = { git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fc-rpc = { git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
 
 ulas-runtime = { version = "1.0.0", optional = true, path = "../../runtime/ulas" }
 cygnus-runtime = { version = "1.0.0", optional = true, path = "../../runtime/cygnus" }

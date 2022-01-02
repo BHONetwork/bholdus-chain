@@ -2,7 +2,7 @@
 
 use std::sync::{Arc, Mutex};
 
-use crate::{BeefyDeps, GrandpaDeps, RpcConfig};
+use crate::{BeefyDeps, GrandpaDeps, IoHandler, RpcConfig};
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use fc_rpc::{
     EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
@@ -10,7 +10,7 @@ use fc_rpc::{
 };
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use pallet_ethereum::EthereumStorageSchema;
-use sc_client_api::backend::{Backend, StorageProvider};
+use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 use sc_client_api::AuxStore;
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
@@ -22,6 +22,7 @@ use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
+use sp_runtime::traits::BlakeTwo256;
 use std::collections::BTreeMap;
 
 /// Full client dependencies.
@@ -50,6 +51,10 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub frontier_backend: Arc<fc_db::Backend<Block>>,
     /// RPC Config
     pub rpc_config: RpcConfig,
+    /// Fee History Cache
+    pub fee_history_cache: FeeHistoryCache,
+    /// Ethereum Schema Overrides
+    pub overrides: Arc<OverrideHandle<Block>>,
 }
 
 /// Light client extra dependencies.
@@ -64,13 +69,37 @@ pub struct LightDeps<C, F, P> {
     pub fetcher: Arc<F>,
 }
 
-/// A IO handler that uses all Full RPC extensions.
-pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
+pub fn overrides_handle<C, BE>(client: Arc<C>) -> Arc<OverrideHandle<Block>>
+where
+    C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
+    C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError>,
+    C: Send + Sync + 'static,
+    C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+    BE: Backend<Block> + 'static,
+    BE::State: StateBackend<BlakeTwo256>,
+{
+    let mut overrides_map = BTreeMap::new();
+    overrides_map.insert(
+        EthereumStorageSchema::V1,
+        Box::new(SchemaV1Override::new(client.clone()))
+            as Box<dyn StorageOverride<_> + Send + Sync>,
+    );
+    overrides_map.insert(
+        EthereumStorageSchema::V2,
+        Box::new(SchemaV2Override::new(client.clone()))
+            as Box<dyn StorageOverride<_> + Send + Sync>,
+    );
+
+    Arc::new(OverrideHandle {
+        schemas: overrides_map,
+        fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
+    })
+}
 
 /// Instantiate all Full RPC extensions.
 pub fn create_full<C, P, SC, B, A>(
     deps: FullDeps<C, P, SC, B, A>,
-) -> Result<jsonrpc_core::IoHandler<sc_rpc_api::Metadata>, Box<dyn std::error::Error + Send + Sync>>
+) -> Result<IoHandler, Box<dyn std::error::Error + Send + Sync>>
 where
     C: ProvideRuntimeApi<Block>
         + HeaderBackend<Block>
@@ -115,7 +144,9 @@ where
         is_authority,
         network,
         frontier_backend,
+        fee_history_cache,
         rpc_config,
+        overrides,
     } = deps;
 
     let GrandpaDeps {
@@ -165,23 +196,6 @@ where
         true,
     )));
 
-    let mut overrides_map = BTreeMap::new();
-    overrides_map.insert(
-        EthereumStorageSchema::V1,
-        Box::new(SchemaV1Override::new(client.clone()))
-            as Box<dyn StorageOverride<_> + Send + Sync>,
-    );
-    overrides_map.insert(
-        EthereumStorageSchema::V2,
-        Box::new(SchemaV2Override::new(client.clone()))
-            as Box<dyn StorageOverride<_> + Send + Sync>,
-    );
-
-    let overrides = Arc::new(OverrideHandle {
-        schemas: overrides_map,
-        fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
-    });
-
     // Nor any signers
     let signers = Vec::new();
 
@@ -190,8 +204,6 @@ where
         rpc_config.eth_log_block_cache,
         rpc_config.eth_log_block_cache,
     ));
-
-    let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 
     io.extend_with(EthApiServer::to_delegate(EthApi::new(
         client.clone(),

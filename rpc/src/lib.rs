@@ -20,7 +20,6 @@ pub use phoenix_runtime;
 use std::sync::Arc;
 
 use bholdus_primitives::{Block, BlockNumber, Hash};
-use fc_rpc_core::types::FeeHistoryCache;
 use sc_finality_grandpa::{
     FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -63,3 +62,6 @@ pub struct RpcConfig {
     /// Maximum fee history cache size.
     pub fee_history_limit: u64,
 }
+
+/// A IO handler that uses all Full RPC extensions.
+pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
