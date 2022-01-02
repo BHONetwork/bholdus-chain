@@ -4,16 +4,22 @@ pub use phoenix_runtime::RuntimeApi;
 
 use bholdus_primitives::{Block, Hash};
 use bholdus_rpc::DenyUnsafe;
+use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use frame_system_rpc_runtime_api::AccountNonceApi;
 use futures::prelude::*;
-use sc_client_api::{BlockchainEvents, BlockBackend, ExecutorProvider, RemoteBackend};
+use futures::StreamExt;
+use jsonrpc_core::{MetaIoHandler, Metadata};
+use sc_cli::SubstrateCli;
+use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider, RemoteBackend};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 pub use sc_executor::NativeElseWasmExecutor;
 use sc_finality_grandpa::{self as grandpa};
 use sc_keystore::LocalKeystore;
 use sc_network::{Event, NetworkService};
-use sc_service::{BasePath, config::Configuration, error::Error as ServiceError, RpcHandlers, TaskManager};
 use sc_rpc::RpcExtension;
+use sc_service::{
+    config::Configuration, error::Error as ServiceError, BasePath, RpcHandlers, TaskManager,
+};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_api::ProvideRuntimeApi;
 use sp_consensus::SlotData;
@@ -21,11 +27,7 @@ use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sp_core::{Encode, Pair};
 use sp_runtime::{generic, traits::Block as BlockT, SaturatedConversion};
 use std::sync::Arc;
-use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
-use futures::StreamExt;
-use sc_cli::SubstrateCli;
 use std::time::Duration;
-use jsonrpc_core::{Metadata, MetaIoHandler};
 pub struct IoHandler<M: Metadata = ()>(MetaIoHandler<M>);
 type RpcResult = Result<jsonrpc_core::IoHandler<sc_rpc_api::Metadata>, ServiceError>;
 
@@ -136,26 +138,25 @@ pub fn create_extrinsic(
 }
 
 pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
-	let config_dir = config
-		.base_path
-		.as_ref()
-		.map(|base_path| base_path.config_dir(config.chain_spec.id()))
-		.unwrap_or_else(|| {
-			BasePath::from_project("", "", "phonenix")
-				.config_dir(config.chain_spec.id())
-		});
-	config_dir.join("frontier").join("db")
+    let config_dir = config
+        .base_path
+        .as_ref()
+        .map(|base_path| base_path.config_dir(config.chain_spec.id()))
+        .unwrap_or_else(|| {
+            BasePath::from_project("", "", "phonenix").config_dir(config.chain_spec.id())
+        });
+    config_dir.join("frontier").join("db")
 }
 
 pub fn open_frontier_backend(config: &Configuration) -> Result<Arc<fc_db::Backend<Block>>, String> {
-	Ok(Arc::new(fc_db::Backend::<Block>::new(
-		&fc_db::DatabaseSettings {
-			source: fc_db::DatabaseSettingsSrc::RocksDb {
-				path: frontier_database_dir(&config),
-				cache_size: 0,
-			},
-		},
-	)?))
+    Ok(Arc::new(fc_db::Backend::<Block>::new(
+        &fc_db::DatabaseSettings {
+            source: fc_db::DatabaseSettingsSrc::RocksDb {
+                path: frontier_database_dir(&config),
+                cache_size: 0,
+            },
+        },
+    )?))
 }
 
 pub fn new_partial(
@@ -169,11 +170,11 @@ pub fn new_partial(
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
             impl Fn(
-				DenyUnsafe,
+                DenyUnsafe,
                 bool,
-				Arc<NetworkService<Block, Hash>>,
-				bholdus_rpc::SubscriptionTaskExecutor,
-			) -> RpcResult,
+                Arc<NetworkService<Block, Hash>>,
+                bholdus_rpc::SubscriptionTaskExecutor,
+            ) -> RpcResult,
             (sc_finality_grandpa::SharedVoterState,),
             (
                 sc_finality_grandpa::GrandpaBlockImport<
@@ -292,7 +293,11 @@ pub fn new_partial(
         let frontier_backend = frontier_backend.clone();
 
         let rpc_extensions_builder =
-            move |deny_unsafe, is_authority, network, subscription_executor: bholdus_rpc::SubscriptionTaskExecutor|-> RpcResult {
+            move |deny_unsafe,
+                  is_authority,
+                  network,
+                  subscription_executor: bholdus_rpc::SubscriptionTaskExecutor|
+                  -> RpcResult {
                 let deps = bholdus_rpc::phoenix::FullDeps {
                     client: client.clone(),
                     pool: pool.clone(),
@@ -331,7 +336,13 @@ pub fn new_partial(
         keystore_container,
         select_chain,
         transaction_pool,
-        other: (rpc_extensions_builder, rpc_setup, import_setup, frontier_backend, telemetry),
+        other: (
+            rpc_extensions_builder,
+            rpc_setup,
+            import_setup,
+            frontier_backend,
+            telemetry,
+        ),
     })
 }
 
@@ -430,21 +441,21 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         keystore: keystore_container.sync_keystore(),
         network: network.clone(),
         rpc_extensions_builder: {
-			let wrap_rpc_extensions_builder = {
-				let network = network.clone();
+            let wrap_rpc_extensions_builder = {
+                let network = network.clone();
 
-				move |deny_unsafe, subscription_executor| -> RpcResult {
-					rpc_extensions_builder(
-						deny_unsafe,
-						is_authority,
-						network.clone(),
-						subscription_executor,
-					)
-				}
-			};
+                move |deny_unsafe, subscription_executor| -> RpcResult {
+                    rpc_extensions_builder(
+                        deny_unsafe,
+                        is_authority,
+                        network.clone(),
+                        subscription_executor,
+                    )
+                }
+            };
 
-			Box::new(wrap_rpc_extensions_builder)
-		},
+            Box::new(wrap_rpc_extensions_builder)
+        },
         transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
         on_demand: None,
@@ -454,17 +465,17 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
     })?;
 
     task_manager.spawn_essential_handle().spawn(
-		"frontier-mapping-sync-worker",
-		MappingSyncWorker::new(
-			client.import_notification_stream(),
-			Duration::new(6, 0),
-			client.clone(),
-			backend.clone(),
-			frontier_backend.clone(),
-			SyncStrategy::Normal,
-		)
-		.for_each(|()| futures::future::ready(())),
-	);
+        "frontier-mapping-sync-worker",
+        MappingSyncWorker::new(
+            client.import_notification_stream(),
+            Duration::new(6, 0),
+            client.clone(),
+            backend.clone(),
+            frontier_backend.clone(),
+            SyncStrategy::Normal,
+        )
+        .for_each(|()| futures::future::ready(())),
+    );
 
     if let sc_service::config::Role::Authority { .. } = &role {
         let proposer_factory = sc_basic_authorship::ProposerFactory::new(

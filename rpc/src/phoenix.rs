@@ -4,24 +4,22 @@ use std::sync::{Arc, Mutex};
 
 use crate::{BeefyDeps, GrandpaDeps};
 use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use fc_rpc::{EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride};
+use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use sc_client_api::backend::{Backend, StorageProvider};
 use sc_client_api::AuxStore;
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
+use sc_network::NetworkService;
 pub use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
-use sc_transaction_pool_api::TransactionPool;
 use sc_transaction_pool::{ChainApi, Pool};
-use std::collections::BTreeMap;
-use fc_rpc::{
-	EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride,
-};
-use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
-use sp_runtime::traits::BlakeTwo256;
+use sc_transaction_pool_api::TransactionPool;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
-use sc_network::NetworkService;
+use sp_runtime::traits::BlakeTwo256;
+use std::collections::BTreeMap;
 
 /// Full client dependencies.
 pub struct FullDeps<C, P, SC, B, A: ChainApi> {
@@ -30,7 +28,7 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     /// Transaction pool instance.
     pub pool: Arc<P>,
     /// Graph pool instance.
-	pub graph: Arc<Pool<A>>,
+    pub graph: Arc<Pool<A>>,
     /// The SelectChain Strategy
     pub select_chain: SC,
     /// A copy of the chain spec.
@@ -44,9 +42,9 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     /// The Node authority flag
     pub is_authority: bool,
     /// Network service
-	pub network: Arc<NetworkService<Block, Hash>>,
+    pub network: Arc<NetworkService<Block, Hash>>,
     /// Backend.
-	pub backend: Arc<fc_db::Backend<Block>>,
+    pub backend: Arc<fc_db::Backend<Block>>,
 }
 
 /// Light client extra dependencies.
@@ -90,10 +88,10 @@ where
     A: ChainApi<Block = Block> + 'static,
 {
     use fc_rpc::{
-		EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi,
-		EthPubSubApiServer, EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api,
-		Web3ApiServer,
-	};
+        EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi,
+        EthPubSubApiServer, EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api,
+        Web3ApiServer,
+    };
     use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_mmr_rpc::{Mmr, MmrApi};
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
@@ -155,47 +153,47 @@ where
     ));
 
     io.extend_with(NetApiServer::to_delegate(NetApi::new(
-		client.clone(),
-		network.clone(),
-		// Whether to format the `peer_count` response as Hex (default) or not.
-		true,
-	)));
+        client.clone(),
+        network.clone(),
+        // Whether to format the `peer_count` response as Hex (default) or not.
+        true,
+    )));
 
     let overrides = Arc::new(OverrideHandle {
-		schemas: BTreeMap::new(),
-		fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
-	});
+        schemas: BTreeMap::new(),
+        fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
+    });
 
-	// Nor any signers
-	let signers = Vec::new();
+    // Nor any signers
+    let signers = Vec::new();
 
-	// Limit the number of queryable logs. In a production chain, this
-	// could be extended back to the CLI. See Moonbeam for example.
-	let max_past_logs = 1024;
+    // Limit the number of queryable logs. In a production chain, this
+    // could be extended back to the CLI. See Moonbeam for example.
+    let max_past_logs = 1024;
 
     /// Maximum fee history cache size.
-	let fee_history_limit = 1000000;
-	/// Fee history cache.
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
+    let fee_history_limit = 1000000;
+    /// Fee history cache.
+    let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 
-	// Reasonable default caching inspired by the frontier template
-	let block_data_cache = Arc::new(EthBlockDataCache::new(50, 50));
+    // Reasonable default caching inspired by the frontier template
+    let block_data_cache = Arc::new(EthBlockDataCache::new(50, 50));
 
-	io.extend_with(EthApiServer::to_delegate(EthApi::new(
-		client.clone(),
-		pool.clone(),
-		graph,
-		phoenix_runtime::TransactionConverter,
-		network.clone(),
-		signers,
-		overrides.clone(),
-		backend.clone(),
-		is_authority,
-		max_past_logs,
-		block_data_cache.clone(),
+    io.extend_with(EthApiServer::to_delegate(EthApi::new(
+        client.clone(),
+        pool.clone(),
+        graph,
+        phoenix_runtime::TransactionConverter,
+        network.clone(),
+        signers,
+        overrides.clone(),
+        backend.clone(),
+        is_authority,
+        max_past_logs,
+        block_data_cache.clone(),
         fee_history_limit,
-		fee_history_cache,
-	)));
+        fee_history_cache,
+    )));
 
     Ok(io)
 }
