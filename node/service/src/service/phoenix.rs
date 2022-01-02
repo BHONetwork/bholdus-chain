@@ -380,6 +380,7 @@ pub fn new_full_base(
 
     let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
     let overrides = bholdus_rpc::phoenix::overrides_handle(client.clone());
+    let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 
     let (rpc_extensions_builder, rpc_setup) = {
         let justification_stream = grandpa_link.justification_stream();
@@ -401,6 +402,7 @@ pub fn new_full_base(
         let fee_history_cache = fee_history_cache.clone();
         let overrides = overrides.clone();
         let rpc_config = rpc_config.clone();
+        let filter_pool = filter_pool.clone();
 
         let rpc_extensions_builder =
             move |deny_unsafe,
@@ -431,6 +433,7 @@ pub fn new_full_base(
                     rpc_config: rpc_config.clone(),
                     fee_history_cache: fee_history_cache.clone(),
                     overrides: overrides.clone(),
+                    filter_pool: filter_pool.clone(),
                 };
 
                 bholdus_rpc::phoenix::create_full(deps).map_err(Into::into)
@@ -484,6 +487,16 @@ pub fn new_full_base(
         "frontier-schema-cache-task",
         EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
     );
+
+    // Spawn Frontier EthFilterApi maintenance task.
+    if let Some(filter_pool) = filter_pool {
+        // Each filter is allowed to stay in the pool for 100 blocks.
+        const FILTER_RETAIN_THRESHOLD: u64 = 100;
+        task_manager.spawn_essential_handle().spawn(
+            "frontier-filter-pool",
+            EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
+        );
+    }
 
     if let sc_service::config::Role::Authority { .. } = &role {
         let proposer_factory = sc_basic_authorship::ProposerFactory::new(

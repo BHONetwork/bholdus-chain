@@ -55,6 +55,8 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub fee_history_cache: FeeHistoryCache,
     /// Ethereum Schema Overrides
     pub overrides: Arc<OverrideHandle<Block>>,
+    /// EthFilterApi pool.
+    pub filter_pool: Option<FilterPool>,
 }
 
 /// Light client extra dependencies.
@@ -147,6 +149,7 @@ where
         fee_history_cache,
         rpc_config,
         overrides,
+        filter_pool,
     } = deps;
 
     let GrandpaDeps {
@@ -220,6 +223,18 @@ where
         rpc_config.fee_history_limit,
         fee_history_cache,
     )));
+
+    if let Some(filter_pool) = filter_pool {
+        io.extend_with(EthFilterApiServer::to_delegate(EthFilterApi::new(
+            client.clone(),
+            frontier_backend.clone(),
+            filter_pool.clone(),
+            500 as usize, // max stored filters
+            overrides.clone(),
+            rpc_config.max_past_logs,
+            block_data_cache.clone(),
+        )));
+    }
 
     Ok(io)
 }
