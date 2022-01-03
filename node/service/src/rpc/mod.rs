@@ -1,9 +1,11 @@
-//! Phoenix-specific RPCs implementation.
+//! A collection of node-specific RPC methods.
+//! Substrate provides the `sc-rpc` crate, which defines the core RPC layer
+//! used by Substrate nodes. This file extends those RPC definitions with
+//! capabilities that are specific to this project's runtime configuration.
 
-use std::sync::{Arc, Mutex};
+#![warn(missing_docs)]
 
-use crate::{BeefyDeps, GrandpaDeps, IoHandler, RpcConfig};
-use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use crate::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use fc_rpc::{
     EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
     SchemaV2Override, StorageOverride,
@@ -14,6 +16,9 @@ use pallet_ethereum::EthereumStorageSchema;
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 use sc_client_api::client::BlockchainEvents;
 use sc_client_api::AuxStore;
+use sc_finality_grandpa::{
+    FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
+};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
 pub use sc_rpc::SubscriptionTaskExecutor;
@@ -26,6 +31,52 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_runtime::traits::BlakeTwo256;
 use std::collections::BTreeMap;
+use std::error::Error;
+use std::sync::Arc;
+
+/// A IO handler that uses all Full RPC extensions.
+pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
+/// A type representing all RPC extensions.
+pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
+/// RPC result.
+pub type RpcResult = Result<RpcExtension, Box<dyn Error + Send + Sync>>;
+
+/// Extra dependencies for GRANDPA
+pub struct GrandpaDeps<B> {
+    /// Voting round info.
+    pub shared_voter_state: SharedVoterState,
+    /// Authority set info.
+    pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
+    /// Receives notifications about justification events from Grandpa.
+    pub justification_stream: GrandpaJustificationStream<Block>,
+    /// Executor to drive the subscription manager in the Grandpa RPC handler.
+    pub subscription_executor: SubscriptionTaskExecutor,
+    /// Finality proof provider.
+    pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
+}
+
+/// Extra dependencies for BEEFY
+pub struct BeefyDeps {
+    /// Receives notifications about signed commitment events from BEEFY.
+    pub beefy_commitment_stream: beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
+    /// Executor to drive the subscription manager in the BEEFY RPC handler.
+    pub subscription_executor: sc_rpc::SubscriptionTaskExecutor,
+}
+
+/// Configurations of RPC
+#[derive(Clone)]
+pub struct RpcConfig {
+    // pub ethapi: Vec<EthApiCmd>,
+    // pub ethapi_max_permits: u32,
+    // pub ethapi_trace_max_count: u32,
+    // pub ethapi_trace_cache_duration: u64,
+    /// Ethereum log block cache
+    pub eth_log_block_cache: usize,
+    /// Maximum number of logs in a query.
+    pub max_past_logs: u32,
+    /// Maximum fee history cache size.
+    pub fee_history_limit: u64,
+}
 
 /// Full client dependencies.
 pub struct FullDeps<C, P, SC, B, A: ChainApi> {
@@ -103,9 +154,7 @@ where
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B, A>(
-    deps: FullDeps<C, P, SC, B, A>,
-) -> Result<IoHandler, Box<dyn std::error::Error + Send + Sync>>
+pub fn create_full<C, P, SC, B, A>(deps: FullDeps<C, P, SC, B, A>) -> RpcResult
 where
     C: ProvideRuntimeApi<Block>
         + HeaderBackend<Block>

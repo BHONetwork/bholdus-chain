@@ -3,7 +3,6 @@ members = [
     'node',
     'node/cli',
     'node/service',
-    'rpc',
 
     'primitives/bholdus',
     'primitives/bsc',

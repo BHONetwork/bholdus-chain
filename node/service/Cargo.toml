@@ -18,6 +18,7 @@ serde = { version = "1.0.124", features = ["derive"] }
 serde_json = "1.0.68"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
 jsonrpc-core = "18.0.0"
+jsonrpc-pubsub = "18.0.0"
 
 beefy-gadget = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
 beefy-gadget-rpc = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
@@ -30,6 +31,8 @@ substrate-frame-rpc-system = { version = "4.0.0-dev", git = "https://github.com/
 pallet-transaction-payment-rpc = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 pallet-im-online = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
+pallet-contracts-rpc = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
+pallet-mmr-rpc = { version = '3.0.0', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-cli = { version = "0.10.0-dev", features = [
@@ -54,6 +57,7 @@ sc-service = { version = "0.10.0-dev", features = [
 ], git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-telemetry = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
+sc-transaction-pool-api = { version = '4.0.0-dev', git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11' }
 sc-network = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-authority-discovery = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 sc-chain-spec = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
@@ -82,6 +86,9 @@ fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/Bholdus/fro
 fc-db = { version = "2.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
 fc-rpc-core = { git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
 fc-rpc = { git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+fp-rpc = { version = "3.0.0-dev", git = "https://github.com/Bholdus/frontier.git", branch = "bholdus-monthly-2021-11" }
+pallet-ethereum = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+
 
 ulas-runtime = { version = "1.0.0", optional = true, path = "../../runtime/ulas" }
 cygnus-runtime = { version = "1.0.0", optional = true, path = "../../runtime/cygnus" }
