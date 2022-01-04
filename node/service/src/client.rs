@@ -47,6 +47,7 @@ pub trait RuntimeApiCollection:
     + pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
     + pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
     + fp_rpc::EthereumRuntimeRPCApi<Block>
+    + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>
 where
     <Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
@@ -68,7 +69,8 @@ where
         + pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
         + pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
         + pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
-        + fp_rpc::EthereumRuntimeRPCApi<Block>,
+        + fp_rpc::EthereumRuntimeRPCApi<Block>
+        + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>,
     <Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
 }
@@ -135,9 +137,9 @@ pub trait ExecuteWithClient {
         Client: AbstractClient<Block, Backend, Api = Api> + 'static;
 }
 
-/// A handle to a Moonbeam client instance.
+/// A handle to a Bholdus client instance.
 ///
-/// The Moonbeam service supports multiple different runtimes (Moonbase, Moonbeam
+/// The Bholdus service supports multiple different runtimes (Phoenix, Cygnus, Ulas
 /// itself, etc). As each runtime has a specialized client, we need to hide them
 /// behind a trait. This is this trait.
 ///
@@ -147,7 +149,7 @@ pub trait ClientHandle {
     fn execute_with<T: ExecuteWithClient>(&self, t: T) -> T::Output;
 }
 
-/// A client instance of Moonbeam.
+/// A client instance of Bholdus.
 #[derive(Clone)]
 pub enum Client {
     #[cfg(feature = "with-ulas-runtime")]

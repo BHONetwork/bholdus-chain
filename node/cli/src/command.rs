@@ -136,6 +136,10 @@ pub fn run() -> sc_cli::Result<()> {
                     eth_log_block_cache: cli.run.eth_log_block_cache,
                     fee_history_limit: cli.run.fee_history_limit,
                     max_past_logs: cli.run.max_past_logs,
+                    ethapi: cli.run.ethapi,
+                    ethapi_max_permits: cli.run.ethapi_max_permits,
+                    ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,
+                    ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
                 };
 
                 if chain_spec.is_ulas() {

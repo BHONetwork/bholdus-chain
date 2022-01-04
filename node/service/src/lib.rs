@@ -50,6 +50,8 @@ pub mod chain_spec;
 pub mod client;
 pub mod rpc;
 
+pub use rpc::EthApiCmd;
+
 pub use client::*;
 
 #[cfg(feature = "with-ulas-runtime")]
@@ -77,10 +79,13 @@ pub struct UlasExecutor;
 impl sc_executor::NativeExecutionDispatch for UlasExecutor {
     /// Only enable the benchmarking host functions when we actually want to benchmark.
     #[cfg(feature = "runtime-benchmarks")]
-    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    type ExtendHostFunctions = (
+        frame_benchmarking::benchmarking::HostFunctions,
+        bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+    );
     /// Otherwise we only use the default Substrate host functions.
     #[cfg(not(feature = "runtime-benchmarks"))]
-    type ExtendHostFunctions = ();
+    type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
 
     fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
         ulas_runtime::api::dispatch(method, data)
@@ -98,10 +103,13 @@ pub struct CygnusExecutor;
 impl sc_executor::NativeExecutionDispatch for CygnusExecutor {
     /// Only enable the benchmarking host functions when we actually want to benchmark.
     #[cfg(feature = "runtime-benchmarks")]
-    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    type ExtendHostFunctions = (
+        frame_benchmarking::benchmarking::HostFunctions,
+        bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+    );
     /// Otherwise we only use the default Substrate host functions.
     #[cfg(not(feature = "runtime-benchmarks"))]
-    type ExtendHostFunctions = ();
+    type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
 
     fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
         cygnus_runtime::api::dispatch(method, data)
@@ -119,10 +127,13 @@ pub struct PhoenixExecutor;
 impl sc_executor::NativeExecutionDispatch for PhoenixExecutor {
     /// Only enable the benchmarking host functions when we actually want to benchmark.
     #[cfg(feature = "runtime-benchmarks")]
-    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    type ExtendHostFunctions = (
+        frame_benchmarking::benchmarking::HostFunctions,
+        bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+    );
     /// Otherwise we only use the default Substrate host functions.
     #[cfg(not(feature = "runtime-benchmarks"))]
-    type ExtendHostFunctions = ();
+    type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
 
     fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
         phoenix_runtime::api::dispatch(method, data)
@@ -492,6 +503,41 @@ where
     let overrides = rpc::overrides_handle(client.clone());
     let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 
+    // Spawning Ethereum tasks
+    rpc::spawn_essential_tasks(rpc::SpawnTasksParams {
+        task_manager: &task_manager,
+        client: client.clone(),
+        substrate_backend: backend.clone(),
+        frontier_backend: frontier_backend.clone(),
+        filter_pool: filter_pool.clone(),
+        overrides: overrides.clone(),
+        fee_history_limit: rpc_config.fee_history_limit,
+        fee_history_cache: fee_history_cache.clone(),
+    });
+
+    let ethapi_cmd = rpc_config.ethapi.clone();
+    let tracing_requesters =
+        if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace) {
+            rpc::tracing::spawn_tracing_tasks(
+                &rpc_config,
+                rpc::SpawnTasksParams {
+                    task_manager: &task_manager,
+                    client: client.clone(),
+                    substrate_backend: backend.clone(),
+                    frontier_backend: frontier_backend.clone(),
+                    filter_pool: filter_pool.clone(),
+                    overrides: overrides.clone(),
+                    fee_history_limit: rpc_config.fee_history_limit,
+                    fee_history_cache: fee_history_cache.clone(),
+                },
+            )
+        } else {
+            rpc::tracing::RpcRequesters {
+                debug: None,
+                trace: None,
+            }
+        };
+
     let (rpc_extensions_builder, rpc_setup) = {
         let justification_stream = grandpa_link.justification_stream();
         let shared_authority_set = grandpa_link.shared_authority_set().clone();
@@ -545,7 +591,19 @@ where
                     subscription_executor: subscription_executor.clone(),
                 };
 
-                rpc::create_full(deps).map_err(Into::into)
+                let mut io = rpc::create_full(deps);
+
+                // Ethereum Tracing RPC
+                if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace)
+                {
+                    rpc::tracing::extend_with_tracing(
+                        client.clone(),
+                        tracing_requesters.clone(),
+                        rpc_config.ethapi_trace_max_count,
+                        &mut io,
+                    );
+                }
+                Ok(io)
             };
 
         (rpc_extensions_builder, rpc_setup)
@@ -567,45 +625,6 @@ where
         system_rpc_tx,
         telemetry: telemetry.as_mut(),
     })?;
-
-    task_manager.spawn_essential_handle().spawn(
-        "frontier-mapping-sync-worker",
-        MappingSyncWorker::new(
-            client.import_notification_stream(),
-            Duration::new(6, 0),
-            client.clone(),
-            backend.clone(),
-            frontier_backend.clone(),
-            SyncStrategy::Normal,
-        )
-        .for_each(|()| futures::future::ready(())),
-    );
-
-    // Spawn Frontier FeeHistory cache maintenance task.
-    task_manager.spawn_essential_handle().spawn(
-        "frontier-fee-history",
-        EthTask::fee_history_task(
-            Arc::clone(&client),
-            Arc::clone(&overrides),
-            fee_history_cache,
-            rpc_config.fee_history_limit,
-        ),
-    );
-
-    task_manager.spawn_essential_handle().spawn(
-        "frontier-schema-cache-task",
-        EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
-    );
-
-    // Spawn Frontier EthFilterApi maintenance task.
-    if let Some(filter_pool) = filter_pool {
-        // Each filter is allowed to stay in the pool for 100 blocks.
-        const FILTER_RETAIN_THRESHOLD: u64 = 100;
-        task_manager.spawn_essential_handle().spawn(
-            "frontier-filter-pool",
-            EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
-        );
-    }
 
     if let sc_service::config::Role::Authority { .. } = &role {
         let proposer_factory = sc_basic_authorship::ProposerFactory::new(

@@ -1,0 +1,41 @@
+[package]
+name = "bholdus-evm-rpc-debug"
+authors = ["Bholdus"]
+edition = "2018"
+homepage = "https://bholdus.com"
+license = "GPL-3.0-only"
+repository = "https://github.com/bholdus/bholdus-chain/"
+version = "0.1.0"
+
+[dependencies]
+futures = { version = "0.3", features = ["compat"] }
+jsonrpc-core = "18.0.0"
+tokio = { version = "1.10", features = ["sync", "time"] }
+
+# Bholdus
+bholdus-client-evm-tracing = { path = "../../evm-tracing" }
+bholdus-evm-rpc-core-debug = { path = "../../rpc-core/debug" }
+bholdus-evm-rpc-core-types = { path = "../../rpc-core/types" }
+bholdus-evm-rpc-primitives-debug = { path = "../../../../primitives/evm/rpc/debug" }
+
+# Substrate
+sc-client-api = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sc-utils = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-api = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-block-builder = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-blockchain = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-core = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-io = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-runtime = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+
+# Frontier
+ethereum = { version = "0.10.0", default-features = false, features = [
+    "with-codec",
+] }
+ethereum-types = "0.12.0"
+fc-consensus = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+fc-db = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+fc-rpc = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11", features = [
+    "rpc_binary_search_estimate",
+] }
+fp-rpc = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }

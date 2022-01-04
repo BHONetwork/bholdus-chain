@@ -1,0 +1,44 @@
+[package]
+name = "bholdus-evm-rpc-trace"
+authors = ["Bholdus"]
+edition = "2018"
+homepage = "https://bholdus.com"
+license = "GPL-3.0-only"
+repository = "https://github.com/Bholdus/bholdus-chain/"
+version = "0.6.0"
+
+[dependencies]
+ethereum = { version = "0.10.0", features = ["with-codec"] }
+ethereum-types = "0.12.0"
+futures = { version = "0.3" }
+jsonrpc-core = "18.0.0"
+serde = { version = "1.0", features = ["derive"] }
+sha3 = "0.9"
+tokio = { version = "1.10", features = ["sync", "time"] }
+tracing = "0.1.25"
+
+# Bholdus
+bholdus-client-evm-tracing = { path = "../../evm-tracing" }
+bholdus-evm-rpc-core-trace = { path = "../../rpc-core/trace" }
+bholdus-evm-rpc-core-types = { path = "../../rpc-core/types" }
+bholdus-evm-rpc-primitives-debug = { path = "../../../../primitives/evm/rpc/debug" }
+
+# Substrate
+sc-client-api = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sc-network = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sc-utils = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-api = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-block-builder = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-blockchain = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-io = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-runtime = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-std = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sp-transaction-pool = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+
+# Frontier
+fc-consensus = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+fc-rpc = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11", features = [
+    "rpc_binary_search_estimate",
+] }
+fc-rpc-core = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+fp-rpc = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }

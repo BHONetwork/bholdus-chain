@@ -5,17 +5,22 @@
 
 #![warn(missing_docs)]
 
+use crate::client::RuntimeApiCollection;
 use crate::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{
-    EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
+    EthBlockDataCache, EthTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
     SchemaV2Override, StorageOverride,
 };
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
+use fp_rpc::EthereumRuntimeRPCApi;
+use futures::prelude::*;
 use jsonrpc_pubsub::manager::SubscriptionManager;
 use pallet_ethereum::EthereumStorageSchema;
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 use sc_client_api::client::BlockchainEvents;
 use sc_client_api::AuxStore;
+use sc_client_api::BlockOf;
 use sc_finality_grandpa::{
     FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -23,16 +28,22 @@ use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
 pub use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
+use sc_service::TaskManager;
 use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::TransactionPool;
-use sp_api::ProvideRuntimeApi;
+use sp_api::{HeaderT, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder;
-use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
+use sp_blockchain::{
+    Backend as BlockchainBackend, Error as BlockChainError, HeaderBackend, HeaderMetadata,
+};
 use sp_consensus::SelectChain;
-use sp_runtime::traits::BlakeTwo256;
+use sp_core::H256;
+use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
 use std::collections::BTreeMap;
 use std::error::Error;
+use std::str::FromStr;
 use std::sync::Arc;
+use std::time::Duration;
 
 /// A IO handler that uses all Full RPC extensions.
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
@@ -40,6 +51,8 @@ pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 /// RPC result.
 pub type RpcResult = Result<RpcExtension, Box<dyn Error + Send + Sync>>;
+
+pub mod tracing;
 
 /// Extra dependencies for GRANDPA
 pub struct GrandpaDeps<B> {
@@ -61,21 +74,6 @@ pub struct BeefyDeps {
     pub beefy_commitment_stream: beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
     /// Executor to drive the subscription manager in the BEEFY RPC handler.
     pub subscription_executor: sc_rpc::SubscriptionTaskExecutor,
-}
-
-/// Configurations of RPC
-#[derive(Clone)]
-pub struct RpcConfig {
-    // pub ethapi: Vec<EthApiCmd>,
-    // pub ethapi_max_permits: u32,
-    // pub ethapi_trace_max_count: u32,
-    // pub ethapi_trace_cache_duration: u64,
-    /// Ethereum log block cache
-    pub eth_log_block_cache: usize,
-    /// Maximum number of logs in a query.
-    pub max_past_logs: u32,
-    /// Maximum fee history cache size.
-    pub fee_history_limit: u64,
 }
 
 /// Full client dependencies.
@@ -126,6 +124,119 @@ pub struct LightDeps<C, F, P> {
     pub fetcher: Arc<F>,
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub enum EthApiCmd {
+    Debug,
+    Trace,
+}
+
+impl FromStr for EthApiCmd {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "debug" => Self::Debug,
+            "trace" => Self::Trace,
+            _ => {
+                return Err(format!(
+                    "`{}` is not recognized as a supported Ethereum Api",
+                    s
+                ))
+            }
+        })
+    }
+}
+
+/// Configurations of RPC
+#[derive(Clone)]
+pub struct RpcConfig {
+    pub ethapi: Vec<EthApiCmd>,
+    pub ethapi_max_permits: u32,
+    pub ethapi_trace_max_count: u32,
+    pub ethapi_trace_cache_duration: u64,
+    /// Ethereum log block cache
+    pub eth_log_block_cache: usize,
+    /// Maximum number of logs in a query.
+    pub max_past_logs: u32,
+    /// Maximum fee history cache size.
+    pub fee_history_limit: u64,
+}
+
+pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
+    pub task_manager: &'a TaskManager,
+    pub client: Arc<C>,
+    pub substrate_backend: Arc<BE>,
+    pub frontier_backend: Arc<fc_db::Backend<B>>,
+    pub filter_pool: Option<FilterPool>,
+    pub overrides: Arc<OverrideHandle<B>>,
+    pub fee_history_limit: u64,
+    pub fee_history_cache: FeeHistoryCache,
+}
+
+/// Spawn the tasks that are required to run Bholdus.
+pub fn spawn_essential_tasks<B, C, BE>(params: SpawnTasksParams<B, C, BE>)
+where
+    C: ProvideRuntimeApi<B> + BlockOf,
+    C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + 'static,
+    C: BlockchainEvents<B> + StorageProvider<B, BE>,
+    C: Send + Sync + 'static,
+    C::Api: EthereumRuntimeRPCApi<B>,
+    C::Api: BlockBuilder<B>,
+    B: BlockT<Hash = H256> + Send + Sync + 'static,
+    B::Header: HeaderT<Number = u32>,
+    BE: Backend<B> + 'static,
+    BE::State: StateBackend<BlakeTwo256>,
+{
+    // Frontier offchain DB task. Essential.
+    // Maps emulated ethereum data to substrate native data.
+    params.task_manager.spawn_essential_handle().spawn(
+        "frontier-mapping-sync-worker",
+        MappingSyncWorker::new(
+            params.client.import_notification_stream(),
+            Duration::new(6, 0),
+            params.client.clone(),
+            params.substrate_backend.clone(),
+            params.frontier_backend.clone(),
+            SyncStrategy::Normal,
+        )
+        .for_each(|()| futures::future::ready(())),
+    );
+
+    // Frontier `EthFilterApi` maintenance.
+    // Manages the pool of user-created Filters.
+    if let Some(filter_pool) = params.filter_pool {
+        // Each filter is allowed to stay in the pool for 100 blocks.
+        const FILTER_RETAIN_THRESHOLD: u64 = 100;
+        params.task_manager.spawn_essential_handle().spawn(
+            "frontier-filter-pool",
+            EthTask::filter_pool_task(
+                Arc::clone(&params.client),
+                filter_pool,
+                FILTER_RETAIN_THRESHOLD,
+            ),
+        );
+    }
+
+    params.task_manager.spawn_essential_handle().spawn(
+        "frontier-schema-cache-task",
+        EthTask::ethereum_schema_cache_task(
+            Arc::clone(&params.client),
+            Arc::clone(&params.frontier_backend),
+        ),
+    );
+
+    // Spawn Frontier FeeHistory cache maintenance task.
+    params.task_manager.spawn_essential_handle().spawn(
+        "frontier-fee-history",
+        EthTask::fee_history_task(
+            Arc::clone(&params.client),
+            Arc::clone(&params.overrides),
+            params.fee_history_cache,
+            params.fee_history_limit,
+        ),
+    );
+}
+
 pub fn overrides_handle<C, BE>(client: Arc<C>) -> Arc<OverrideHandle<Block>>
 where
     C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
@@ -154,7 +265,7 @@ where
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B, A>(deps: FullDeps<C, P, SC, B, A>) -> RpcResult
+pub fn create_full<C, P, SC, B, A>(deps: FullDeps<C, P, SC, B, A>) -> IoHandler
 where
     C: ProvideRuntimeApi<Block>
         + HeaderBackend<Block>
@@ -304,7 +415,7 @@ where
         overrides,
     )));
 
-    Ok(io)
+    io
 }
 
 /// Instantiate all Light RPC extensions.

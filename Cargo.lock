@@ -579,6 +579,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-client-evm-tracing"
+version = "0.1.0"
+dependencies = [
+ "bholdus-evm-rpc-primitives-debug",
+ "ethereum-types",
+ "evm-tracing-events",
+ "hex",
+ "parity-scale-codec",
+ "serde",
+ "serde_json",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "bholdus-currencies"
 version = "4.0.0-dev"
 dependencies = [
@@ -651,6 +665,154 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-evm-primitives-ext"
+version = "0.1.0"
+dependencies = [
+ "ethereum-types",
+ "evm-tracing-events",
+ "parity-scale-codec",
+ "sp-externalities 0.10.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime-interface 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
+name = "bholdus-evm-rpc-core-debug"
+version = "0.1.0"
+dependencies = [
+ "bholdus-client-evm-tracing",
+ "bholdus-evm-rpc-core-types",
+ "ethereum-types",
+ "futures 0.3.19",
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "serde",
+ "serde_json",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
+name = "bholdus-evm-rpc-core-trace"
+version = "0.6.0"
+dependencies = [
+ "bholdus-client-evm-tracing",
+ "bholdus-evm-rpc-core-types",
+ "ethereum-types",
+ "futures 0.3.19",
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "bholdus-evm-rpc-core-types"
+version = "0.1.0"
+dependencies = [
+ "ethereum-types",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "bholdus-evm-rpc-debug"
+version = "0.1.0"
+dependencies = [
+ "bholdus-client-evm-tracing",
+ "bholdus-evm-rpc-core-debug",
+ "bholdus-evm-rpc-core-types",
+ "bholdus-evm-rpc-primitives-debug",
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-db",
+ "fc-rpc",
+ "fp-rpc",
+ "futures 0.3.19",
+ "jsonrpc-core",
+ "sc-client-api",
+ "sc-utils",
+ "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "tokio",
+]
+
+[[package]]
+name = "bholdus-evm-rpc-primitives-debug"
+version = "0.1.0"
+dependencies = [
+ "environmental",
+ "ethereum",
+ "ethereum-types",
+ "hex",
+ "parity-scale-codec",
+ "serde",
+ "serde_json",
+ "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
+name = "bholdus-evm-rpc-trace"
+version = "0.6.0"
+dependencies = [
+ "bholdus-client-evm-tracing",
+ "bholdus-evm-rpc-core-trace",
+ "bholdus-evm-rpc-core-types",
+ "bholdus-evm-rpc-primitives-debug",
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-rpc",
+ "fc-rpc-core",
+ "fp-rpc",
+ "futures 0.3.19",
+ "jsonrpc-core",
+ "sc-client-api",
+ "sc-network",
+ "sc-utils",
+ "serde",
+ "sha3 0.9.1",
+ "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-transaction-pool",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "bholdus-evm-tracer"
+version = "0.1.0"
+dependencies = [
+ "bholdus-evm-primitives-ext",
+ "ethereum-types",
+ "evm",
+ "evm-gasometer",
+ "evm-runtime",
+ "evm-tracing-events",
+ "fp-evm",
+ "pallet-evm",
+ "parity-scale-codec",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "bholdus-nft"
 version = "4.0.0-dev"
 dependencies = [
@@ -687,49 +849,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bholdus-rpc"
-version = "4.0.0-dev"
-dependencies = [
- "beefy-gadget",
- "beefy-gadget-rpc",
- "bholdus-primitives",
- "fc-db",
- "fc-rpc",
- "fc-rpc-core",
- "fp-rpc",
- "jsonrpc-core",
- "jsonrpc-pubsub",
- "pallet-contracts",
- "pallet-contracts-rpc",
- "pallet-ethereum",
- "pallet-im-online",
- "pallet-mmr-rpc",
- "pallet-transaction-payment-rpc",
- "parity-scale-codec",
- "phoenix-runtime",
- "sc-chain-spec",
- "sc-client-api",
- "sc-consensus",
- "sc-consensus-epochs",
- "sc-consensus-uncles",
- "sc-finality-grandpa",
- "sc-finality-grandpa-rpc",
- "sc-keystore",
- "sc-network",
- "sc-rpc",
- "sc-rpc-api",
- "sc-transaction-pool",
- "sc-transaction-pool-api",
- "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-keystore 0.10.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
- "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
- "substrate-frame-rpc-system",
-]
-
-[[package]]
 name = "bholdus-service"
 version = "4.0.0-dev"
 dependencies = [
@@ -737,8 +856,11 @@ dependencies = [
  "beefy-gadget",
  "beefy-gadget-rpc",
  "beefy-primitives",
+ "bholdus-evm-primitives-ext",
+ "bholdus-evm-rpc-debug",
+ "bholdus-evm-rpc-primitives-debug",
+ "bholdus-evm-rpc-trace",
  "bholdus-primitives",
- "bholdus-rpc",
  "cygnus-runtime",
  "fc-db",
  "fc-mapping-sync",
@@ -805,6 +927,7 @@ dependencies = [
  "sp-trie 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "structopt",
  "substrate-frame-rpc-system",
+ "tokio",
  "ulas-runtime",
 ]
 
@@ -2011,6 +2134,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "evm-tracing-events"
+version = "0.1.0"
+dependencies = [
+ "environmental",
+ "ethereum",
+ "ethereum-types",
+ "evm",
+ "evm-gasometer",
+ "evm-runtime",
+ "parity-scale-codec",
+ "sp-runtime-interface 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "exit-future"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2969,6 +3106,9 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "hex-literal"
@@ -5970,10 +6110,13 @@ dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
  "bholdus-currencies",
+ "bholdus-evm-rpc-primitives-debug",
+ "bholdus-evm-tracer",
  "bholdus-nft",
  "bholdus-primitives",
  "bholdus-support",
  "bholdus-tokens",
+ "evm-tracing-events",
  "fp-evm",
  "fp-rpc",
  "fp-self-contained",
@@ -6032,7 +6175,9 @@ dependencies = [
  "pallet-treasury",
  "pallet-utility",
  "parity-scale-codec",
+ "rlp",
  "scale-info",
+ "sha3 0.8.2",
  "smallvec 1.7.0",
  "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-authority-discovery",

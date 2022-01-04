@@ -19,6 +19,25 @@ pub struct RunCmd {
     #[structopt(flatten)]
     pub base: sc_cli::RunCmd,
 
+    /// Enable EVM tracing module on a non-authority node.
+    #[structopt(long, conflicts_with = "validator", require_delimiter = true)]
+    pub ethapi: Vec<service::EthApiCmd>,
+
+    /// Number of concurrent tracing tasks. Meant to be shared by both "debug" and "trace" modules.
+    #[structopt(long, default_value = "10")]
+    pub ethapi_max_permits: u32,
+
+    /// Maximum number of trace entries a single request of `trace_filter` is allowed to return.
+    /// A request asking for more or an unbounded one going over this limit will both return an
+    /// error.
+    #[structopt(long, default_value = "500")]
+    pub ethapi_trace_max_count: u32,
+
+    /// Duration (in seconds) after which the cache of `trace_filter` for a given block will be
+    /// discarded.
+    #[structopt(long, default_value = "300")]
+    pub ethapi_trace_cache_duration: u64,
+
     /// Maximum number of logs in a query.
     #[structopt(long, default_value = "10000")]
     pub max_past_logs: u32,
@@ -31,8 +50,8 @@ pub struct RunCmd {
     #[structopt(long, default_value = "1")]
     pub target_gas_price: u64,
 
-    /// Ethereum log block cache
-    #[structopt(long, default_value = "50")]
+    /// Size of the LRU cache for block data and their transaction statuses.
+    #[structopt(long, default_value = "3000")]
     pub eth_log_block_cache: usize,
 }
 
