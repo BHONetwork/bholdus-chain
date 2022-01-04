@@ -57,6 +57,19 @@ pub mod pallet {
         StorageOverflow,
     }
 
+    #[pallet::hooks]
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+        fn on_initialize(_: T::BlockNumber) -> Weight {
+            0
+        }
+
+        fn on_finalize(_n: <T as frame_system::Config>::BlockNumber) {}
+
+        fn on_runtime_upgrade() -> Weight {
+            0
+        }
+    }
+
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
     // These functions materialize as "extrinsics", which are often compared to transactions.
     // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
