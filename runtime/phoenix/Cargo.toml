@@ -99,6 +99,7 @@ bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", defau
 bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { version = "4.0.0-dev", path = "../../pallets/bridge/native-transfer", default-features = false }
 sample-extension = { version = "4.0.0-dev", path = "../../pallets/pallet-integration/sample-extension", default-features = false }
+pallet-integration = { version = "4.0.0-dev", path = "../../pallets/pallet-integration", default-features = false }
 
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
 
@@ -174,6 +175,7 @@ std = [
 	"bholdus-bridge-native-transfer/std",
 	"bholdus-bridge-native-transfer/std",
 	"sample-extension/std",
+	"pallet-integration/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-core/std",

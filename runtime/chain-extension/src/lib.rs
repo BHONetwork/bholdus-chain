@@ -48,16 +48,17 @@ where
                     .call_transfer_surcharge;
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 
-                let (amount, target): (T::Balance, T::AccountId) = env.read_as()?;
+                let (tokenId, amount, target): (u64, T::Balance, T::AccountId) = env.read_as()?;
                 let caller = env.ext().caller().clone();
                 let dest = T::Lookup::unlookup(target);
 
-                pallet_balances::Pallet::<T>::transfer(
-                    RawOrigin::Signed(caller).into(),
-                    dest,
-                    amount,
-                )
-                .map_err(|d| d.error)?;
+                // pallet_integration::Pallet::<T>::transfer(
+                //     RawOrigin::Signed(caller).into(),
+                //     dest,
+                //     tokenId,
+                //     amount,
+                // )
+                // .map_err(|d| d.error)?;
             }
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);

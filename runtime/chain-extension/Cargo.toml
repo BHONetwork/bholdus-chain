@@ -78,6 +78,11 @@ default-features = false
 path = "../../pallets/pallet-integration/sample-extension"
 version = '4.0.0-dev'
 
+[dependencies.pallet-integration]
+default-features = false
+path = "../../pallets/pallet-integration"
+version = '4.0.0-dev'
+
 [features]
 default = ['std']
 std = [
@@ -91,6 +96,7 @@ std = [
 	'pallet-contracts/std',
 	'pallet-balances/std',
 	'sample-extension/std',
+	"pallet-integration/std",
 ]
 runtime-benchmarks = [
 	'frame-benchmarking',
