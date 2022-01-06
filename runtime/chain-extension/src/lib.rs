@@ -20,7 +20,7 @@ pub struct IntegrationExtensions;
 
 impl<T> ChainExtension<T> for IntegrationExtensions
 where
-    T: SysConfig + pallet_contracts::Config + sample_extension::Config + pallet_balances::Config,
+    T: SysConfig + pallet_contracts::Config + pallet_integration::Config + pallet_balances::Config,
     <T as SysConfig>::AccountId: UncheckedFrom<<T as SysConfig>::Hash> + AsRef<[u8]>,
 {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
@@ -59,6 +59,12 @@ where
                 //     amount,
                 // )
                 // .map_err(|d| d.error)?;
+                pallet_integration::Pallet::<T>::transfer(
+                    RawOrigin::Signed(caller).into(),
+                    dest,
+                    tokenId,
+                    amount
+                )?;
             }
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);

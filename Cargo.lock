@@ -725,23 +725,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bholdus-smart-contract"
-version = "4.0.0-dev"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-contracts",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "bholdus-support"
 version = "4.0.0-dev"
 dependencies = [
@@ -2792,6 +2775,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "integration-tokens"
+version = "4.0.0-dev"
+dependencies = [
+ "bholdus-currencies",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "intervalier"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4714,6 +4714,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-integration"
+version = "4.0.0-dev"
+dependencies = [
+ "bholdus-currencies",
+ "bholdus-primitives",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "integration-tokens",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-mmr"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
@@ -5288,7 +5308,6 @@ dependencies = [
  "bholdus-currencies",
  "bholdus-nft",
  "bholdus-primitives",
- "bholdus-smart-contract",
  "bholdus-support",
  "bholdus-tokens",
  "frame-benchmarking",
@@ -5300,6 +5319,7 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "hex-literal",
+ "integration-tokens",
  "log",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -5319,6 +5339,7 @@ dependencies = [
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
+ "pallet-integration",
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
@@ -5337,6 +5358,8 @@ dependencies = [
  "pallet-treasury",
  "pallet-utility",
  "parity-scale-codec",
+ "runtime-chain-extension",
+ "sample-extension",
  "scale-info",
  "smallvec 1.7.0",
  "sp-api",
@@ -6033,6 +6056,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "runtime-chain-extension"
+version = "1.0.10"
+dependencies = [
+ "enumflags2",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "integration-tokens",
+ "pallet-balances",
+ "pallet-contracts",
+ "pallet-integration",
+ "parity-scale-codec",
+ "sample-extension",
+ "scale-info",
+ "smallvec 1.7.0",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6135,6 +6179,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "sample-extension"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
