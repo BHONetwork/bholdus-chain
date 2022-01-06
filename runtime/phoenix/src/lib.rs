@@ -71,7 +71,7 @@ use bholdus_currencies::BasicCurrencyAdapter;
 pub use bholdus_primitives::*;
 use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
-pub use runtime_chain_extension::IntegrationExtensions;
+pub use runtime_chain_extension::SampleExtensions;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -768,7 +768,8 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = IntegrationExtensions;
+    // type ChainExtension = IntegrationExtensions;
+    type ChainExtension = SampleExtensions;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -1097,7 +1098,7 @@ impl pallet_template::Config for Runtime {
 
 impl sample_extension::Config for Runtime {
     type Event = Event;
-    type Currency = Balances;
+    type Currency = Currencies;
     type WeightInfo = sample_extension::weights::SubstrateWeight<Runtime>;
 }
 // Create the runtime by composing the FRAME pallets that were previously configured.

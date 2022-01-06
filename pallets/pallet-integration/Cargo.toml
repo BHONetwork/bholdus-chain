@@ -11,4 +11,22 @@ version = '4.0.0-dev'
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+# Local dependencies
+[dependencies.bholdus-primitives]
+default-features = false
+version = '4.0.0-dev'
+path = '../../primitives/bholdus'
+
+[dependencies.bholdus-support]
+default-features = false
+version = '4.0.0-dev'
+path = '../support'
+
+[features]
+default = ['std']
+std = [
+	"bholdus-primitives/std",
+	"bholdus-support/std",
+
+]
+

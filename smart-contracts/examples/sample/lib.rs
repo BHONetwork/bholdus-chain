@@ -2,6 +2,7 @@
 
 use ink_env::{AccountId, Environment};
 use ink_lang as ink;
+type CurrencyId = u64;
 
 #[ink::chain_extension]
 pub trait ChainExtension {
@@ -18,6 +19,7 @@ pub trait ChainExtension {
     fn do_balance_transfer(
         value: <ink_env::DefaultEnvironment as Environment>::Balance,
         recipient: AccountId,
+        currency_id: CurrencyId,
     ) -> Result<u32, ContractError>;
 
     #[ink(extension = 3)]
@@ -75,7 +77,7 @@ impl Environment for CustomEnvironment {
 #[ink::contract(env = crate::CustomEnvironment)]
 /// A smart contract with a custom environment, necessary for the chain extension
 mod contract_with_extension {
-    use super::ContractError;
+    use super::*;
 
     /// Defines the storage of our contract.
     #[ink(storage)]
@@ -140,10 +142,11 @@ mod contract_with_extension {
             &mut self,
             amount: Balance,
             recipient: AccountId,
+            currency_id: CurrencyId,
         ) -> Result<(), ContractError> {
             self.env()
                 .extension()
-                .do_balance_transfer(amount, recipient)?;
+                .do_balance_transfer(amount, recipient, currency_id)?;
             self.stored_number = 100;
             Ok(())
         }
