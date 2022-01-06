@@ -99,6 +99,9 @@ mod voter_bags;
 /// Import the template pallet.
 pub use pallet_template;
 
+/// Import the example pallet.
+pub use pallet_example;
+
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -1112,6 +1115,11 @@ impl pallet_template::Config for Runtime {
     type Event = Event;
 }
 
+/// Configure the pallet-example in pallets/example.
+impl pallet_example::Config for Runtime {
+    type Event = Event;
+}
+
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
 impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
     fn find_author<'a, I>(digests: I) -> Option<H160>
@@ -1229,6 +1237,8 @@ construct_runtime!(
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+        // Include the custom logic from the pallet-example in the runtime.
+        ExampleModule: pallet_example::{Pallet, Call, Storage, Event<T>},
         // Include the pallet-evm in the runtime.
         EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>},
         // Include the pallet-ethereum in the runtime.

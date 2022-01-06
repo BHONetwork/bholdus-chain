@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Bholdus. If not, see <http://www.gnu.org/licenses/>.
 
+use crate::Runtime;
+use bholdus_evm_precompile_example::PalletExamplePrecompileSet;
 use fp_evm::Context;
 use pallet_evm::{AddressMapping, Precompile, PrecompileResult, PrecompileSet};
 use pallet_evm_precompile_blake2::Blake2F;
@@ -66,6 +68,9 @@ where
         context: &Context,
         is_static: bool,
     ) -> Option<PrecompileResult> {
+        let palletExamplePrecompileSet: PalletExamplePrecompileSet<Runtime> =
+            PalletExamplePrecompileSet::<Runtime>::new();
+
         match address {
             // Ethereum precompiles :
             a if a == hash(1) => Some(ECRecover::execute(input, target_gas, context, is_static)),
@@ -87,6 +92,9 @@ where
             a if a == hash(1026) => Some(ECRecoverPublicKey::execute(
                 input, target_gas, context, is_static,
             )),
+            a if a == hash(2048) => {
+                palletExamplePrecompileSet.execute(address, input, target_gas, context, is_static)
+            }
             // Phoenix specific precompiles :
             _ => None,
         }
