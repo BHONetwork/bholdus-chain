@@ -255,6 +255,65 @@ where
     ))
 }
 
+/// `fp_rpc::ConvertTransaction` is implemented for an arbitrary struct that lives in each runtime.
+/// It receives a ethereum::Transaction and returns a pallet-ethereum transact Call wrapped in an
+/// UncheckedExtrinsic.
+///
+/// Although the implementation should be the same in each runtime, this might change at some point.
+/// `TransactionConverters` is just a `fp_rpc::ConvertTransaction` implementor that proxies calls to
+/// each runtime implementation.
+pub enum TransactionConverters {
+    #[cfg(feature = "with-ulas-runtime")]
+    Ulas(ulas_runtime::TransactionConverter),
+    #[cfg(feature = "with-cygnus-runtime")]
+    Cygnus(cygnus_runtime::TransactionConverter),
+    #[cfg(feature = "with-phoenix-runtime")]
+    Phoenix(phoenix_runtime::TransactionConverter),
+}
+
+impl TransactionConverters {
+    #[cfg(feature = "with-ulas-runtime")]
+    fn ulas() -> Self {
+        TransactionConverters::Ulas(ulas_runtime::TransactionConverter)
+    }
+    #[cfg(not(feature = "with-ulas-runtime"))]
+    fn ulas() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "with-cygnus-runtime")]
+    fn cygnus() -> Self {
+        TransactionConverters::Cygnus(cygnus_runtime::TransactionConverter)
+    }
+    #[cfg(not(feature = "with-cygnus-runtime"))]
+    fn cygnus() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "with-phoenix-runtime")]
+    fn phoenix() -> Self {
+        TransactionConverters::Phoenix(phoenix_runtime::TransactionConverter)
+    }
+    #[cfg(not(feature = "with-phoenix-runtime"))]
+    fn phoenix() -> Self {
+        unimplemented!()
+    }
+}
+
+impl fp_rpc::ConvertTransaction<bholdus_primitives::OpaqueExtrinsic> for TransactionConverters {
+    fn convert_transaction(
+        &self,
+        transaction: pallet_ethereum::Transaction,
+    ) -> bholdus_primitives::OpaqueExtrinsic {
+        match &self {
+            #[cfg(feature = "with-ulas-runtime")]
+            Self::Ulas(inner) => inner.convert_transaction(transaction),
+            #[cfg(feature = "with-cygnus-runtime")]
+            Self::Cygnus(inner) => inner.convert_transaction(transaction),
+            #[cfg(feature = "with-phoenix-runtime")]
+            Self::Phoenix(inner) => inner.convert_transaction(transaction),
+        }
+    }
+}
+
 pub fn new_partial<RuntimeApi, Executor>(
     config: &Configuration,
 ) -> Result<
@@ -560,8 +619,19 @@ where
         let rpc_config = rpc_config.clone();
         let filter_pool = filter_pool.clone();
 
+        let is_ulas = config.chain_spec.is_ulas();
+        let is_cygnus = config.chain_spec.is_cygnus();
+
         let rpc_extensions_builder =
             move |deny_unsafe, subscription_executor: rpc::SubscriptionTaskExecutor| {
+                let transaction_converter: TransactionConverters = if is_ulas {
+                    TransactionConverters::ulas()
+                } else if is_cygnus {
+                    TransactionConverters::cygnus()
+                } else {
+                    TransactionConverters::phoenix()
+                };
+
                 let deps = rpc::FullDeps {
                     client: client.clone(),
                     pool: pool.clone(),
@@ -571,6 +641,7 @@ where
                     chain_spec: chain_spec.cloned_box(),
                     is_authority,
                     network: network.clone(),
+                    transaction_converter,
                     // Grandpa
                     grandpa: rpc::GrandpaDeps {
                         shared_voter_state: shared_voter_state.clone(),

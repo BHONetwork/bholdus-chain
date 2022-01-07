@@ -108,7 +108,7 @@ pub mod opaque {
 
     pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
 
-    pub use bholdus_primitives::{Block, BlockId, Header};
+    pub use bholdus_primitives::{Block, Header};
 
     impl_opaque_keys! {
         pub struct SessionKeys {
@@ -120,7 +120,6 @@ pub mod opaque {
         }
     }
 }
-use opaque::*;
 
 // To learn more about runtime versioning and what each of the following value means:
 //   https://substrate.dev/docs/en/knowledgebase/runtime/upgrades#runtime-versioning
@@ -473,8 +472,8 @@ impl pallet_session::Config for Runtime {
     type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
     type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
     type SessionManager = pallet_session::historical::NoteHistoricalRoot<Self, Staking>;
-    type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
-    type Keys = SessionKeys;
+    type SessionHandler = <opaque::SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+    type Keys = opaque::SessionKeys;
     type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
 }
 

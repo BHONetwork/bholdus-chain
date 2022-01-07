@@ -6,7 +6,7 @@
 #![warn(missing_docs)]
 
 use crate::client::RuntimeApiCollection;
-use crate::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use crate::{AccountId, Balance, Block, BlockNumber, Hash, Index, TransactionConverters};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{
     EthBlockDataCache, EthTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
@@ -110,6 +110,8 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub filter_pool: Option<FilterPool>,
     /// Subscription Task Executor
     pub subscription_executor: SubscriptionTaskExecutor,
+    /// Ethereum transaction to Extrinsic converter.
+    pub transaction_converter: TransactionConverters,
 }
 
 /// Light client extra dependencies.
@@ -315,6 +317,7 @@ where
         rpc_config,
         overrides,
         filter_pool,
+        transaction_converter,
         ..
     } = deps;
 
@@ -378,7 +381,7 @@ where
         client.clone(),
         pool.clone(),
         graph,
-        phoenix_runtime::TransactionConverter,
+        transaction_converter,
         network.clone(),
         signers,
         overrides.clone(),

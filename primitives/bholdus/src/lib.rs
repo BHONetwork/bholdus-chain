@@ -6,10 +6,11 @@
 pub mod currency;
 pub mod dex;
 
+pub use sp_runtime::OpaqueExtrinsic;
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentifyAccount, Verify},
-    FixedU128, MultiSignature, OpaqueExtrinsic,
+    FixedU128, MultiSignature,
 };
 
 pub use currency::*;
