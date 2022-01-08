@@ -22,6 +22,7 @@ where
         + bholdus_currencies::Config
         + pallet_contracts::Config
         + sample_extension::Config
+        + bholdus_pallet_integration::Config
         + pallet_balances::Config,
     <T as SysConfig>::AccountId: UncheckedFrom<<T as SysConfig>::Hash> + AsRef<[u8]>,
 {
@@ -79,7 +80,14 @@ where
                 //     transfer_amount,
                 // )
                 // .map_err(|d| d.error)?;
-                sample_extension::Pallet::<T>::transfer(
+
+                // sample_extension::Pallet::<T>::transfer(
+                //     RawOrigin::Signed(caller).into(),
+                //     recipient,
+                //     currency_id,
+                //     transfer_amount,
+                // );
+                bholdus_pallet_integration::Pallet::<T>::transfer(
                     RawOrigin::Signed(caller).into(),
                     recipient,
                     currency_id,

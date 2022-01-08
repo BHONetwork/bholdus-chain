@@ -94,6 +94,12 @@ default-features = false
 path = "../../primitives/bholdus"
 version = '4.0.0-dev'
 
+[dependencies.bholdus-pallet-integration]
+default-features = false
+path = "../../pallets/pallet-integration"
+version = '4.0.0-dev'
+package = 'pallet-integration'
+
 [features]
 default = ['std']
 std = [
@@ -110,6 +116,7 @@ std = [
 	'integration-tokens/std',
 	'bholdus-currencies/std',
 	'bholdus-primitives/std',
+	'bholdus-pallet-integration/std',
 ]
 runtime-benchmarks = [
 	'frame-benchmarking',
