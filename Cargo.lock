@@ -4719,6 +4719,18 @@ version = "4.0.0-dev"
 dependencies = [
  "bholdus-primitives",
  "bholdus-support",
+ "enumflags2",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "integration-tokens",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "sample-extension",
+ "scale-info",
+ "serde",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -5307,6 +5319,7 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "hex-literal",
+ "integration-tokens",
  "log",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -5326,6 +5339,7 @@ dependencies = [
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
+ "pallet-integration",
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
@@ -6054,6 +6068,7 @@ dependencies = [
  "integration-tokens",
  "pallet-balances",
  "pallet-contracts",
+ "pallet-integration",
  "parity-scale-codec",
  "sample-extension",
  "scale-info",

@@ -27,7 +27,7 @@ pub mod pallet {
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
-    pub trait Config: frame_system::Config + sample_extension::Config {
+    pub trait Config: frame_system::Config + integration_tokens::Config {
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
@@ -59,7 +59,7 @@ pub mod pallet {
             currency_id: CurrencyId,
             amount: Balance,
         ) -> DispatchResult {
-            sample_extension::Pallet::<T>::transfer(origin, dest, currency_id, amount)
+            integration_tokens::Pallet::<T>::transfer(origin, dest, currency_id, amount)
         }
     }
 }

@@ -1102,6 +1102,11 @@ impl sample_extension::Config for Runtime {
     type WeightInfo = sample_extension::weights::SubstrateWeight<Runtime>;
 }
 
+impl integration_tokens::Config for Runtime {
+    type Event = Event;
+    type Currency = Currencies;
+    type WeightInfo = integration_tokens::weights::SubstrateWeight<Runtime>;
+}
 impl bholdus_pallet_integration::Config for Runtime {
     type Event = Event;
 }
@@ -1158,6 +1163,7 @@ construct_runtime!(
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
         SampleExtension: sample_extension::{Pallet, Call, Storage, Event<T>},
+        IntegrationTokens: integration_tokens::{Pallet, Call, Storage, Event<T>},
         PalletIntegration: bholdus_pallet_integration::{Pallet, Call, Storage, Event<T>},
     }
 );

@@ -84,6 +84,12 @@ version = '4.0.0-dev'
 package = 'sample-extension'
 path = 'sample-extension'
 
+[dependencies.integration-tokens]
+default-features = false
+version = '4.0.0-dev'
+package = 'integration-tokens'
+path = 'tokens'
+
 [features]
 default = ['std']
 std = [
@@ -98,8 +104,10 @@ std = [
 	"pallet-contracts/std",
 	"bholdus-primitives/std",
 	"bholdus-support/std",
-	"sample-extension/std"
+	"sample-extension/std",
+	"integration-tokens/std",
 ]
+
 
 runtime-benchmarks = [
 	"frame-benchmarking",

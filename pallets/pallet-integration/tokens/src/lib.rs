@@ -13,16 +13,16 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 
-// #[cfg(test)]
-// mod mock;
+#[cfg(test)]
+mod mock;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
-// #[cfg(feature = "runtime-benchmarks")]
-// mod benchmarking;
-// pub mod weights;
-// pub use weights::WeightInfo;
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
+pub mod weights;
+pub use weights::WeightInfo;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -38,7 +38,7 @@ pub mod pallet {
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
         type Currency: MultiCurrency<Self::AccountId, CurrencyId = CurrencyId, Balance = Balance>;
-        // type WeightInfo: WeightInfo;
+        type WeightInfo: WeightInfo;
     }
 
     // Some const value to compare inputs of unknown size to
@@ -63,7 +63,7 @@ pub mod pallet {
     // Errors inform users that something went wrong.
     #[pallet::error]
     pub enum Error<T> {
-        InputTooLarge,
+        InvalidAmount,
     }
 
     #[pallet::call]
@@ -81,6 +81,7 @@ pub mod pallet {
         ) -> DispatchResult {
             let from = ensure_signed(origin)?;
             let to = T::Lookup::lookup(dest)?;
+            ensure!(amount > 0, Error::<T>::InvalidAmount);
             <T as pallet::Config>::Currency::transfer(currency_id, &from, &to, amount);
             Self::deposit_event(Event::Transferred(currency_id, from, to, amount));
             Ok(())
