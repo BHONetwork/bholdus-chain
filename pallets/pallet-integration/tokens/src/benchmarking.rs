@@ -1,9 +1,9 @@
 //! Benchmarking setup for pallet-template
-
-use super::*;
+#![cfg(feature = "runtime-benchmarks")]
+pub use super::*;
 
 #[allow(unused)]
-use crate::Pallet as Template;
+use crate::Pallet as IntegrationTokens;
 use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller, account};
 use frame_system::RawOrigin as SystemOrigin;
 use pallet_contracts::chain_extension::UncheckedFrom;
@@ -30,4 +30,4 @@ benchmarks! {
     }: _(SystemOrigin::Signed(caller.clone()), target_lookup, currency_id, transfer_amount)
 }
 
-impl_benchmark_test_suite!(Template, crate::mock::new_test_ext(), crate::mock::Test);
+impl_benchmark_test_suite!(IntegrationTokens, crate::mock::new_test_ext(), crate::mock::Test);

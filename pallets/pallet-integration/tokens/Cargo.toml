@@ -51,7 +51,9 @@ serde = '1.0.119'
 
 [features]
 default = ['std']
-runtime-benchmarks = ['frame-benchmarking']
+runtime-benchmarks = ['frame-benchmarking',
+	"sp-runtime/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",]
 std = [
 	'codec/std',
 	'scale-info/std',

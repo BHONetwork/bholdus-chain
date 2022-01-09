@@ -1452,6 +1452,7 @@ impl_runtime_apis! {
 
             use bholdus_nft::benchmarking::Pallet as NFTBench;
             use bholdus_tokens::benchmarking::Pallet as TokensBench;
+            use integration_tokens::benchmarking::Pallet as IntegrationTokens;
 
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
             // issues. To get around that, we separated the Session benchmarks into its own crate,
@@ -1462,6 +1463,7 @@ impl_runtime_apis! {
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_tokens, TokensBench::<Runtime>);
+            list_benchmark!(list, extra, integration_tokens, IntegrationTokens::<Runtime>);
             list_benchmark!(list, extra, bholdus_nft, NFTBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
@@ -1481,6 +1483,7 @@ impl_runtime_apis! {
             use frame_system_benchmarking::Pallet as SystemBench;
             use bholdus_nft::benchmarking::Pallet as NFTBench;
             use bholdus_tokens::benchmarking::Pallet as TokensBench;
+            use integration_tokens::benchmarking::Pallet as IntegrationTokens;
 
             impl frame_system_benchmarking::Config for Runtime {}
 
@@ -1506,6 +1509,7 @@ impl_runtime_apis! {
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_tokens, TokensBench::<Runtime>);
+            add_benchmark!(params, batches, integration_tokens, IntegrationTokens::<Runtime>);
             add_benchmark!(params, batches, bholdus_nft, NFTBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
