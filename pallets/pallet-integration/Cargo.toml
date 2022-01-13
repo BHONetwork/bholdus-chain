@@ -10,5 +10,109 @@ repository = 'https://github.com/bholdus/bholdus-chain.git'
 version = '4.0.0-dev'
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
 
-[dependencies]
+[dependencies.enumflags2]
+version = '0.6.3'
+
+[dependencies.serde]
+optional = true
+version = '1.0.124'
+
+[dependencies.codec]
+default-features = false
+features = ['derive', 'max-encoded-len']
+package = 'parity-scale-codec'
+version = '2.0.0'
+
+
+[dependencies.frame-benchmarking]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+optional = true
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.frame-system]
+default-features = false
+# path = '../frame/system'
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.pallet-contracts]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+# Local dependencies
+[dependencies.bholdus-primitives]
+default-features = false
+version = '4.0.0-dev'
+path = '../../primitives/bholdus'
+
+[dependencies.bholdus-support]
+default-features = false
+version = '4.0.0-dev'
+path = '../support'
+
+[dependencies.sample-extension]
+default-features = false
+version = '4.0.0-dev'
+package = 'sample-extension'
+path = 'sample-extension'
+
+[dependencies.integration-tokens]
+default-features = false
+version = '4.0.0-dev'
+package = 'integration-tokens'
+path = 'tokens'
+
+[features]
+default = ['std']
+std = [
+	"serde",
+	"codec/std",
+	'scale-info/std',
+	"enumflags2/serde",
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+	"pallet-contracts/std",
+	"bholdus-primitives/std",
+	"bholdus-support/std",
+	"sample-extension/std",
+	"integration-tokens/std",
+]
+
+
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+]
+try-runtime = ["frame-support/try-runtime"]
+

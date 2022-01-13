@@ -1,7 +1,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
+use bholdus_primitives::{Balance, TokenId};
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::traits::Get;
+pub type CurrencyId = TokenId;
 
 use frame_support::{
     log::error,
@@ -20,7 +21,12 @@ pub struct IntegrationExtensions;
 
 impl<T> ChainExtension<T> for IntegrationExtensions
 where
-    T: SysConfig + pallet_contracts::Config + sample_extension::Config + pallet_balances::Config,
+    T: SysConfig
+        + bholdus_currencies::Config
+        + pallet_contracts::Config
+        + sample_extension::Config
+        + integration_tokens::Config
+        + pallet_balances::Config,
     <T as SysConfig>::AccountId: UncheckedFrom<<T as SysConfig>::Hash> + AsRef<[u8]>,
 {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
@@ -48,16 +54,20 @@ where
                     .call_transfer_surcharge;
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 
-                let (amount, target): (T::Balance, T::AccountId) = env.read_as()?;
+                let (transfer_amount, recipient_account, currency_id): (
+                    Balance,
+                    T::AccountId,
+                    CurrencyId,
+                ) = env.read_as()?;
+                let recipient = T::Lookup::unlookup(recipient_account);
                 let caller = env.ext().caller().clone();
-                let dest = T::Lookup::unlookup(target);
 
-                pallet_balances::Pallet::<T>::transfer(
+                integration_tokens::Pallet::<T>::transfer(
                     RawOrigin::Signed(caller).into(),
-                    dest,
-                    amount,
-                )
-                .map_err(|d| d.error)?;
+                    recipient,
+                    currency_id,
+                    transfer_amount,
+                );
             }
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);

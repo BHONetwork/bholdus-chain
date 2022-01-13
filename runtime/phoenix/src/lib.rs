@@ -71,7 +71,7 @@ use bholdus_currencies::BasicCurrencyAdapter;
 pub use bholdus_primitives::*;
 use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
-pub use runtime_chain_extension::IntegrationExtensions;
+pub use runtime_chain_extension::SampleExtensions;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -768,7 +768,8 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = IntegrationExtensions;
+    // type ChainExtension = IntegrationExtensions;
+    type ChainExtension = SampleExtensions;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -1097,9 +1098,19 @@ impl pallet_template::Config for Runtime {
 
 impl sample_extension::Config for Runtime {
     type Event = Event;
-    type Currency = Balances;
+    type Currency = Currencies;
     type WeightInfo = sample_extension::weights::SubstrateWeight<Runtime>;
 }
+
+impl integration_tokens::Config for Runtime {
+    type Event = Event;
+    type Currency = Currencies;
+    type WeightInfo = integration_tokens::weights::SubstrateWeight<Runtime>;
+}
+impl bholdus_pallet_integration::Config for Runtime {
+    type Event = Event;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -1152,6 +1163,8 @@ construct_runtime!(
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
         SampleExtension: sample_extension::{Pallet, Call, Storage, Event<T>},
+        IntegrationTokens: integration_tokens::{Pallet, Call, Storage, Event<T>},
+        PalletIntegration: bholdus_pallet_integration::{Pallet, Call, Storage, Event<T>},
     }
 );
 
@@ -1439,6 +1452,7 @@ impl_runtime_apis! {
 
             use bholdus_nft::benchmarking::Pallet as NFTBench;
             use bholdus_tokens::benchmarking::Pallet as TokensBench;
+            use integration_tokens::benchmarking::Pallet as IntegrationTokens;
 
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
             // issues. To get around that, we separated the Session benchmarks into its own crate,
@@ -1449,6 +1463,7 @@ impl_runtime_apis! {
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_tokens, TokensBench::<Runtime>);
+            list_benchmark!(list, extra, integration_tokens, IntegrationTokens::<Runtime>);
             list_benchmark!(list, extra, bholdus_nft, NFTBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
@@ -1468,6 +1483,7 @@ impl_runtime_apis! {
             use frame_system_benchmarking::Pallet as SystemBench;
             use bholdus_nft::benchmarking::Pallet as NFTBench;
             use bholdus_tokens::benchmarking::Pallet as TokensBench;
+            use integration_tokens::benchmarking::Pallet as IntegrationTokens;
 
             impl frame_system_benchmarking::Config for Runtime {}
 
@@ -1493,6 +1509,7 @@ impl_runtime_apis! {
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_tokens, TokensBench::<Runtime>);
+            add_benchmark!(params, batches, integration_tokens, IntegrationTokens::<Runtime>);
             add_benchmark!(params, batches, bholdus_nft, NFTBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 

@@ -1,12 +1,17 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
-use frame_support::{dispatch::DispatchResult, inherent::Vec, pallet_prelude::*, traits::Currency};
+use bholdus_primitives::{Balance, TokenId as CurrencyId};
+use bholdus_support::MultiCurrency;
+use frame_support::{inherent::Vec, pallet_prelude::*, traits::Currency};
 use frame_system::pallet_prelude::*;
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 use pallet_contracts::chain_extension::UncheckedFrom;
+use sp_runtime::{
+    traits::{CheckedSub, MaybeSerializeDeserialize, StaticLookup, Zero},
+    DispatchError, DispatchResult,
+};
 
 #[cfg(test)]
 mod mock;
@@ -32,7 +37,7 @@ pub mod pallet {
     pub trait Config: frame_system::Config + pallet_contracts::Config {
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
-        type Currency: Currency<Self::AccountId>;
+        type Currency: MultiCurrency<Self::AccountId, CurrencyId = CurrencyId, Balance = Balance>;
         type WeightInfo: WeightInfo;
     }
 
@@ -70,6 +75,18 @@ pub mod pallet {
         T::AccountId: UncheckedFrom<T::Hash>,
         T::AccountId: AsRef<[u8]>,
     {
+        #[pallet::weight(0)]
+        pub fn transfer(
+            origin: OriginFor<T>,
+            dest: <T::Lookup as StaticLookup>::Source,
+            currency_id: CurrencyId,
+            amount: Balance,
+        ) -> DispatchResult {
+            let from = ensure_signed(origin)?;
+            let to = T::Lookup::lookup(dest)?;
+            <T as pallet::Config>::Currency::transfer(currency_id, &from, &to, amount)
+        }
+
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         /// A generic extrinsic to wrap
         /// [pallet_contracts::bare_call](https://github.com/paritytech/substrate/blob/352c46a648a5f2d4526e790a184daa4a1ffdb3bf/frame/contracts/src/lib.rs#L545-L562)
