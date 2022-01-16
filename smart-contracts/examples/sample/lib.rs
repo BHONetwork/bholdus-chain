@@ -1,8 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
-use ink_env::{AccountId, Environment};
+#![feature(int_abs_diff)]
+use ink_env::{AccountId, Environment, Error};
 use ink_lang as ink;
-type CurrencyId = u64;
+use ink_prelude::vec;
+use ink_prelude::vec::Vec;
 
 #[ink::chain_extension]
 pub trait ChainExtension {
@@ -19,7 +20,6 @@ pub trait ChainExtension {
     fn do_balance_transfer(
         value: <ink_env::DefaultEnvironment as Environment>::Balance,
         recipient: AccountId,
-        currency_id: CurrencyId,
     ) -> Result<u32, ContractError>;
 
     #[ink(extension = 3)]
@@ -31,6 +31,15 @@ pub trait ChainExtension {
     /// Calls the runtime chain extension with func_id 4, to get the current value held in the
     /// runtime storage value.
     fn do_get_from_runtime() -> u32;
+
+    #[ink(extension = 5)]
+    /// Calls the runtime chain extension with func_id 3, which calls free_balance of
+    /// pallet_balances for the given account.
+    fn claim(
+        from: AccountId,
+        recipient: AccountId,
+        value: <ink_env::DefaultEnvironment as Environment>::Balance,
+    ) -> Result<(), ContractError>;
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -39,6 +48,7 @@ pub enum ContractError {
     FailToCallRuntime,
     UnknownStatusCode,
     InvalidScaleEncoding,
+    InsufficientBalance,
 }
 
 impl From<scale::Error> for ContractError {
@@ -78,7 +88,7 @@ impl Environment for CustomEnvironment {
 /// A smart contract with a custom environment, necessary for the chain extension
 mod contract_with_extension {
     use super::*;
-
+    use core::convert::TryInto;
     /// Defines the storage of our contract.
     #[ink(storage)]
     pub struct RuntimeInterface {
@@ -111,8 +121,106 @@ mod contract_with_extension {
 
         /// Simply returns the current value.
         #[ink(message)]
-        pub fn get(&self) -> u32 {
-            self.stored_number
+        pub fn get(&self) -> Balance {
+            // ink_env::balance::<CustomEnvironment>()
+            // self.stored_number
+            self.env().balance()
+        }
+
+        /// Returns a random hash seed
+        #[ink(message)]
+        // pub fn random(&self, subject: u8) -> Result<(Hash, BlockNumber), ContractError> {
+        //     let (hash, block) = self.env().random(&[subject]);
+        //     Ok((hash, block))
+        // }
+        pub fn randomess(&self, subject: u8) -> (Hash, BlockNumber) {
+            let (hash, block_number) = self.env().random(&[subject]);
+            (hash, block_number)
+        }
+
+        /// Returns a random hash seed
+        #[ink(message)]
+        pub fn random_m(&self, value: u8) -> BlockNumber {
+            // let block_number = self.get_block_number();
+            let subject: Vec<u8> = (0..7).map(|v| v + value).collect();
+            let (hash, n0) = self.env().random(&subject);
+            n0
+        }
+
+        #[ink(message)]
+        pub fn lixi(&self, lucky_number: u8, select: u8) -> (u8, u8, u64, Balance) {
+            let bounded_vec: Vec<u8> = (0u8..100u8).map(|v| v).collect();
+            let bounded_lucky_number = if bounded_vec.contains(&lucky_number) {
+                lucky_number
+            } else {
+                0
+            };
+            let bounded_select: u8 = if select == 0 | 1 | 2 { select } else { 0 };
+            // let block_number = self.get_block_number();
+            let now: u64 = self.get_timestamp();
+            let s0: Vec<u8> = (0..7).map(|v| v + bounded_lucky_number).collect(); // 7 days + lucky_number
+            let (_, r0) = self.env().random(&[bounded_lucky_number]);
+            let (_, r1) = self.env().random(&s0);
+            let number: u64 = u32::from(r0 + r1).into();
+            let n = (number + now) % 3;
+            let balance = if n == bounded_select.into() {
+                /* let sub: u32 = r0.abs_diff(r1);
+                let u8sub: u8 = sub.try_into().unwrap();
+                let l = if bounded_vec.contains(&u8sub) {
+                    sub
+                } else {
+                    bounded_lucky_number.try_into().unwrap()
+                };
+                // error trapped
+                // let (_, now_r) = self.env().random(&[now.try_into().unwrap()]);
+                let (_, rr) = self.env().random(&[l.try_into().unwrap()]);
+                */
+                let div: u32 = r1 % 3;
+                if div == 0 {
+                    100
+                } else if div == 1 {
+                    1000
+                } else {
+                    assert_eq!(div, 2);
+                    10000
+                }
+            } else {
+                let div: u32 = r1 % 3;
+                if div == 0 {
+                    10
+                } else if div == 1 {
+                    20
+                } else {
+                    assert_eq!(div, 2);
+                    30
+                }
+            };
+            (bounded_select, bounded_lucky_number, n, balance)
+        }
+
+        /// Returns the current block number
+        // #[inline]
+        #[ink(message)]
+        pub fn get_block_number(&self) -> BlockNumber {
+            self.env().block_number()
+        }
+
+        // #[inline]
+        #[ink(message)]
+        pub fn get_timestamp(&self) -> Timestamp {
+            self.env().block_timestamp()
+        }
+
+        /// Returns the account ID of the executed contract
+        #[ink(message)]
+        pub fn smart_contract_account(&self) -> AccountId {
+            // ink_env::account_id::<CustomEnvironment>()
+            self.env().account_id()
+        }
+
+        #[ink(message)]
+        pub fn caller_account(&mut self) -> AccountId {
+            self.env().caller()
         }
 
         /// A simple storage function meant to demonstrate calling a smart contract from a custom
@@ -142,11 +250,10 @@ mod contract_with_extension {
             &mut self,
             amount: Balance,
             recipient: AccountId,
-            currency_id: CurrencyId,
         ) -> Result<(), ContractError> {
             self.env()
                 .extension()
-                .do_balance_transfer(amount, recipient, currency_id)?;
+                .do_balance_transfer(amount, recipient)?;
             self.stored_number = 100;
             Ok(())
         }
@@ -168,6 +275,35 @@ mod contract_with_extension {
             self.env().emit_event(ResultNum { number: value? });
             self.stored_number = 50;
             value
+        }
+
+        #[ink(message)]
+        pub fn transfer_native(
+            &mut self,
+            destination: AccountId,
+            value: Balance,
+        ) -> Result<(), ContractError> {
+            ink_env::transfer::<CustomEnvironment>(destination, value);
+            Ok(())
+        }
+
+        /* /// Transfer value from the contract to the destination account ID
+        #[ink(message)]
+        pub fn deposit(&mut self, value: Balance) -> Result<(), ContractError> {
+            let from: AccountId = self.env().account_id();
+            let to: AccountId = self.caller_account();
+            self.transfer_from_to(&from, &to, value);
+            Ok(())
+        }
+        */
+
+        //#[inline]
+        #[ink(message)]
+        pub fn give_me(&mut self, value: Balance) -> Result<(), ContractError> {
+            self.env()
+                .extension()
+                .claim(self.env().account_id(), self.env().caller(), value);
+            Ok(())
         }
     }
 
