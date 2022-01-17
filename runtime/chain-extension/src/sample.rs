@@ -94,7 +94,7 @@ where
                     transfer_amount,
                 );
             }
-            3 | 4 => {
+            /*3 | 4 => {
                 let base_weight = RocksDbWeight::get().reads(1);
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 
@@ -116,6 +116,32 @@ where
                     }
                     _ => unreachable!(),
                 }
+            }
+            */
+            // do_balance_transfer
+            5 => {
+                // Retrieve arguments
+                let base_weight = <T as pallet_contracts::Config>::Schedule::get()
+                    .host_fn_weights
+                    .call_transfer_surcharge;
+                env.charge_weight(base_weight.saturating_add(extension_overhead))?;
+
+                let (from, to, value): (
+                    T::AccountId,
+                    T::AccountId,
+                    // <T as frame_support::traits::Currency<T::AccountId>>::Balance,
+                    T::Balance,
+                ) = env.read_as()?;
+                let recipient = T::Lookup::unlookup(to);
+                let address = env.ext().address().clone();
+
+                pallet_balances::Pallet::<T>::transfer(
+                    RawOrigin::Signed(address).into(),
+                    recipient,
+                    value,
+                )
+                .map_err(|d| d.error)?;
+                // env.ext().transfer(&to, value);
             }
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);
