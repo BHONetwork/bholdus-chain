@@ -143,11 +143,6 @@ pub mod pallet {
 
         #[cfg(feature = "try-runtime")]
         fn post_upgrade() -> Result<(), &'static str> {
-            ensure!(
-                Self::service_fee() == 0,
-                "Service fee is not 0 after upgrade"
-            );
-
             Ok(())
         }
     }

@@ -53,6 +53,8 @@ impl SubstrateCli for Cli {
             "ulas-local" => Box::new(chain_spec::ulas::local_testnet_config()?),
             #[cfg(feature = "with-ulas-runtime")]
             "ulas-prod-sample" => Box::new(chain_spec::ulas::production_sample_config()?),
+            #[cfg(feature = "with-ulas-runtime")]
+            "ulas" => Box::new(chain_spec::ulas::config()?),
 
             #[cfg(feature = "with-cygnus-runtime")]
             "cygnus-dev" => Box::new(chain_spec::cygnus::development_config()?),
@@ -60,6 +62,8 @@ impl SubstrateCli for Cli {
             "cygnus-local" => Box::new(chain_spec::cygnus::local_testnet_config()?),
             #[cfg(feature = "with-cygnus-runtime")]
             "cygnus-prod-sample" => Box::new(chain_spec::cygnus::production_sample_config()?),
+            #[cfg(feature = "with-cygnus-runtime")]
+            "cygnus" => Box::new(chain_spec::cygnus::config()?),
 
             #[cfg(feature = "with-phoenix-runtime")]
             "phoenix-dev" => Box::new(chain_spec::phoenix::development_config()?),
@@ -67,6 +71,8 @@ impl SubstrateCli for Cli {
             "phoenix-local" => Box::new(chain_spec::phoenix::local_testnet_config()?),
             #[cfg(feature = "with-phoenix-runtime")]
             "phoenix-prod-sample" => Box::new(chain_spec::phoenix::production_sample_config()?),
+            #[cfg(feature = "with-phoenix-runtime")]
+            "phoenix" => Box::new(chain_spec::phoenix::config()?),
 
             path => {
                 let path = std::path::PathBuf::from(path);

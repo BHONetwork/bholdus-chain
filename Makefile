@@ -22,19 +22,6 @@ run-benchmark-phoenix:
 toolchain:
 	./scripts/init.sh
 
-.PHONY: build-ulas
-build-ulas:
-	SKIP_WASM_BUILD= cargo build --features with-ulas-runtime --release
-.PHONY: build-cygnus
-build-cygnus:
-	SKIP_WASM_BUILD= cargo build --features with-cygnus-runtime --release
-.PHONY: build-phoenix
-build-phoenix:
-	SKIP_WASM_BUILD= cargo build --features with-phoenix-runtime --release
-.PHONY: build-all
-build-all:
-	cargo build --locked --features with-all-runtime
-
 .PHONY: check-debug-ulas
 check-debug-ulas:
 	RUSTFLAGS="-Z macro-backtrace" SKIP_WASM_BUILD= cargo +nightly check --features with-ulas-runtime --release
@@ -55,6 +42,7 @@ test-cygnus-runtime:
 test-phoenix-runtime:
 	SKIP_WASM_BUILD= cargo test --features with-phoenix-runtime -- --nocapture
 
+# For CI
 .PHONY: test-runtimes
 test-runtimes:
 	SKIP_WASM_BUILD= cargo test --all --features with-all-runtime
@@ -86,3 +74,40 @@ check-phoenix-try-runtime:
 .PHONY: check-try-runtime
 check-try-runtime:
 	SKIP_WASM_BUILD= cargo check --features try-runtime --features with-all-runtime
+
+# Run the try-runtime
+.PHONY: run-ulas-try-runtime
+run-ulas-try-runtime:
+	RUST_LOG=runtime=trace,try-runtime::cli=trace,executor=trace \
+    cargo run --features try-runtime,with-ulas-runtime try-runtime \
+    --chain ulas-dev \
+    on-runtime-upgrade \
+    live \
+    --uri wss://blockchain-wss-0.bho.network/ \
+.PHONY: run-cygnus-try-runtime
+run-cygnus-try-runtime:
+	RUST_LOG=runtime=trace,try-runtime::cli=trace,executor=trace \
+    cargo run --features try-runtime,with-cygnus-runtime try-runtime \
+    --chain cygnus-dev \
+    on-runtime-upgrade \
+    live \
+    --uri wss://blockchain-wss-0.testnet.bholdus.net/ \
+.PHONY: run-phoenix-try-runtime
+run-phoenix-try-runtime:
+	RUST_LOG=runtime=trace,try-runtime::cli=trace,executor=trace \
+    cargo run --features try-runtime,with-phoenix-runtime try-runtime \
+    --chain phoenix-dev \
+    on-runtime-upgrade \
+    live \
+    --uri wss://blockchain-wss-0.dev.bholdus.net/ \
+
+# Build WASM runtime only
+.PHONY: build-ulas-runtime-wasm
+build-ulas-runtime-wasm:
+	PACKAGE=ulas-runtime ./scripts/srtool_build.sh
+.PHONY: build-cygnus-runtime-wasm
+build-cygnus-runtime-wasm:
+	PACKAGE=cygnus-runtime ./scripts/srtool_build.sh
+.PHONY: build-phoenix-runtime-wasm
+build-phoenix-runtime-wasm:
+	PACKAGE=phoenix-runtime ./scripts/srtool_build.sh
