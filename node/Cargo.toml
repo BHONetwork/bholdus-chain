@@ -29,7 +29,10 @@ bholdus-service = { version = '4.0.0-dev', path = 'service' }
 
 [features]
 default = []
-runtime-benchmarks = ["bholdus-cli/runtime-benchmarks"]
+runtime-benchmarks = [
+    "bholdus-cli/runtime-benchmarks",
+    "bholdus-service/runtime-benchmarks",
+]
 with-ulas-runtime = [
     "bholdus-service/with-ulas-runtime",
     "bholdus-cli/with-ulas-runtime",

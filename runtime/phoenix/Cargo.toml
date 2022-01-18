@@ -132,8 +132,9 @@ runtime-benchmarks = [
 	'pallet-balances/runtime-benchmarks',
 	'pallet-timestamp/runtime-benchmarks',
 	'pallet-collective/runtime-benchmarks',
-	"pallet-evm/runtime-benchmarks",
 	"hex-literal",
+
+	"pallet-ethereum/runtime-benchmarks",
 
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
 	"bholdus-tokens/runtime-benchmarks",
