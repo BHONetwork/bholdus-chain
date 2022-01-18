@@ -44,6 +44,10 @@ scale-info = { version = "1.0", default-features = false, features = [
     "derive",
 ] }
 sp-runtime = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+pallet-timestamp = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+pallet-balances = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+bholdus-tokens = { path = "../../pallets/tokens" }
+bholdus-support = { path = "../../pallets/support" }
 
 [features]
 default = ["std"]

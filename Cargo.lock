@@ -615,14 +615,18 @@ name = "bholdus-evm-precompile-template"
 version = "1.0.10"
 dependencies = [
  "bholdus-evm-precompile-utils",
+ "bholdus-support",
+ "bholdus-tokens",
  "derive_more",
  "fp-evm",
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "log",
  "num_enum",
+ "pallet-balances",
  "pallet-evm",
  "pallet-template",
+ "pallet-timestamp",
  "parity-scale-codec",
  "scale-info",
  "serde",

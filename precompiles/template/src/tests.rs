@@ -4,8 +4,10 @@ use std::{assert_matches::assert_matches, str::from_utf8};
 
 use crate::mock::*;
 use crate::*;
+use fp_evm::{Context, PrecompileFailure};
+use sha3::{Digest, Keccak256};
 
-fn precompiles() -> Precompiles<Runtime> {
+fn precompiles() -> PalletTemplatePrecompileSet<Runtime> {
     PrecompilesValue::get()
 }
 

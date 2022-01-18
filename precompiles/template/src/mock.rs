@@ -21,6 +21,7 @@ use super::*;
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::{construct_runtime, parameter_types, traits::Everything};
 
+use bholdus_support::parameter_type_with_key;
 use frame_system::EnsureRoot;
 use pallet_evm::{AddressMapping, EnsureAddressNever, EnsureAddressRoot};
 use scale_info::TypeInfo;
@@ -28,7 +29,7 @@ use serde::{Deserialize, Serialize};
 use sp_core::{H160, H256};
 use sp_runtime::{
     testing::Header,
-    traits::{BlakeTwo256, IdentityLookup},
+    traits::{BlakeTwo256, IdentityLookup, Zero},
 };
 
 pub type AccountId = Account;
@@ -36,6 +37,8 @@ pub type Balance = u128;
 pub type BlockNumber = u64;
 pub type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>;
 pub type Block = frame_system::mocking::MockBlock<Runtime>;
+pub type TokenId = u64;
+pub type Amount = i128;
 
 /// A simple account type.
 #[derive(
@@ -149,6 +152,82 @@ impl pallet_evm::Config for Runtime {
     type FindAuthor = ();
 }
 
+parameter_types! {
+    pub const MinimumPeriod: u64 = 5;
+}
+
+impl pallet_timestamp::Config for Runtime {
+    type Moment = u64;
+    type OnTimestampSet = ();
+    type MinimumPeriod = MinimumPeriod;
+    type WeightInfo = ();
+}
+
+parameter_types! {
+    pub const ExistentialDeposit: u128 = 0;
+}
+
+impl pallet_balances::Config for Runtime {
+    type MaxReserves = ();
+    type ReserveIdentifier = ();
+    type MaxLocks = ();
+    type Balance = Balance;
+    type Event = Event;
+    type DustRemoval = ();
+    type ExistentialDeposit = ExistentialDeposit;
+    type AccountStore = System;
+    type WeightInfo = ();
+}
+
+parameter_types! {
+    pub const AssetDeposit: Balance = 0;
+    pub const ApprovalDeposit: Balance = 0;
+    pub const StringLimit: u32 = 50;
+    pub const MaxDecimals: u8 = 18;
+    pub const MetadataDepositBase: Balance = 0;
+    pub const MetadataDepositPerByte: Balance = 0;
+    pub const BasicDeposit: Balance = 0;
+    pub const FieldDeposit: Balance = 0;
+    pub const SubAccountDeposit: Balance = 0;
+    pub const MaxSubAccounts: u32 = 100;
+    pub const MaxAdditionalFields: u32 = 100;
+    pub const MaxRegistrars: u32 = 20;
+}
+
+parameter_type_with_key! {
+    pub ExistentialDeposits: |_asset_id: TokenId| -> Balance {
+        Zero::zero()
+    };
+}
+
+impl bholdus_tokens::Config for Runtime {
+    type Event = Event;
+    type Balance = Balance;
+    type Amount = Amount;
+    type AssetId = TokenId;
+
+    type Currency = Balances;
+    type BasicDeposit = BasicDeposit;
+    type FieldDeposit = FieldDeposit;
+    type MaxRegistrars = MaxRegistrars;
+    type MaxAdditionalFields = MaxAdditionalFields;
+    type ForceOrigin = EnsureRoot<AccountId>;
+    type AssetDeposit = AssetDeposit;
+    type MetadataDepositBase = MetadataDepositBase;
+    type MetadataDepositPerByte = MetadataDepositPerByte;
+    type ApprovalDeposit = ApprovalDeposit;
+    type StringLimit = StringLimit;
+    type MaxDecimals = MaxDecimals;
+    type Freezer = ();
+    type Extra = ();
+    type WeightInfo = bholdus_tokens::weights::SubstrateWeight<Runtime>;
+    type ExistentialDeposits = ExistentialDeposits;
+}
+
+impl pallet_template::Config for Runtime {
+    type Event = Event;
+}
+
 // Configure a mock runtime to test the pallet.
 construct_runtime!(
     pub enum Runtime where
@@ -158,9 +237,10 @@ construct_runtime!(
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
-        Assets: pallet_assets::{Pallet, Call, Storage, Event<T>},
+        Tokens: bholdus_tokens,
         Evm: pallet_evm::{Pallet, Call, Storage, Event<T>},
         Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
+        Template: pallet_template,
     }
 );
 
