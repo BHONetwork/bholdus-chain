@@ -32,28 +32,45 @@ check-debug-cygnus:
 check-debug-phoenix:
 	RUSTFLAGS="-Z macro-backtrace" SKIP_WASM_BUILD= cargo +nightly check --features with-phoenix-runtime --release
 
-.PHONY: test-ulas
-test-ulas:
-	SKIP_WASM_BUILD= cargo test --features with-ulas-runtime --release -- --nocapture
-.PHONY: test-cygnus
-test-cygnus:
-	SKIP_WASM_BUILD= cargo test --features with-cygnus-runtime --release -- --nocapture
-.PHONY: test-phoenix
-test-phoenix:
-	SKIP_WASM_BUILD= cargo test --features with-phoenix-runtime --release -- --nocapture
+.PHONY: test-ulas-runtime
+test-ulas-runtime:
+	SKIP_WASM_BUILD= cargo test --features with-ulas-runtime -- --nocapture
+.PHONY: test-cygnus-runtime
+test-cygnus-runtime:
+	SKIP_WASM_BUILD= cargo test --features with-cygnus-runtime -- --nocapture
+.PHONY: test-phoenix-runtime
+test-phoenix-runtime:
+	SKIP_WASM_BUILD= cargo test --features with-phoenix-runtime -- --nocapture
 
 # For CI
 .PHONY: test-runtimes
 test-runtimes:
 	SKIP_WASM_BUILD= cargo test --all --features with-all-runtime
+
+.PHONY: test-ulas-benchmarking
+test-ulas-benchmarking:
+	cargo test --features runtime-benchmarks,with-ulas-runtime --all benchmarking
+.PHONY: test-cygnus-benchmarking
+test-cygnus-benchmarking:
+	cargo test --features runtime-benchmarks,with-cygnus-runtime --all benchmarking
+.PHONY: test-phoenix-benchmarking
+test-phoenix-benchmarking:
+	cargo test --features runtime-benchmarks,with-phoenix-runtime --all benchmarking
+
 .PHONY: test-benchmarking
 test-benchmarking:
 	cargo test --features runtime-benchmarks --features with-all-runtime --features --all benchmarking
-.PHONY: check-benchmarks
-check-benchmarks:
-	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p ulas-runtime
-	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p cygnus-runtime
-	SKIP_WASM_BUILD= cargo check --features runtime-benchmarks -p phoenix-runtime
+
+.PHONY: check-ulas-try-runtime
+check-ulas-try-runtime:
+	SKIP_WASM_BUILD= cargo check --features try-runtime,with-ulas-runtime
+.PHONY: check-cygnus-try-runtime
+check-cygnus-try-runtime:
+	SKIP_WASM_BUILD= cargo check --features try-runtime,with-cygnus-runtime
+.PHONY: check-phoenix-try-runtime
+check-phoenix-try-runtime:
+	SKIP_WASM_BUILD= cargo check --features try-runtime,with-phoenix-runtime
+
 .PHONY: check-try-runtime
 check-try-runtime:
 	SKIP_WASM_BUILD= cargo check --features try-runtime --features with-all-runtime

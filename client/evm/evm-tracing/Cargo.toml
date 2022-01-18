@@ -1,0 +1,22 @@
+[package]
+name = "bholdus-client-evm-tracing"
+authors = ["Bholdus"]
+edition = "2018"
+homepage = "https://bholdus.com"
+license = "GPL-3.0-only"
+repository = "https://github.com/Bholdus/bholdus-chain/"
+version = "0.1.0"
+
+[dependencies]
+ethereum-types = { version = "0.12.0" }
+hex = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+
+# Bholdus
+evm-tracing-events = { path = "../../../primitives/evm/rpc/evm-tracing-events" }
+bholdus-evm-rpc-primitives-debug = { path = "../../../primitives/evm/rpc/debug" }
+
+# Substrate
+codec = { package = "parity-scale-codec", version = "2.2", default-features = false }
+sp-std = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }

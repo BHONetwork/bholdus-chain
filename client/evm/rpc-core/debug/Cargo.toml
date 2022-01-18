@@ -1,0 +1,21 @@
+[package]
+name = "bholdus-evm-rpc-core-debug"
+authors = ["Bholdus"]
+edition = "2018"
+homepage = "https://bholdus.com"
+license = "GPL-3.0-only"
+repository = "https://github.com/Bholdus/bholdus-chain/"
+version = "0.1.0"
+
+[dependencies]
+ethereum-types = "0.12.0"
+futures = { version = "0.3", features = ["compat"] }
+jsonrpc-core = "18.0.0"
+jsonrpc-core-client = "18.0.0"
+jsonrpc-derive = "18.0.0"
+bholdus-client-evm-tracing = { path = "../../evm-tracing" }
+bholdus-evm-rpc-core-types = { path = "../types" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+sp-core = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
