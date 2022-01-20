@@ -23,7 +23,8 @@ members = [
 ]
 
 exclude = [
-    'smart-contracts/tokens'
+    'smart-contracts/tokens',
+	'smart-contracts/lixi',
 ]
 [profile.release]
 panic = 'unwind'
