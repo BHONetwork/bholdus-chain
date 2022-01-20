@@ -1,32 +1,28 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use bholdus_primitives::{Balance, TokenId};
 use codec::{Decode, Encode, MaxEncodedLen};
-use frame_support::traits::Get;
+use frame_support::dispatch::Output;
+use frame_support::traits::{Get, Randomness};
 pub type CurrencyId = TokenId;
 
 use frame_support::{
-    log::error,
+    log::{error, trace},
     weights::{constants::RocksDbWeight, Weight},
 };
 use frame_system::RawOrigin;
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
 };
-
-mod sample;
-pub use sample::SampleExtensions;
-
 use sp_runtime::{traits::StaticLookup, DispatchError};
+
 pub struct IntegrationExtensions;
 
 impl<T> ChainExtension<T> for IntegrationExtensions
 where
     T: SysConfig
-        + bholdus_currencies::Config
         + pallet_contracts::Config
-        + sample_extension::Config
-        + integration_tokens::Config
-        + pallet_balances::Config,
+        + pallet_balances::Config
+        + pallet_randomness_collective_flip::Config,
     <T as SysConfig>::AccountId: UncheckedFrom<<T as SysConfig>::Hash> + AsRef<[u8]>,
 {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
@@ -35,18 +31,13 @@ where
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
         let mut env = env.buf_in_buf_out();
-
-        // Use the weight of `debug_message` as the baseline weight overhead for the chain extension
-        // functions. `debug_message` is one reasonable choice as it immediately returns, which
-        // represents the function of the chain extension well, as they don't do much beyond call an
-        // already-weighted extrinsic.
         let extension_overhead = <T as pallet_contracts::Config>::Schedule::get()
             .host_fn_weights
             .debug_message;
 
         // Match on function id assigned in the contract
         match func_id {
-            // ToDo: call transfer native
+            // do_balance_transfer
             1 => {
                 // Retrieve arguments
                 let base_weight = <T as pallet_contracts::Config>::Schedule::get()
@@ -54,20 +45,30 @@ where
                     .call_transfer_surcharge;
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 
-                let (transfer_amount, recipient_account, currency_id): (
-                    Balance,
-                    T::AccountId,
-                    CurrencyId,
-                ) = env.read_as()?;
-                let recipient = T::Lookup::unlookup(recipient_account);
-                let caller = env.ext().caller().clone();
+                let (from, to, value): (T::AccountId, T::AccountId, T::Balance) = env.read_as()?;
+                let recipient = T::Lookup::unlookup(to);
+                let address = env.ext().address().clone();
 
-                integration_tokens::Pallet::<T>::transfer(
-                    RawOrigin::Signed(caller).into(),
+                pallet_balances::Pallet::<T>::transfer(
+                    RawOrigin::Signed(address).into(),
                     recipient,
-                    currency_id,
-                    transfer_amount,
+                    value,
+                )
+                .map_err(|d| d.error)?;
+            }
+
+            2 => {
+                let arg: [u8; 32] = env.read_as()?;
+                let random_seed = <pallet_randomness_collective_flip::Pallet<T>>::random(&arg).0;
+                let random_slice = random_seed.encode();
+                trace!(
+                    target: "runtime",
+                    "[ChainExtension]|call|func_id:{:}",
+                    func_id
                 );
+
+                env.write(&random_slice, false, None)
+                    .map_err(|_| DispatchError::Other("ChainExtension failed to call random"))?
             }
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);
