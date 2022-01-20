@@ -6069,6 +6069,7 @@ dependencies = [
  "pallet-balances",
  "pallet-contracts",
  "pallet-integration",
+ "pallet-randomness-collective-flip",
  "parity-scale-codec",
  "sample-extension",
  "scale-info",

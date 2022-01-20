@@ -10,14 +10,14 @@ use ink_prelude::vec::Vec;
 #[ink::chain_extension]
 pub trait LixiChainExtension {
     type ErrorCode = ContractError;
-    #[ink(extension = 5, returns_result = false)]
+    #[ink(extension = 1, returns_result = false)]
     fn claim(
         from: AccountId,
         recipient: AccountId,
         value: <ink_env::DefaultEnvironment as Environment>::Balance,
     ) -> Result<(), ContractError>;
 
-    #[ink(extension = 7, returns_result = false)]
+    #[ink(extension = 2, returns_result = false)]
     fn fetch_random(subject: [u8; 32]) -> [u8; 32];
 }
 
