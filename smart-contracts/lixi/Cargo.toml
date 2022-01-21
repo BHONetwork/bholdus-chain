@@ -10,20 +10,20 @@ repository = 'https://github.com/bholdus/bholdus-chain'
 version = '4.0.0-dev'
 
 [dependencies]
-ink_primitives = { version = "=3.0.0-rc7", default-features = false }
-ink_metadata = { version = "=3.0.0-rc7", default-features = false, features = ["derive"], optional = true }
-ink_env = { version = "=3.0.0-rc7", default-features = false, features = [ "ink-debug" ] }
-ink_storage = { version = "=3.0.0-rc7", default-features = false }
-ink_lang = { version = "=3.0.0-rc7", default-features = false }
-ink_prelude = { version = "=3.0.0-rc7", default-features = false }
+ink_primitives = { version = "3.0.0-rc7", default-features = false, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
+ink_metadata = { version = "3.0.0-rc7", default-features = false, features = ["derive"], optional = true, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
+ink_env = { version = "3.0.0-rc7", default-features = false, features = [ "ink-debug" ], git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
+ink_storage = { version = "3.0.0-rc7", default-features = false, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
+ink_lang = { version = "3.0.0-rc7", default-features = false, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
+ink_prelude = { version = "3.0.0-rc7", default-features = false, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
 
-scale = { package = "parity-scale-codec", version = "=2", default-features = false, features = ["derive"] }
+scale = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = ["derive"] }
 scale-info = { version = "=1.0.0", default-features = false, features = ["derive"], optional = true }
 
 
 # Needed until https://github.com/paritytech/ink/issues/364 is resolved.
-# [profile.release]
-# overflow-checks = false
+[profile.release]
+overflow-checks = false
 
 
 [lib]
