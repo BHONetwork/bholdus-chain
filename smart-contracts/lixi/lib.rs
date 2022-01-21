@@ -2,8 +2,10 @@
 use core::convert::TryInto;
 use ink_env::{AccountId, Environment, Error, Hash};
 use ink_lang as ink;
+use ink_prelude::vec;
 use ink_prelude::vec::Vec;
 use ink_storage::{lazy::Mapping, Lazy};
+type DayId = i8;
 
 #[ink::chain_extension]
 pub trait LixiChainExtension {
@@ -60,13 +62,17 @@ impl Environment for LixiEnv {
 /// A smart contract with a custom environment, necessary for the chain extension
 mod lixi {
     use super::*;
+    use ink_storage::{
+        collections::{hashmap::Entry, HashMap as StorageHashMap, Vec as StorageVec},
+        traits::{PackedLayout, SpreadLayout},
+        Lazy,
+    };
     #[ink(storage)]
     pub struct LixiApp {
         nonce: u8,
         randomness: Vec<u32>,
-        rewards: Vec<Balance>,
         balance: Balance,
-        winners: Mapping<AccountId, (Balance, Timestamp)>,
+        winners: StorageHashMap<(AccountId, DayId), (Timestamp, Balance)>,
     }
 
     /// Event emitted when user claimed BHO
@@ -94,7 +100,6 @@ mod lixi {
             Self {
                 nonce: Default::default(),
                 randomness: Default::default(),
-                rewards: Default::default(),
                 balance: Default::default(),
                 winners: Default::default(),
             }
@@ -109,16 +114,12 @@ mod lixi {
         #[ink(message)]
         pub fn lixi(&mut self) -> Result<Balance, ContractError> {
             let caller: AccountId = self.env().caller();
-            let block_number: u8 = self.env().block_number().try_into().unwrap();
+            let account_id: AccountId = self.env().account_id();
+            let block_number: BlockNumber = self.env().block_number();
             let timestamp: Timestamp = self.env().block_timestamp();
-            let add_number = if self.nonce % 2 == 0 {
-                self.nonce + block_number + 1
-            } else {
-                self.nonce + block_number
-            };
-            let subject_runtime: [u8; 32] = [add_number; 32];
-            let randomness_runtime = self.env().extension().fetch_random(subject_runtime)?;
-            let (_hash, randomness) = self.env().random(&randomness_runtime);
+            let subject_runtime: [u8; 32] = [self.nonce; 32];
+            let random_seed = self.env().extension().fetch_random(subject_runtime)?;
+            let (_hash, randomness) = self.env().random(&random_seed);
             let lucky_number = randomness % 3;
             let amount: Balance = if lucky_number == 0 {
                 10
@@ -128,20 +129,20 @@ mod lixi {
                 30
             };
             let reward: Balance = amount * 10u128.checked_pow(18).unwrap();
-
             // TODO: Do transfer
             self.give_me(reward);
-            self.winners
-                .insert(self.env().caller(), &(amount, timestamp));
+            self.winners.insert((caller, 1i8), (timestamp, amount));
 
-            let rewards = &mut self.rewards;
-            rewards.push(amount);
-            ink_env::debug_println!("ink_rewards {:?}", &rewards);
-            self.rewards = rewards.to_vec();
+            // let rewards = &mut self.rewards;
+            // rewards.push(amount);
+
+            // ink_env::debug_println!("ink_rewards {:?}", &rewards);
+            // self.rewards = rewards.to_vec();
+
             self.nonce += 1;
             self.env().emit_event(Reward {
-                from: self.env().account_id(),
-                to: self.env().caller(),
+                from: account_id,
+                to: caller,
                 value: reward,
                 timestamp,
             });
@@ -165,17 +166,14 @@ mod lixi {
         }
 
         #[ink(message)]
-        pub fn winners(&mut self) -> Result<(), ContractError> {
-            let (amount, timestamp) = self.winners.get(self.env().caller()).unwrap();
-            let reward: Balance = amount * 10u128.checked_pow(18).unwrap();
+        pub fn get_winners(&self, owner: AccountId) -> Vec<(Timestamp, Balance)> {
+            let (t1, a1) = self.winners.get(&(owner, 1i8)).copied().unwrap_or((0, 0));
+            let (t2, a2) = self.winners.get(&(owner, 2i8)).copied().unwrap_or((0, 0));
+            let (t3, a3) = self.winners.get(&(owner, 3i8)).copied().unwrap_or((0, 0));
 
-            self.env().emit_event(Claimed {
-                user: self.env().caller(),
-                value: reward,
-                timestamp,
-            });
-
-            Ok(())
+            let mut xs = vec![(t1, a1), (t2, a2), (t3, a3)];
+            xs.retain(|&(x, _)| x != 0);
+            xs
         }
 
         #[ink(message)]
@@ -188,11 +186,11 @@ mod lixi {
             self.randomness.clone()
         }
 
-        /// Get list rewards
+        /*/// Get list rewards
         #[ink(message)]
-        pub fn get_rewards(&self) -> Vec<Balance> {
-            self.rewards.clone()
-        }
+        pub fn get_rewards(&self, owner: AccountId) -> Option<Balance> {
+            self.rewards.get(&owner).cloned()
+        }*/
 
         /// Returns balance of smart contract.
         #[ink(message)]
