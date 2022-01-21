@@ -1,11 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+use core::convert::TryInto;
 use ink_env::{AccountId, Environment, Error, Hash};
 use ink_lang as ink;
-use ink_prelude::vec;
 use ink_prelude::vec::Vec;
-// use ink_storage::collections::{
-//     HashMap as StorageHashMap, Stash as StorageStash, Vec as StorageVec,
-// };
+use ink_storage::{lazy::Mapping, Lazy};
 
 #[ink::chain_extension]
 pub trait LixiChainExtension {
@@ -68,6 +66,26 @@ mod lixi {
         randomness: Vec<u32>,
         rewards: Vec<Balance>,
         balance: Balance,
+        winners: Mapping<AccountId, (Balance, Timestamp)>,
+    }
+
+    /// Event emitted when user claimed BHO
+    #[ink(event)]
+    pub struct Reward {
+        #[ink(topic)]
+        from: AccountId,
+        #[ink(topic)]
+        to: AccountId,
+        value: Balance,
+        timestamp: Timestamp,
+    }
+
+    #[ink(event)]
+    pub struct Claimed {
+        #[ink(topic)]
+        user: AccountId,
+        value: Balance,
+        timestamp: Timestamp,
     }
 
     impl LixiApp {
@@ -78,6 +96,7 @@ mod lixi {
                 randomness: Default::default(),
                 rewards: Default::default(),
                 balance: Default::default(),
+                winners: Default::default(),
             }
         }
 
@@ -88,9 +107,10 @@ mod lixi {
 
         /// Lixi App
         #[ink(message)]
-        pub fn lixi(&mut self, select: u8) -> Result<Balance, ContractError> {
-            let bounded_number: u8 = if select == 0 | 1 | 2 { select } else { 0u8 };
+        pub fn lixi(&mut self) -> Result<Balance, ContractError> {
+            let caller: AccountId = self.env().caller();
             let block_number: u8 = self.env().block_number().try_into().unwrap();
+            let timestamp: Timestamp = self.env().block_timestamp();
             let add_number = if self.nonce % 2 == 0 {
                 self.nonce + block_number + 1
             } else {
@@ -100,20 +120,31 @@ mod lixi {
             let randomness_runtime = self.env().extension().fetch_random(subject_runtime)?;
             let (_hash, randomness) = self.env().random(&randomness_runtime);
             let lucky_number = randomness % 3;
-            let amount = if lucky_number == bounded_number.into() {
-                50
-            } else {
+            let amount: Balance = if lucky_number == 0 {
                 10
+            } else if lucky_number == 1 {
+                20
+            } else {
+                30
             };
-            // TODO: Do transfer
-            self.give_me(amount);
-            //self.env().transfer(self.env().caller(), balance);
+            let reward: Balance = amount * 10u128.checked_pow(18).unwrap();
 
-            let mut rewards = &mut self.rewards;
+            // TODO: Do transfer
+            self.give_me(reward);
+            self.winners
+                .insert(self.env().caller(), &(amount, timestamp));
+
+            let rewards = &mut self.rewards;
             rewards.push(amount);
             ink_env::debug_println!("ink_rewards {:?}", &rewards);
             self.rewards = rewards.to_vec();
             self.nonce += 1;
+            self.env().emit_event(Reward {
+                from: self.env().account_id(),
+                to: self.env().caller(),
+                value: reward,
+                timestamp,
+            });
             Ok(amount)
         }
 
@@ -130,6 +161,20 @@ mod lixi {
             self.env()
                 .extension()
                 .claim(self.env().account_id(), self.env().caller(), value);
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn winners(&mut self) -> Result<(), ContractError> {
+            let (amount, timestamp) = self.winners.get(self.env().caller()).unwrap();
+            let reward: Balance = amount * 10u128.checked_pow(18).unwrap();
+
+            self.env().emit_event(Claimed {
+                user: self.env().caller(),
+                value: reward,
+                timestamp,
+            });
+
             Ok(())
         }
 
