@@ -15,3 +15,8 @@ services:
         source: ./.local
         target: /root/.local
     command: bash -c "cargo build --release && ./target/release/node-template --dev --ws-external"
+
+  subwasm-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.subwasm 
