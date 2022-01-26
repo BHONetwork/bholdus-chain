@@ -5301,7 +5301,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.10"
+version = "1.0.11"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
