@@ -43,12 +43,11 @@ use sp_core::{
 use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::generic::Era;
 use sp_runtime::traits::{
-    self, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys, SaturatedConversion,
-    StaticLookup, Zero,
+    self, AccountIdConversion, BlakeTwo256, Block as BlockT, Keccak256, NumberFor, OpaqueKeys,
+    SaturatedConversion, StaticLookup, Zero,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
-    traits::AccountIdConversion,
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill, Perquintill,
 };
@@ -69,9 +68,10 @@ pub use sp_runtime::BuildStorage;
 
 /// Bholdus dependencies
 use bholdus_currencies::BasicCurrencyAdapter;
-use bholdus_primitives::CurrencyId;
 pub use bholdus_primitives::*;
+use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
+pub use runtime_chain_extension::IntegrationExtensions;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -82,7 +82,6 @@ pub mod constants;
 pub mod weights;
 pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
-
 /// Import the template pallet.
 pub use pallet_template;
 
@@ -156,8 +155,8 @@ const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
 /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used
 /// by  Operational  extrinsics.
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2 seconds of compute with a 6 second average block time.
-const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
+/// We allow for 1 second of compute with a 3 seconds average block time.
+pub const MAXIMUM_BLOCK_WEIGHT: Weight = 1 * WEIGHT_PER_SECOND;
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -769,7 +768,7 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = ();
+    type ChainExtension = IntegrationExtensions;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -983,30 +982,17 @@ parameter_types! {
 }
 
 parameter_type_with_key! {
-    pub ExistentialDeposits: |_asset_id: u64| -> Balance {
+    pub ExistentialDeposits: |_asset_id: TokenId| -> Balance {
         Zero::zero()
     };
 }
-
-/* parameter_types! {
-    pub const GetNativeCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
-}
-
-impl bholdus_currencies::Config for Runtime {
-    type Event = Event;
-    type MultiCurrency = Tokens;
-    type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-    type GetNativeCurrencyId = GetNativeCurrencyId;
-    type WeightInfo = weights::bholdus_currencies::WeightInfo<Runtime>;
-}
-
-*/
 
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type Amount = Amount;
-    type AssetId = u64;
+    type AssetId = TokenId;
+
     type Currency = Balances;
     type BasicDeposit = BasicDeposit;
     type FieldDeposit = FieldDeposit;
@@ -1035,7 +1021,7 @@ impl bholdus_nft::Config for Runtime {
     type PalletId = NftPalletId;
     type MaxAttributesBytes = MaxAttributesBytes;
     type MaxQuantity = MaxQuantity;
-    type WeightInfo = weights::bholdus_nft::WeightInfo<Runtime>;
+    type WeightInfo = bholdus_nft::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -1067,6 +1053,7 @@ impl bholdus_dex::Config for Runtime {
     type PalletId = DexPalletId;
 }
  */
+
 /* parameter_types! {
     pub Configuration: BSCConfiguration = BSCConfiguration {
         chain_id: 97,
@@ -1137,11 +1124,9 @@ construct_runtime!(
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
-        Tokens: bholdus_tokens::{Pallet, Call, Config<T>, Storage, Event<T>},
+        Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
-        // Bholdus Support
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
@@ -1422,7 +1407,6 @@ impl_runtime_apis! {
         }
     }
 
-
     #[cfg(feature = "runtime-benchmarks")]
     impl frame_benchmarking::Benchmark<Block> for Runtime {
         fn benchmark_metadata(extra: bool) -> (
@@ -1432,6 +1416,9 @@ impl_runtime_apis! {
             use frame_benchmarking::{list_benchmark, Benchmarking, BenchmarkList};
             use frame_support::traits::StorageInfoTrait;
 
+            use bholdus_nft::benchmarking::Pallet as NFTBench;
+            use bholdus_tokens::benchmarking::Pallet as TokensBench;
+
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
             // issues. To get around that, we separated the Session benchmarks into its own crate,
             // which is why we need these two lines below.
@@ -1440,6 +1427,9 @@ impl_runtime_apis! {
             let mut list = Vec::<BenchmarkList>::new();
 
             list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_tokens, TokensBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_nft, NFTBench::<Runtime>);
+            list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1455,6 +1445,8 @@ impl_runtime_apis! {
             // issues. To get around that, we separated the Session benchmarks into its own crate,
             // which is why we need these two lines below.
             use frame_system_benchmarking::Pallet as SystemBench;
+            use bholdus_nft::benchmarking::Pallet as NFTBench;
+            use bholdus_tokens::benchmarking::Pallet as TokensBench;
 
             impl frame_system_benchmarking::Config for Runtime {}
 
@@ -1479,6 +1471,9 @@ impl_runtime_apis! {
             let params = (&config, &whitelist);
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, bholdus_tokens, TokensBench::<Runtime>);
+            add_benchmark!(params, batches, bholdus_nft, NFTBench::<Runtime>);
+            add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
 
             Ok(batches)
         }
