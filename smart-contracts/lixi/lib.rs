@@ -137,10 +137,13 @@ pub mod lixi {
 
         /// Lixi App
         #[ink(message)]
-        pub fn lixi(&mut self) -> Result<Balance, ContractError> {
-            let caller: AccountId = self.env().caller();
+        pub fn lixi(&mut self, to: AccountId) -> Result<Balance, ContractError> {
             let account_id: AccountId = self.env().account_id();
             let timestamp: Timestamp = self.env().block_timestamp();
+
+            //#[test]
+            let block_number: BlockNumber = self.block;
+            // let div = self.nonce % 100;
 
             let subject_runtime: [u8; 32] = [self.nonce; 32];
             let random_seed = self.env().extension().fetch_random(subject_runtime)?;
@@ -150,10 +153,6 @@ pub mod lixi {
             // let block_number: BlockNumber = self.env().block_number();
             // div in range: [1..100];
             let div = index0 % 100;
-
-            //#[test]
-            let block_number: BlockNumber = self.block;
-            // let div = self.nonce % 100;
 
             let mapping_reward = if div >= 1 && div <= 5 {
                 REWARD_TYPE_1
@@ -181,7 +180,7 @@ pub mod lixi {
                 return Err(ContractError::Overflow);
             };
 
-            let user = self.winners.get(&(caller, holiday));
+            let user = self.winners.get(&(to, holiday));
             if user.is_some() {
                 return Err(ContractError::InvalidRequest);
             };
@@ -196,22 +195,22 @@ pub mod lixi {
             };
             let actual_reward: Balance = amount * 10u128.checked_pow(18).unwrap();
             // TODO: Do transfer
-            self.give_me(actual_reward);
+            self.give_me(to, actual_reward);
             self.insert_nonce(self.nonce);
             self.winners
-                .insert((caller, holiday), (timestamp, actual_reward));
+                .insert((to, holiday), (timestamp, actual_reward));
 
             let mut user_reward: Vec<(Timestamp, Balance)> =
-                self.users.get(&caller).clone().unwrap_or(&vec![]).to_vec();
+                self.users.get(&to).clone().unwrap_or(&vec![]).to_vec();
             user_reward.push((timestamp, actual_reward));
-            self.users.insert(caller, user_reward.to_vec());
+            self.users.insert(to, user_reward.to_vec());
 
             self.reward_per_day
                 .insert((holiday, type_of_reward), num_of_rewards);
 
             self.env().emit_event(Reward {
                 from: account_id,
-                to: caller,
+                to,
                 value: actual_reward,
                 timestamp,
             });
@@ -220,10 +219,10 @@ pub mod lixi {
 
         /// transfer from funds
         #[inline]
-        pub fn give_me(&mut self, value: Balance) {
+        pub fn give_me(&mut self, to: AccountId, value: Balance) {
             assert!(value <= self.env().balance(), "insufficient funds!");
 
-            if self.env().transfer(self.env().caller(), value).is_err() {
+            if self.env().transfer(to, value).is_err() {
                 panic!(
                     "requested transfer failed. this can be the case if the contract does not\
                      have sufficient free funds."
@@ -431,18 +430,22 @@ pub mod lixi {
         fn claim_overflow() {
             let contract_balance = 1000000 * 10u128.checked_pow(18).unwrap();
             let mut contract = create_contracts(contract_balance);
+            let accounts = default_accounts();
             contract.nonce = 0;
+            let caller = accounts.alice;
             // self.block == 0
-            assert_eq!(contract.lixi(), Err(ContractError::Overflow))
+            assert_eq!(contract.lixi(caller), Err(ContractError::Overflow))
         }
 
         #[ink::test]
         fn blocknumber_overflow() {
             let contract_balance = 1000000 * 10u128.checked_pow(18).unwrap();
             let mut contract = create_contracts(contract_balance);
+            let accounts = default_accounts();
+            let caller = accounts.alice;
             contract.block = END_OF_HOLIDAY + 1;
             // self.block == 0
-            assert_eq!(contract.lixi(), Err(ContractError::Overflow))
+            assert_eq!(contract.lixi(caller), Err(ContractError::Overflow))
         }
 
         #[ink::test]
@@ -469,7 +472,8 @@ pub mod lixi {
             // TODO: call lixi 1st
             // match case: claim reward 4
             set_balance(accounts.alice, 0);
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             let type_of_reward = REWARD_TYPE_4;
             assert_eq!(contract.winners.len(), 1);
             assert_eq!(contract.reward_per_day.len(), 3);
@@ -509,14 +513,15 @@ pub mod lixi {
 
             // TODO: call lixi 1st: success
             // caller: Alice
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             let contract_balance =
                 contract_balance - reward_value * 10u128.checked_pow(18).unwrap();
             assert_eq!(get_balance(contract_id), contract_balance);
 
             // TODO: call lixi 2nd: failure
             // caller: Alice
-            assert_eq!(contract.lixi(), Err(ContractError::InvalidRequest));
+            assert_eq!(contract.lixi(caller), Err(ContractError::InvalidRequest));
             assert_eq!(
                 contract.reward_per_day.get(&(day_id, reward_type)).unwrap(),
                 &1u32
@@ -536,8 +541,9 @@ pub mod lixi {
             // Call lixi 4th: success
             // caller: Charlie
             set_balance(accounts.charlie, 0);
-            set_sender(accounts.charlie);
-            contract.lixi();
+            // set_sender(accounts.charlie);
+            let caller = accounts.charlie;
+            contract.lixi(caller);
             let (_, user_reward) = contract.winners.get(&(accounts.charlie, day_id)).unwrap();
             assert_eq!(
                 user_reward,
@@ -555,8 +561,9 @@ pub mod lixi {
             // Call lixi 5th: success
             // match case: reward 3
             set_balance(accounts.eve, 0);
-            set_sender(accounts.eve);
-            contract.lixi();
+            // set_sender(accounts.eve);
+            let caller = accounts.eve;
+            contract.lixi(caller);
             let reward_value = REWARD_3_VALUE;
             let max_value = MAX_REWARD_3;
             let reward_type = REWARD_TYPE_3;
@@ -572,10 +579,11 @@ pub mod lixi {
                 .reward_per_day
                 .insert((day_id, reward_type), max_value);
 
-            set_sender(accounts.frank);
+            // set_sender(accounts.frank);
+            let caller = accounts.frank;
             set_balance(accounts.frank, 0);
             // TODO: call lixi
-            contract.lixi();
+            contract.lixi(caller);
             let reward_value = REWARD_4_VALUE;
             let reward_type = REWARD_TYPE_4;
             let max_value = MAX_REWARD_4;
@@ -609,7 +617,8 @@ pub mod lixi {
 
             // TODO: call lixi: 1st
             // caller: Alice
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             assert_eq!(contract.winners.len(), 1);
             assert_eq!(contract.reward_per_day.len(), 1);
             assert!(contract
@@ -633,8 +642,9 @@ pub mod lixi {
             // TODO: call lixi 3rd: success
             // caller: Bob
             set_balance(accounts.bob, 0);
-            set_sender(accounts.bob);
-            contract.lixi();
+            // set_sender(accounts.bob);
+            let caller = accounts.bob;
+            contract.lixi(caller);
             assert_eq!(
                 get_balance(accounts.bob),
                 reward_value * 10u128.checked_pow(18).unwrap()
@@ -661,9 +671,10 @@ pub mod lixi {
             // TODO:
             // update maximum reward 3
             // match case reward 2
-            set_sender(accounts.eve);
+            // set_sender(accounts.eve);
+            let caller = accounts.eve;
             set_balance(accounts.eve, 0);
-            contract.lixi();
+            contract.lixi(caller);
             let reward_type = REWARD_TYPE_2;
             let reward_value = REWARD_2_VALUE;
             let (_, user_reward) = contract.winners.get(&(accounts.eve, day_id)).unwrap();
@@ -700,7 +711,8 @@ pub mod lixi {
 
             // TODO: call lixi 1st: success
             // caller: Alice
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             let (_, user_reward) = contract.winners.get(&(accounts.alice, day_id)).unwrap();
             assert_eq!(user_reward, &0u128);
             assert_eq!(user_reward, &reward_value);
@@ -710,8 +722,9 @@ pub mod lixi {
 
             // TODO: call lixi 2nd
             // caller: bob
-            contract.lixi();
-            assert_eq!(contract.nonce, 0);
+            let caller = accounts.bob;
+            contract.lixi(caller);
+            assert_eq!(contract.nonce, 1);
             let reward_type = REWARD_TYPE_4;
             let reward_value = REWARD_4_VALUE;
             let max_reward = MAX_REWARD_4;
@@ -746,7 +759,8 @@ pub mod lixi {
             assert!(contract.winners.get(&(accounts.alice, day_id)).is_none());
             // TODO:
             // Call lixi 1st
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             assert_eq!(contract.winners.len(), 1);
             assert_eq!(contract.reward_per_day.len(), 1);
             assert!(contract
@@ -769,9 +783,10 @@ pub mod lixi {
             // TODO:
             // call lixi 2nd
             // match case reward 2
-            set_sender(accounts.bob);
+            // set_sender(accounts.bob);
+            let caller = accounts.bob;
             set_balance(accounts.bob, 0);
-            contract.lixi();
+            contract.lixi(caller);
 
             let type_of_reward = REWARD_TYPE_2;
             let reward_value = REWARD_2_VALUE;
@@ -808,9 +823,10 @@ pub mod lixi {
             // TODO:
             // call lixi 3rd
             // match case reward 3
-            set_sender(accounts.eve);
+            // set_sender(accounts.eve);
+            let caller = accounts.eve;
             set_balance(accounts.eve, 0);
-            contract.lixi();
+            contract.lixi(caller);
             let type_of_reward = REWARD_TYPE_3;
             let reward_value = REWARD_3_VALUE;
             let max_value = MAX_REWARD_3;
@@ -855,7 +871,8 @@ pub mod lixi {
 
             // TODO:
             // Call lixi 1st
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             assert_eq!(contract.winners.len(), 1);
             assert_eq!(contract.reward_per_day.len(), 1);
             assert!(contract
@@ -878,9 +895,10 @@ pub mod lixi {
             // TODO:
             // call lixi 2nd
             // match case reward 2
-            set_sender(accounts.bob);
+            // set_sender(accounts.bob);
+            let caller = accounts.bob;
             set_balance(accounts.bob, 0);
-            contract.lixi();
+            contract.lixi(caller);
 
             let type_of_reward = REWARD_TYPE_2;
             let reward_value = REWARD_2_VALUE;
@@ -917,9 +935,10 @@ pub mod lixi {
             // TODO:
             // call lixi 3rd
             // match case reward 3
-            set_sender(accounts.eve);
+            // set_sender(accounts.eve);
+            let caller = accounts.eve;
             set_balance(accounts.eve, 0);
-            contract.lixi();
+            contract.lixi(caller);
             let type_of_reward = REWARD_TYPE_3;
             let reward_value = REWARD_3_VALUE;
             let max_value = MAX_REWARD_3;
@@ -963,7 +982,8 @@ pub mod lixi {
 
             // TODO:
             // Call lixi 1st
-            contract.lixi();
+            let caller = accounts.alice;
+            contract.lixi(caller);
             let num_of_reward = contract
                 .reward_per_day
                 .get(&(day_id, type_of_reward))
@@ -986,9 +1006,10 @@ pub mod lixi {
             assert_eq!(contract.block, HOLIDAY_3_BLOCK_NUMBER + 1);
             let day_id: DayId = HOLIDAY_3;
 
-            set_sender(accounts.bob);
+            // set_sender(accounts.bob);
+            let caller = accounts.bob;
             set_balance(accounts.bob, 0);
-            contract.lixi();
+            contract.lixi(caller);
             // reward_1  existed in 2nd, match case reward 2
             let type_of_reward = REWARD_TYPE_2;
             let reward_value = REWARD_2_VALUE;
