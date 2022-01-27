@@ -61,16 +61,9 @@ impl Environment for LixiEnv {
 /// A smart contract with a custom environment, necessary for the chain extension
 pub mod lixi {
     use super::*;
-    use core::convert::TryInto;
-    use ink_prelude::string::String;
     use ink_prelude::vec;
     use ink_prelude::vec::Vec;
-    use ink_storage::lazy::Mapping;
-    use ink_storage::{
-        collections::{hashmap::Entry, HashMap as StorageHashMap, Vec as StorageVec},
-        traits::{PackedLayout, SpreadLayout},
-        Lazy,
-    };
+    use ink_storage::collections::HashMap as StorageHashMap;
     type DayId = i8;
     type RewardType = i8;
     type Quantity = u32;
@@ -469,6 +462,58 @@ pub mod lixi {
             contract.block = END_OF_HOLIDAY + 1;
             // self.block == 0
             assert_eq!(contract.lixi(caller), Err(ContractError::Overflow))
+        }
+
+        #[ink::test]
+        fn limit_should_work() {
+            let contract_balance = 1000000 * 10u128.checked_pow(18).unwrap();
+            let mut contract = create_contracts(contract_balance);
+            let contract_id: AccountId = contract_id();
+            let accounts = default_accounts();
+            // Set block to match 1st day
+            contract.block = HOLIDAY_3_BLOCK_NUMBER;
+            assert_eq!(contract.block, HOLIDAY_3_BLOCK_NUMBER);
+            let day_id: DayId = HOLIDAY_1;
+            // Set nonce to match reward 2
+            // 6 =< nonce <= 15
+            contract.nonce = 6;
+            let type_of_reward = REWARD_TYPE_2;
+            let reward_value = REWARD_2_VALUE;
+            let max_reward = MAX_REWARD_2;
+            let actual_reward_value = to_balance(reward_value);
+
+            // TODO: caller: accounts.bob
+            // call lixi x1: success
+            contract.lixi(accounts.bob);
+            let contract_balance = contract_balance - actual_reward_value;
+            assert_eq!(contract.winners.len(), 1);
+            assert_eq!(contract.reward_per_day.len(), 1);
+            assert_eq!(get_balance(contract_id), contract_balance);
+
+            // TODO: caller: accounts.bob
+            // call lixi x2: failure
+            assert_eq!(
+                contract.lixi(accounts.bob),
+                Err(ContractError::InvalidRequest)
+            );
+
+            // TODO: check limit
+            assert_eq!(contract.is_limit(accounts.bob), Ok(true));
+            assert_eq!(contract.is_limit(accounts.alice), Ok(false));
+            // Set block: day 1
+            contract.block = HOLIDAY_1_BLOCK_NUMBER;
+            assert_eq!(contract.is_limit(accounts.bob), Ok(false));
+
+            // Set block: day 2
+            contract.block = HOLIDAY_2_BLOCK_NUMBER;
+            contract.lixi(accounts.eve);
+            let contract_balance = contract_balance - actual_reward_value;
+            assert_eq!(contract.winners.len(), 2);
+            assert_eq!(contract.reward_per_day.len(), 2);
+            assert_eq!(get_balance(contract_id), contract_balance);
+
+            assert_eq!(contract.is_limit(accounts.bob), Ok(false));
+            assert_eq!(contract.is_limit(accounts.eve), Ok(true));
         }
 
         #[ink::test]
@@ -1088,6 +1133,10 @@ pub mod lixi {
         fn set_balance(account_id: AccountId, balance: Balance) {
             ink_env::test::set_account_balance::<ink_env::DefaultEnvironment>(account_id, balance)
                 .expect("Cannot set account balance");
+        }
+
+        fn to_balance(value: Balance) -> Balance {
+            value * 10u128.checked_pow(18).unwrap()
         }
 
         fn get_balance(account_id: AccountId) -> Balance {
