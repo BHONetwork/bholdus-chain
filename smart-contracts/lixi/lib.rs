@@ -235,6 +235,29 @@ pub mod lixi {
             self.users.get(&owner).clone().unwrap_or(&vec![]).to_vec()
         }
 
+        /// Check limit
+        #[ink(message)]
+        pub fn is_limit(&self, to: AccountId) -> Result<bool, ContractError> {
+            // let block_number = self.env().block_number();
+            let block_number: BlockNumber = self.block;
+            let holiday = if block_number >= HOLIDAY_1_BLOCK_NUMBER
+                && block_number < HOLIDAY_2_BLOCK_NUMBER
+            {
+                HOLIDAY_1
+            } else if block_number >= HOLIDAY_2_BLOCK_NUMBER
+                && block_number < HOLIDAY_3_BLOCK_NUMBER
+            {
+                HOLIDAY_2
+            } else if block_number >= HOLIDAY_3_BLOCK_NUMBER && block_number < END_OF_HOLIDAY {
+                HOLIDAY_3
+            } else {
+                return Err(ContractError::Overflow);
+            };
+
+            let user = self.winners.get(&(to, holiday));
+            Ok(user.is_some())
+        }
+
         /// Returns balance of smart contract.
         #[ink(message)]
         pub fn balance_of(&self) -> Balance {
