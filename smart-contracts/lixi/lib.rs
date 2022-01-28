@@ -89,8 +89,6 @@ pub mod lixi {
 
     #[ink(storage)]
     pub struct LixiApp {
-        // use for testing, set blocknumber
-        pub block: BlockNumber,
         // use for randomness algorithm
         pub nonce: u8,
         // (AccountId, DayId)
@@ -115,7 +113,6 @@ pub mod lixi {
         #[ink(constructor)]
         pub fn new() -> Self {
             Self {
-                block: Default::default(),
                 nonce: Default::default(),
                 winners: StorageHashMap::default(),
                 reward_per_day: StorageHashMap::default(),
