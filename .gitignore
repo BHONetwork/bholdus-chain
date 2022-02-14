@@ -28,3 +28,6 @@ tmp
 
 # Vim bookmarks
 .vim-bookmarks
+
+# CI wasm archive path
+build-wasm-archive
