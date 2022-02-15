@@ -14,7 +14,15 @@ SRTOOL_WASM_OUTPUT_PATH=runtime/$CHAIN/target/srtool/release/wbuild/$CHAIN-runti
 echo "SRTOOL_WASM_OUTPUT_PATH=$SRTOOL_WASM_OUTPUT_PATH"
 
 # Build wasm using srtool cli
-srtool build --build-opts \""--features evm-tracing"\" --package $CHAIN-runtime $PWD
+stdbuf -oL srtool build --json --app --build-opts \""--features evm-tracing"\" --package $CHAIN-runtime | {
+        while IFS= read -r line
+        do
+            echo ║ $line
+            JSON="$line"
+        done
+
+        echo "$JSON" | jq . > $ARCHIVE_PATH/srtool-digest.json
+}
 
 # Move built wasm to archive path
 mv $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.wasm $ARCHIVE_PATH/${CHAIN}_runtime.wasm

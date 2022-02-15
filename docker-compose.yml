@@ -26,3 +26,4 @@ services:
     environment:
       - CHAIN=phoenix
       - ARCHIVE_PATH=build-wasm-archive
+    command: scripts/build_wasm.sh

@@ -3,6 +3,9 @@ FROM rust
 # install docker & compose
 COPY --from=docker:20.10.12 /usr/local/bin/docker /usr/bin/
 
+# install shell tools
+RUN apt update && apt install -y jq
+
 # Substrate deps
 RUN apt update && apt install -y git clang curl libssl-dev llvm libudev-dev 
 
@@ -13,9 +16,3 @@ RUN cargo install --locked --git https://github.com/chevdor/srtool-cli --tag v0.
 RUN cargo install --locked --git https://github.com/chevdor/subwasm --tag v0.16.1
 
 WORKDIR /bholdus
-
-COPY scripts/build_wasm.sh scripts/build_wasm.sh
-
-RUN chmod +x scripts/build_wasm.sh
-
-CMD CHAIN=$CHAIN ARCHIVE_PATH=$ARCHIVE_PATH scripts/build_wasm.sh
