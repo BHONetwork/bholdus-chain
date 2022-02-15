@@ -1,0 +1,3 @@
+FROM paritytech/ci-linux:production
+
+WORKDIR /bholdus

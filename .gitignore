@@ -31,3 +31,6 @@ tmp
 
 # CI wasm archive path
 build-wasm-archive
+
+# CI binary archive path
+build-binary-archive

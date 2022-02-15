@@ -28,3 +28,14 @@ services:
       - ARCHIVE_PATH=build-wasm-archive
       - SRTOOL_TAG=1.57.0
     command: scripts/build-wasm.sh
+
+  build-binary:
+    build:
+      context: .
+      dockerfile: Dockerfile.build-binary
+    volumes:
+      - /bholdus:/bholdus
+    environment:
+      - CHAIN=phoenix
+      - ARCHIVE_PATH=build-binary-archive
+    command: scripts/build-binary.sh
