@@ -5,6 +5,8 @@ set -xe
 CHAIN=$CHAIN
 ARCHIVE_PATH=$ARCHIVE_PATH
 
+echo "Srtool Image Tag: $SRTOOL_TAG"
+
 echo  "Current Path = $PWD"
 
 echo "ARCHIVE_PATH=$ARCHIVE_PATH"
@@ -25,9 +27,9 @@ stdbuf -oL srtool build --json --app --build-opts \""--features evm-tracing"\" -
 }
 
 # Move built wasm to archive path
-mv $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.wasm $ARCHIVE_PATH/${CHAIN}_runtime.wasm
-mv $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.compact.wasm $ARCHIVE_PATH/${CHAIN}_runtime.compact.wasm
-mv $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.compact.compressed.wasm $ARCHIVE_PATH/${CHAIN}_runtime.compact.compressed.wasm
+cp $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.wasm $ARCHIVE_PATH/${CHAIN}_runtime.wasm
+cp $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.compact.wasm $ARCHIVE_PATH/${CHAIN}_runtime.compact.wasm
+cp $SRTOOL_WASM_OUTPUT_PATH/${CHAIN}_runtime.compact.compressed.wasm $ARCHIVE_PATH/${CHAIN}_runtime.compact.compressed.wasm
 
 # Generate subwasm info for compact wasm
 subwasm --json info $ARCHIVE_PATH/${CHAIN}_runtime.compact.wasm > $ARCHIVE_PATH/${CHAIN}-runtime-subwasm-info.json
