@@ -3405,6 +3405,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "integration-tokens"
+version = "4.0.0-dev"
+dependencies = [
+ "bholdus-primitives",
+ "bholdus-support",
+ "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "intervalier"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5540,6 +5557,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-integration"
+version = "4.0.0-dev"
+dependencies = [
+ "bholdus-primitives",
+ "bholdus-support",
+ "enumflags2",
+ "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "integration-tokens",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "sample-extension",
+ "scale-info",
+ "serde",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "pallet-mmr"
 version = "4.0.0-dev"
 source = "git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11#c4f305c3481dbdc7eed01d19613ae2c03d7fdbd2"
@@ -6109,7 +6146,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.10"
+version = "1.0.11"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -6133,6 +6170,7 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "hex-literal",
+ "integration-tokens",
  "log",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -6161,6 +6199,7 @@ dependencies = [
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
+ "pallet-integration",
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
@@ -6180,6 +6219,8 @@ dependencies = [
  "pallet-utility",
  "parity-scale-codec",
  "rlp",
+ "runtime-chain-extension",
+ "sample-extension",
  "scale-info",
  "sha3 0.8.2",
  "smallvec 1.7.0",
@@ -6855,6 +6896,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "runtime-chain-extension"
+version = "1.0.10"
+dependencies = [
+ "bholdus-currencies",
+ "bholdus-primitives",
+ "enumflags2",
+ "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "integration-tokens",
+ "pallet-balances",
+ "pallet-contracts",
+ "pallet-integration",
+ "pallet-randomness-collective-flip",
+ "parity-scale-codec",
+ "sample-extension",
+ "scale-info",
+ "smallvec 1.7.0",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6966,6 +7031,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "sample-extension"
+version = "4.0.0-dev"
+dependencies = [
+ "bholdus-primitives",
+ "bholdus-support",
+ "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
 ]
 
 [[package]]

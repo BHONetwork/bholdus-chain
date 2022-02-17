@@ -7,9 +7,9 @@ use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use phoenix_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
-    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig,
-    GenesisAccount, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-    StakerStatus, StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS,
+    BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig, GenesisAccount,
+    GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus,
+    StakingConfig, SudoConfig, SupportNFTConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS,
     TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
@@ -396,7 +396,7 @@ fn testnet_genesis(
                 })
                 .collect::<Vec<_>>(),
         },
-        bholdus_support_nft: BholdusSupportNFTConfig { tokens: vec![] },
+        support_nft: SupportNFTConfig { tokens: vec![] },
         bridge_native_transfer: Default::default(),
         evm: EVMConfig {
             accounts: {

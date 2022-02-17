@@ -1,4 +1,4 @@
-use crate as pallet_template;
+use crate as integration_tokens;
 use frame_support::parameter_types;
 use frame_system as system;
 use sp_core::H256;
@@ -18,9 +18,20 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-        SmartContract: bholdus_smart_contract::{Pallet, Call, Storage, Event<T>},
+        TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
     }
 );
+
+pub type CurrencyId = u64;
+pub type Balance = u64;
+pub type AccountId = u64;
+
+pub const BUSD: CurrencyId = 1;
+pub const ALICE: AccountId = 0;
+pub const BOB: AccountId = 1;
+pub const EVE: AccountId = 2;
+pub const CURRENCY_ID: CurrencyId = 0;
+
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;

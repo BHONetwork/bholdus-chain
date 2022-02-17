@@ -6,8 +6,9 @@ run-cygnus:
 	cargo +nightly run --features with-cygnus-runtime --release -- --alice --chain=cygnus-dev --tmp -lruntime=debug
 .PHONY: run-phoenix
 run-phoenix:
-	cargo +nightly run --features with-phoenix-runtime --release -- --alice --chain=phoenix-dev --tmp -lruntime=debug
-
+	cargo +nightly run --features with-phoenix-runtime --release -- --alice --chain=phoenix-dev --tmp -lruntime=debug --ws-external --rpc-external --rpc-cors all --ws-port 9944 
+debug-phoenix:
+	cargo +nightly run --features with-phoenix-runtime --release -- --alice --chain=phnix-dev --tmp -lruntime=debug --ws-external --rpc-external --rpc-cors all --ws-port 9944 -lerror,runtime::contracts=debug
 .PHONY: run-benchmark-ulas
 run-benchmark-ulas:
 	cargo run --features with-ulas-runtime --features runtime-benchmarks --release -- --alice --chain=ulas-dev --tmp -lruntime=debug

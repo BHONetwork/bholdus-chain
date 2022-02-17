@@ -16,6 +16,17 @@ fn test_blacklist(x: u8) -> Blacklist {
 }
 
 #[test]
+fn test_transfer_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        Balances::make_free_balance_be(&ALICE, 10);
+        Balances::make_free_balance_be(&BOB, 1);
+        assert_ok!(Balances::transfer(Origin::signed(ALICE).into(), BOB, 5));
+        assert_eq!(Balances::free_balance(&ALICE), 5);
+        assert_eq!(Balances::free_balance(&BOB), 6);
+    })
+}
+
+#[test]
 fn genesis_issuance_should_work() {
     ExtBuilder::default()
         .one_hundred_for_alice()

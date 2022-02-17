@@ -7,6 +7,7 @@ members = [
     'primitives/bholdus',
     'primitives/bsc',
 
+    'runtime/chain-extension',
     'runtime/ulas',
     'runtime/cygnus',
     'runtime/phoenix',
@@ -23,6 +24,16 @@ members = [
 
     'precompiles/template',
     'precompiles/utils',
+
+    'pallets/pallet-integration',
+    'pallets/pallet-integration/sample-extension',
 ]
+
+exclude = [
+    'smart-contracts/tokens',
+	'smart-contracts/lixi',
+]
+
 [profile.release]
 panic = 'unwind'
+
