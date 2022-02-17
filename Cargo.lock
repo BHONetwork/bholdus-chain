@@ -1462,7 +1462,7 @@ dependencies = [
  "gimli 0.25.0",
  "log",
  "regalloc",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "target-lexicon",
 ]
 
@@ -1499,7 +1499,7 @@ checksum = "351c9d13b4ecd1a536215ec2fd1c3ee9ee8bc31af172abf1e45ed0adb7a931df"
 dependencies = [
  "cranelift-codegen",
  "log",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "target-lexicon",
 ]
 
@@ -1525,7 +1525,7 @@ dependencies = [
  "cranelift-frontend",
  "itertools",
  "log",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "wasmparser",
  "wasmtime-types",
 ]
@@ -1741,7 +1741,7 @@ dependencies = [
  "pallet-utility",
  "parity-scale-codec",
  "scale-info",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-authority-discovery",
  "sp-block-builder",
@@ -2589,7 +2589,7 @@ dependencies = [
  "paste",
  "scale-info",
  "serde",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-arithmetic 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-inherents 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -2617,7 +2617,7 @@ dependencies = [
  "paste",
  "scale-info",
  "serde",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-arithmetic 4.0.0-dev (git+https://github.com/Bholdus/substrate)",
  "sp-core 4.0.0-dev (git+https://github.com/Bholdus/substrate)",
  "sp-core-hashing-proc-macro",
@@ -3723,7 +3723,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "45a3f58dc069ec0e205a27f5b45920722a46faed802a0541538241af6228f512"
 dependencies = [
  "parity-util-mem",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
 ]
 
 [[package]]
@@ -3752,7 +3752,7 @@ dependencies = [
  "parking_lot",
  "regex",
  "rocksdb",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
 ]
 
 [[package]]
@@ -3837,7 +3837,7 @@ dependencies = [
  "multiaddr",
  "parking_lot",
  "pin-project 1.0.9",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "wasm-timer",
 ]
 
@@ -3868,7 +3868,7 @@ dependencies = [
  "ring",
  "rw-stream-sink",
  "sha2 0.9.8",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "thiserror",
  "unsigned-varint 0.7.1",
  "void",
@@ -3896,7 +3896,7 @@ dependencies = [
  "futures 0.3.19",
  "libp2p-core",
  "log",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "trust-dns-resolver",
 ]
 
@@ -3915,7 +3915,7 @@ dependencies = [
  "prost",
  "prost-build",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
 ]
 
 [[package]]
@@ -3939,7 +3939,7 @@ dependencies = [
  "rand 0.7.3",
  "regex",
  "sha2 0.9.8",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "unsigned-varint 0.7.1",
  "wasm-timer",
 ]
@@ -3956,7 +3956,7 @@ dependencies = [
  "log",
  "prost",
  "prost-build",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "wasm-timer",
 ]
 
@@ -3979,7 +3979,7 @@ dependencies = [
  "prost-build",
  "rand 0.7.3",
  "sha2 0.9.8",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "uint",
  "unsigned-varint 0.7.1",
  "void",
@@ -4002,7 +4002,7 @@ dependencies = [
  "libp2p-swarm",
  "log",
  "rand 0.8.4",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "socket2 0.4.2",
  "void",
 ]
@@ -4021,7 +4021,7 @@ dependencies = [
  "nohash-hasher",
  "parking_lot",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "unsigned-varint 0.7.1",
 ]
 
@@ -4110,7 +4110,7 @@ dependencies = [
  "prost",
  "prost-build",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "unsigned-varint 0.7.1",
  "void",
  "wasm-timer",
@@ -4131,7 +4131,7 @@ dependencies = [
  "lru",
  "minicbor",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "unsigned-varint 0.7.1",
  "wasm-timer",
 ]
@@ -4147,7 +4147,7 @@ dependencies = [
  "libp2p-core",
  "log",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "void",
  "wasm-timer",
 ]
@@ -4770,7 +4770,7 @@ dependencies = [
  "futures 0.3.19",
  "log",
  "pin-project 1.0.9",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "unsigned-varint 0.7.1",
 ]
 
@@ -5273,7 +5273,7 @@ dependencies = [
  "rand 0.7.3",
  "scale-info",
  "serde",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -5825,7 +5825,7 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -5970,7 +5970,7 @@ dependencies = [
  "parity-util-mem-derive",
  "parking_lot",
  "primitive-types",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "winapi 0.3.9",
 ]
 
@@ -6045,7 +6045,7 @@ dependencies = [
  "instant",
  "libc",
  "redox_syscall",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "winapi 0.3.9",
 ]
 
@@ -6223,7 +6223,7 @@ dependencies = [
  "sample-extension",
  "scale-info",
  "sha3 0.8.2",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-authority-discovery",
  "sp-block-builder",
@@ -6744,7 +6744,7 @@ checksum = "571f7f397d61c4755285cd37853fe8e03271c243424a907415909379659381c5"
 dependencies = [
  "log",
  "rustc-hash",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
 ]
 
 [[package]]
@@ -6913,7 +6913,7 @@ dependencies = [
  "parity-scale-codec",
  "sample-extension",
  "scale-info",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -7556,7 +7556,7 @@ dependencies = [
  "sc-utils",
  "serde",
  "serde_json",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-arithmetic 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-blockchain",
  "sp-consensus",
@@ -8254,9 +8254,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.7.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ecab6c735a6bb4139c0caafd0cc3635748bbb3acf4550e8138122099251f309"
+checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
 
 [[package]]
 name = "snap"
@@ -9138,7 +9138,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-externalities 0.10.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-panic-handler 3.0.0",
@@ -9161,7 +9161,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot",
  "rand 0.7.3",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-core 4.0.0-dev (git+https://github.com/Bholdus/substrate)",
  "sp-externalities 0.10.0-dev (git+https://github.com/Bholdus/substrate)",
  "sp-panic-handler 4.0.0-dev",
@@ -9918,7 +9918,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sharded-slab",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "thread_local",
  "tracing",
  "tracing-core",
@@ -9936,7 +9936,7 @@ dependencies = [
  "hashbrown",
  "log",
  "rustc-hex",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
 ]
 
 [[package]]
@@ -9976,7 +9976,7 @@ dependencies = [
  "lazy_static",
  "log",
  "rand 0.8.4",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "thiserror",
  "tinyvec",
  "url 2.2.2",
@@ -9996,7 +9996,7 @@ dependencies = [
  "lru-cache",
  "parking_lot",
  "resolv-conf",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "thiserror",
  "trust-dns-proto",
 ]
@@ -10147,7 +10147,7 @@ dependencies = [
  "runtime-chain-extension",
  "scale-info",
  "sha3 0.8.2",
- "smallvec 1.7.0",
+ "smallvec 1.8.0",
  "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "sp-authority-discovery",
  "sp-block-builder",
