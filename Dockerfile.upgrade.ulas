@@ -1,0 +1,3 @@
+FROM 009997438107.dkr.ecr.ap-southeast-1.amazonaws.com/bholdus-chain:ulas-release
+
+COPY ./build-binary-archive/bholdus /usr/local/bin/bholdus

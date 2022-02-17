@@ -24,7 +24,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /bholdus:/bholdus
     environment:
-      - CHAIN=phoenix
       - ARCHIVE_PATH=build-wasm-archive
       - SRTOOL_TAG=1.57.0
     command: scripts/build-wasm.sh
@@ -36,6 +35,5 @@ services:
     volumes:
       - /bholdus:/bholdus
     environment:
-      - CHAIN=phoenix
       - ARCHIVE_PATH=build-binary-archive
     command: scripts/build-binary.sh

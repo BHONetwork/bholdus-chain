@@ -1,0 +1,3 @@
+FROM 627612630747.dkr.ecr.ap-southeast-1.amazonaws.com/bholdus-chain:phoenix-release
+
+COPY ./build-binary-archive/bholdus /usr/local/bin/bholdus
