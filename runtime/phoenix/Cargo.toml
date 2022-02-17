@@ -125,7 +125,7 @@ bholdus-pallet-integration = {package = 'pallet-integration',version = "4.0.0-de
 
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
 
-runtime-chain-extension = { version = "1.0.10", path = "../chain-extension", default-features = false }
+runtime-chain-extension = { version = "4.0.0-dev", path = "../chain-extension", default-features = false }
 
 [features]
 default = ["std"]

@@ -4,7 +4,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "ulas-runtime"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.10"
+version = "1.0.11"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -98,7 +98,10 @@ bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", defau
 bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { version = "4.0.0-dev", path = "../../pallets/bridge/native-transfer", default-features = false }
 
+
 pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
+
+runtime-chain-extension = { version = "4.0.0-dev", path = "../chain-extension", default-features = false }
 
 [features]
 default = ["std"]
@@ -107,15 +110,16 @@ runtime-benchmarks = [
 	"frame-support/runtime-benchmarks",
 	"frame-system-benchmarking",
 	"frame-system/runtime-benchmarks",
-	"hex-literal",
 	"sp-runtime/runtime-benchmarks",
-
-	"pallet-collective/runtime-benchmarks",
-
+	'pallet-balances/runtime-benchmarks',
+	'pallet-timestamp/runtime-benchmarks',
+	'pallet-collective/runtime-benchmarks',
+	"hex-literal",
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
 	"bholdus-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
 ]
+
 std = [
 	"codec/std",
 	"scale-info/std",
@@ -154,7 +158,6 @@ std = [
 	"pallet-recovery/std",
 	"pallet-beefy/std",
 	"pallet-beefy-mmr/std",
-
 	"bholdus-tokens/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
@@ -162,7 +165,7 @@ std = [
 	"bholdus-currencies/std",
 	"bholdus-primitives/std",
 	"bholdus-bridge-native-transfer/std",
-
+	"bholdus-bridge-native-transfer/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-core/std",
@@ -178,6 +181,7 @@ std = [
 	"sp-npos-elections/std",
 	"sp-consensus-aura/std",
 	"sp-io/std",
+	"runtime-chain-extension/std",
 ]
 try-runtime = [
 	"frame-try-runtime",
@@ -213,3 +217,4 @@ try-runtime = [
 
 	"bholdus-bridge-native-transfer/try-runtime",
 ]
+

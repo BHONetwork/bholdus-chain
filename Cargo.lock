@@ -6897,7 +6897,7 @@ dependencies = [
 
 [[package]]
 name = "runtime-chain-extension"
-version = "1.0.10"
+version = "4.0.0-dev"
 dependencies = [
  "bholdus-currencies",
  "bholdus-primitives",
@@ -10074,7 +10074,7 @@ dependencies = [
 
 [[package]]
 name = "ulas-runtime"
-version = "1.0.10"
+version = "1.0.11"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -10128,6 +10128,7 @@ dependencies = [
  "pallet-treasury",
  "pallet-utility",
  "parity-scale-codec",
+ "runtime-chain-extension",
  "scale-info",
  "smallvec 1.7.0",
  "sp-api 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
