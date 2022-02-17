@@ -8,7 +8,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public};
+use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
     traits::{IdentifyAccount, Verify},
@@ -16,10 +16,10 @@ use sp_runtime::{
 };
 use ulas_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
-    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, GenesisConfig,
-    GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus, StakingConfig,
-    SudoConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS, TOKEN_DECIMALS, TOKEN_SYMBOL,
-    WASM_BINARY,
+    BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig, GenesisAccount,
+    GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus,
+    StakingConfig, SudoConfig, BholdusSupportNFTConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS,
+    TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -398,6 +398,27 @@ fn testnet_genesis(
         },
         bholdus_support_nft: BholdusSupportNFTConfig { tokens: vec![] },
         bridge_native_transfer: Default::default(),
+        evm: EVMConfig {
+            accounts: {
+                // Prefund the "Gerald" account
+                let mut accounts = std::collections::BTreeMap::new();
+                accounts.insert(
+                    H160::from_slice(&hex_literal::hex!(
+                        "fF6a5C321D1AB7B48a39E62cE5de4b0E87EDc828"
+                    )),
+                    GenesisAccount {
+                        nonce: U256::zero(),
+                        // Using a larger number, so I can tell the accounts apart by balance.
+                        balance: U256::from(1u64 << 61),
+                        code: vec![],
+                        storage: std::collections::BTreeMap::new(),
+                    },
+                );
+                accounts
+            },
+        },
+        ethereum: EthereumConfig {},
+        base_fee: Default::default(),
         /* dex: DexConfig {
             initial_provisioning_trading_pairs: vec![],
             initial_enabled_trading_pairs: initial_dex_liquidity_pairs

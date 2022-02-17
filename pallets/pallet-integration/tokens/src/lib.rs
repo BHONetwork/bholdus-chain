@@ -86,7 +86,5 @@ pub mod pallet {
             Self::deposit_event(Event::Transferred(currency_id, from, to, amount));
             Ok(())
         }
-        
     }
 }
-

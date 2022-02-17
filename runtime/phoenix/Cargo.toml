@@ -28,7 +28,6 @@ smallvec = "1.6.1"
 rlp = { version = "0.5", optional = true, default-features = false }
 sha3 = { version = "0.8", optional = true, default-features = false }
 
-
 # FRAME dependencies
 frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, optional = true, branch = "bholdus-monthly-2021-11" }
 frame-executive = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
@@ -108,7 +107,6 @@ sp-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/bhol
 sp-npos-elections = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 sp-io = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
-
 
 # local dependencies
 bholdus-primitives = { version = "4.0.0-dev", path = "../../primitives/bholdus", default-features = false }

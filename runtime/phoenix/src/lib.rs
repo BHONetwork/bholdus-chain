@@ -1263,12 +1263,12 @@ construct_runtime!(
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
-        // Include the pallet-evm in the runtime.
+
+        // Frontier EVM
         EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>},
-        // Include the pallet-ethereum in the runtime.
         Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin},
-        // Include the pallet-base-fee in the runtime.
         BaseFee: pallet_base_fee::{Pallet, Call, Storage, Config<T>, Event},
+
         // Ink Extension
         SampleExtension: sample_extension::{Pallet, Call, Storage, Event<T>},
         IntegrationTokens: integration_tokens::{Pallet, Call, Storage, Event<T>},
@@ -1276,6 +1276,7 @@ construct_runtime!(
     }
 );
 
+// Frontier EVM Transaction Converter
 pub struct TransactionConverter;
 
 impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
@@ -1340,6 +1341,7 @@ mod mmr {
     pub type Hashing = <Runtime as pallet_mmr::Config>::Hashing;
 }
 
+// Ethereum self contained call
 impl fp_self_contained::SelfContainedCall for Call {
     type SignedInfo = H160;
 
@@ -1690,7 +1692,6 @@ impl_runtime_apis! {
             Some(BaseFee::elasticity())
         }
     }
-
 
     impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {
         fn slot_duration() -> sp_consensus_aura::SlotDuration {

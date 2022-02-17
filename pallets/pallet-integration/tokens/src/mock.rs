@@ -32,7 +32,6 @@ pub const BOB: AccountId = 1;
 pub const EVE: AccountId = 2;
 pub const CURRENCY_ID: CurrencyId = 0;
 
-
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
     pub const SS58Prefix: u16 = 2207;

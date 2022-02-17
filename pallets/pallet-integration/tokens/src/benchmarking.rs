@@ -4,10 +4,10 @@ pub use super::*;
 
 #[allow(unused)]
 use crate::Pallet as IntegrationTokens;
-use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller, account};
+use bholdus_primitives::{Balance, TokenId as CurrencyId};
+use frame_benchmarking::{account, benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_system::RawOrigin as SystemOrigin;
 use pallet_contracts::chain_extension::UncheckedFrom;
-use bholdus_primitives::{Balance, TokenId as CurrencyId};
 
 const SEED: u32 = 0;
 
@@ -30,4 +30,8 @@ benchmarks! {
     }: _(SystemOrigin::Signed(caller.clone()), target_lookup, currency_id, transfer_amount)
 }
 
-impl_benchmark_test_suite!(IntegrationTokens, crate::mock::new_test_ext(), crate::mock::Test);
+impl_benchmark_test_suite!(
+    IntegrationTokens,
+    crate::mock::new_test_ext(),
+    crate::mock::Test
+);
