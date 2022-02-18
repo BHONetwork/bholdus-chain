@@ -13,6 +13,8 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 
+use sp_core::Bytes;
+
 #[cfg(test)]
 mod mock;
 
@@ -42,6 +44,7 @@ pub mod pallet {
     }
 
     // Some const value to compare inputs of unknown size to
+    pub const MAX_LENGTH: usize = 50;
 
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
@@ -49,13 +52,17 @@ pub mod pallet {
 
     #[pallet::storage]
     #[pallet::getter(fn get_value)]
-    pub(super) type ContractEntry<T> = StorageValue<_, u32, ValueQuery>;
+    pub(super) type ContractEntry<T> = StorageValue<_, Vec<u8>, ValueQuery>;
 
     // Pallets use events to inform users when important changes are made.
     // https://docs.substrate.io/v3/runtime/events
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
+        /// Event to display when call is made from extrinsic to a smart contract
+        CalledContractFromPallet(T::AccountId),
+        /// Event to display when call is made from a smart contract to the extrinsic
+        CalledPalletFromContract(u32),
         /// Some assets were transferred. \[asset_id, owner, total_supply\]
         Transferred(CurrencyId, T::AccountId, T::AccountId, Balance),
     }
@@ -63,6 +70,7 @@ pub mod pallet {
     // Errors inform users that something went wrong.
     #[pallet::error]
     pub enum Error<T> {
+        InputTooLarge,
         InvalidAmount,
     }
 
@@ -72,6 +80,49 @@ pub mod pallet {
         T::AccountId: UncheckedFrom<T::Hash>,
         T::AccountId: AsRef<[u8]>,
     {
+        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+        /// A generic extrinsic to wrap
+        /// [pallet_contracts::bare_call](https://github.com/paritytech/substrate/blob/352c46a648a5f2d4526e790a184daa4a1ffdb3bf/frame/contracts/src/lib.rs#L545-L562)
+        ///
+        /// * `dest` - A destination account id for the contract being targeted
+        /// * `selector` - The 'selector' of the ink! smart contract function.
+        /// This can be retrived from the compiled `metadata.json`.
+        /// * `arg` - An argument to be passed to the smart contract.
+        /// * `gas_limit` - The gas limit passed to the smart contract bare_call.
+        pub fn call_smart_contract(
+            origin: OriginFor<T>,
+            dest: T::AccountId,
+            mut selector: Vec<u8>,
+            arg: u8,
+            #[pallet::compact] gas_limit: Weight,
+        ) -> DispatchResult {
+            let who = ensure_signed(origin)?;
+            // Check against unbounded input
+            ensure!(selector.len() < MAX_LENGTH, Error::<T>::InputTooLarge);
+            // Amount to transfer
+            let value: BalanceOf<T> = Default::default();
+            let mut arg_enc: Vec<u8> = arg.encode();
+            let mut data = Vec::new();
+            data.append(&mut selector);
+            data.append(&mut arg_enc);
+
+            // Do the actual call to the smart contract function
+            let result = pallet_contracts::Pallet::<T>::bare_call(
+                who,
+                dest.clone(),
+                value,
+                gas_limit,
+                data,
+                false,
+            )
+            .result
+            .unwrap();
+            let val: Vec<u8> = result.data.to_vec();
+            ContractEntry::<T>::put(val);
+            Self::deposit_event(Event::CalledContractFromPallet(dest));
+            Ok(())
+        }
+
         #[pallet::weight(0)]
         pub fn transfer(
             origin: OriginFor<T>,
@@ -86,7 +137,5 @@ pub mod pallet {
             Self::deposit_event(Event::Transferred(currency_id, from, to, amount));
             Ok(())
         }
-        
     }
 }
-

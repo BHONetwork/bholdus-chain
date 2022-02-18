@@ -108,7 +108,10 @@ pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", defa
 runtime-chain-extension = { version = "4.0.0-dev", path = "../chain-extension", default-features = false }
 
 [features]
-default = ["std"]
+default = ["std",
+# temporarily enable unstable contracts features by default, remove this before using on a production chain.
+				"contracts-unstable-interface",
+]
 runtime-benchmarks = [
 	"frame-benchmarking",
 	"frame-support/runtime-benchmarks",
@@ -125,6 +128,9 @@ runtime-benchmarks = [
 	"integration-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
 ]
+
+# Make contracts callable functions marked as __unstable__available. Do not enable
+# on live chains as those are subject to change.
 
 contracts-unstable-interface = [
 	"pallet-contracts/unstable-interface"

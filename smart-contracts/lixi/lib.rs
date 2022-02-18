@@ -251,6 +251,12 @@ pub mod lixi {
             Ok(user.is_some())
         }
 
+        /// Support to test
+        #[ink(message)]
+        pub fn check_status(&self, value: u8) -> Result<u8, ContractError> {
+            Ok(value)
+        }
+
         #[inline]
         fn insert_nonce(&mut self, nonce: u8) {
             if nonce == u8::MAX {
