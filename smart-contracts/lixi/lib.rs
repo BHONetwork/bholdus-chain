@@ -89,8 +89,6 @@ pub mod lixi {
 
     #[ink(storage)]
     pub struct LixiApp {
-        // use for testing, set blocknumber
-        pub block: BlockNumber,
         // use for randomness algorithm
         pub nonce: u8,
         // (AccountId, DayId)
@@ -115,7 +113,6 @@ pub mod lixi {
         #[ink(constructor)]
         pub fn new() -> Self {
             Self {
-                block: Default::default(),
                 nonce: Default::default(),
                 winners: StorageHashMap::default(),
                 reward_per_day: StorageHashMap::default(),
@@ -133,17 +130,12 @@ pub mod lixi {
         pub fn lixi(&mut self, to: AccountId) -> Result<Balance, ContractError> {
             let account_id: AccountId = self.env().account_id();
             let timestamp: Timestamp = self.env().block_timestamp();
-
-            //#[test]
-            let block_number: BlockNumber = self.block;
-            // let div = self.nonce % 100;
-
             let subject_runtime: [u8; 32] = [self.nonce; 32];
             let random_seed = self.env().extension().fetch_random(subject_runtime)?;
             let random: &[u8] = &random_seed;
             let random_vec: Vec<u8> = random.to_vec();
             let index0 = random_vec[0];
-            // let block_number: BlockNumber = self.env().block_number();
+            let block_number: BlockNumber = self.env().block_number();
             // div in range: [1..100];
             let div = index0 % 100;
 
@@ -228,11 +220,19 @@ pub mod lixi {
             self.users.get(&owner).clone().unwrap_or(&vec![]).to_vec()
         }
 
+        /// Get total reward per day
+        #[ink(message)]
+        pub fn get_reward_per_day(&self, holiday: DayId, type_of_reward: RewardType) -> Quantity {
+            self.reward_per_day
+                .get(&(holiday, type_of_reward))
+                .copied()
+                .unwrap_or(0)
+        }
+
         /// Check limit
         #[ink(message)]
         pub fn is_limit(&self, to: AccountId) -> Result<bool, ContractError> {
-            // let block_number = self.env().block_number();
-            let block_number: BlockNumber = self.block;
+            let block_number: BlockNumber = self.env().block_number();
             let holiday = if block_number >= HOLIDAY_1_BLOCK_NUMBER
                 && block_number < HOLIDAY_2_BLOCK_NUMBER
             {
@@ -249,18 +249,6 @@ pub mod lixi {
 
             let user = self.winners.get(&(to, holiday));
             Ok(user.is_some())
-        }
-
-        /// Returns balance of smart contract.
-        #[ink(message)]
-        pub fn balance_of(&self) -> Balance {
-            self.env().balance()
-        }
-
-        /// AccountId of smart contract
-        #[ink(message)]
-        pub fn account_id(&self) -> AccountId {
-            self.env().account_id()
         }
 
         #[inline]
@@ -393,43 +381,6 @@ pub mod lixi {
                     (REWARD_TYPE_2, REWARD_2_VALUE, quantity_of_reward_2)
                 }
             }
-        }
-
-        /// Only support to test. Set blocknumber.
-        #[ink(message)]
-        pub fn set_block_to_test(&mut self, block: BlockNumber) -> Result<(), ContractError> {
-            self.block = block;
-            Ok(())
-        }
-
-        /// Only support to test. Query blocknumber
-        #[ink(message)]
-        pub fn get_block_to_test(&self) -> BlockNumber {
-            self.block
-        }
-
-        /// Only support to test. Check nonce
-        #[ink(message)]
-        pub fn get_nonce(&self) -> u8 {
-            self.nonce
-        }
-
-        /// Only support to test. Reset reward of user.
-        #[ink(message)]
-        pub fn reset(&mut self, user: AccountId) -> Result<(), ContractError> {
-            let ids: Vec<DayId> = vec![1, 2, 3];
-            for day_id in ids.iter() {
-                self.winners.take(&(user, *day_id));
-            }
-            self.users.take(&user);
-
-            Ok(())
-        }
-        /// Only support to test. Set max nonce.
-        #[ink(message)]
-        pub fn set_max_nonce(&mut self) -> Result<(), ContractError> {
-            self.nonce = u8::MAX;
-            Ok(())
         }
     }
 
