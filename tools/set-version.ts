@@ -66,5 +66,5 @@ for (const path of paths) {
   const fileContent = fs.readFileSync(path.path, "utf-8");
   const newContent = fileContent.replace(regexp, `version = "${version}"`);
   fs.writeFileSync(path.path, newContent, "utf8");
-  console.log(`Update version ${version}to ${path}`);
+  console.log(`Update version ${version} to ${path.path}`);
 }
