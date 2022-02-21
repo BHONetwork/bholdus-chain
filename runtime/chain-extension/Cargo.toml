@@ -4,7 +4,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "runtime-chain-extension"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "4.0.0-dev"
+version = "1.0.12"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -82,28 +82,23 @@ version = '4.0.0-dev'
 [dependencies.sample-extension]
 default-features = false
 path = "../../pallets/pallet-integration/sample-extension"
-version = '4.0.0-dev'
 
 [dependencies.integration-tokens]
 default-features = false
 path = "../../pallets/pallet-integration/tokens"
-version = '4.0.0-dev'
 
 [dependencies.bholdus-currencies]
 default-features = false
 path = "../../pallets/currencies"
-version = '4.0.0-dev'
 
 
 [dependencies.bholdus-primitives]
 default-features = false
 path = "../../primitives/bholdus"
-version = '4.0.0-dev'
 
 [dependencies.bholdus-pallet-integration]
 default-features = false
 path = "../../pallets/pallet-integration"
-version = '4.0.0-dev'
 package = 'pallet-integration'
 
 [features]

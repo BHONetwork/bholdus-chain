@@ -1,6 +1,6 @@
 [package]
 name = "integration-tokens"
-version = "4.0.0-dev"
+version = "1.0.12"
 authors = ["Vu hoang <vuhoang2119@gmail.com>"]
 edition = "2018"
 
@@ -36,12 +36,10 @@ version = '4.0.0-dev'
 # Local dependencies
 [dependencies.bholdus-primitives]
 default-features = false
-version = '4.0.0-dev'
 path = '../../../primitives/bholdus'
 
 [dependencies.bholdus-support]
 default-features = false
-version = '4.0.0-dev'
 path = '../../support'
 
 

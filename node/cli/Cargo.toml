@@ -5,7 +5,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "bholdus-cli"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "4.0.0-dev"
+version = "1.0.12"
 
 
 # [build-dependencies]
@@ -32,7 +32,7 @@ sp-runtime = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrat
 sp-core = { version = "4.0.0-dev", optional = true, git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 node-inspect = { version = "0.9.0-dev", optional = true, git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11" }
 
-service = { package = "bholdus-service", optional = true, version = "4.0.0-dev", path = "../service" }
+service = { package = "bholdus-service", optional = true, path = "../service" }
 
 [features]
 default = ["cli"]
