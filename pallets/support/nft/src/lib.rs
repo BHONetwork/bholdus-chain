@@ -55,6 +55,8 @@ pub struct TokenInfo<AccountId, Data, TokenMetadataOf> {
     pub metadata: TokenMetadataOf,
     /// Token owner
     pub owner: AccountId,
+    /// Token creator,
+    pub creator: AccountId,
     /// Token Properties
     pub data: Data,
 }
@@ -175,6 +177,20 @@ pub mod pallet {
             NMapKey<Blake2_128Concat, T::TokenId>,
         ),
         (T::AccountId, T::TokenId),
+        ValueQuery,
+    >;
+
+    /// Token existence check by creator
+    #[pallet::storage]
+    #[pallet::getter(fn tokens_by_creator)]
+    pub type TokensByCreator<T: Config> = StorageNMap<
+        _,
+        (
+            NMapKey<Blake2_128Concat, T::AccountId>,
+            NMapKey<Blake2_128Concat, T::ClassId>,
+            NMapKey<Blake2_128Concat, T::TokenId>,
+        ),
+        (),
         ValueQuery,
     >;
 
@@ -322,11 +338,13 @@ impl<T: Config> Pallet<T> {
             let token_info = TokenInfo {
                 metadata: bounded_metadata,
                 owner: owner.clone(),
+                creator: owner.clone(),
                 data,
             };
 
             Tokens::<T>::insert(class_id, token_id, token_info);
             TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
+            TokensByCreator::<T>::insert((owner, class_id, token_id), ());
             Ok(token_id)
         })
     }
@@ -365,6 +383,7 @@ impl<T: Config> Pallet<T> {
                     let token_info = TokenInfo {
                         metadata: bounded_metadata,
                         owner: owner.clone(),
+                        creator: owner.clone(),
                         data,
                     };
                     if_std!(println!(
@@ -374,6 +393,7 @@ impl<T: Config> Pallet<T> {
 
                     Tokens::<T>::insert(class_id, token_id, token_info);
                     TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
+                    TokensByCreator::<T>::insert((owner, class_id, token_id), ());
                     TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
                     Ok(token_id)
                 });
@@ -419,5 +439,9 @@ impl<T: Config> Pallet<T> {
 
     pub fn is_owner(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
         TokensByOwner::<T>::contains_key((account, token.0, token.1))
+    }
+
+    pub fn is_creator(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
+        TokensByCreator::<T>::contains_key((account, token.0, token.1))
     }
 }

@@ -1,0 +1,132 @@
+[package]
+authors = ["Bholdus Technologies"]
+description = "FRAME NFT marketplace pallet"
+edition = '2018'
+homepage = 'https://substrate.dev'
+license = 'Unlicense'
+name = "bholdus-nft-marketplace"
+readme = 'README.md'
+repository = 'https://github.com/bholdus/bholdus-chain.git'
+version = '4.0.0-dev'
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
+[dependencies.enumflags2]
+version = '0.6.3'
+
+[dependencies.serde]
+optional = true
+version = '1.0.124'
+
+[dependencies.codec]
+default-features = false
+features = ['derive', 'max-encoded-len']
+package = 'parity-scale-codec'
+version = '2.0.0'
+
+
+[dependencies.frame-benchmarking]
+version = "4.0.0-dev"
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+optional = true
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.frame-system]
+default-features = false
+# path = '../frame/system'
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+## Bholdus pallets
+
+# Local dependencies
+[dependencies.bholdus-primitives]
+default-features = false
+version = '4.0.0-dev'
+path = '../../primitives/bholdus'
+
+## Bholdus libs
+
+[dependencies.bholdus-support]
+default-features = false
+version = '4.0.0-dev'
+path = '../../pallets/support'
+
+[dependencies.bholdus-support-nft]
+default-features = false
+package = 'support-nft'
+version = '4.0.0-dev'
+path = '../../pallets/support/nft'
+
+[dependencies.bholdus-support-nft-marketplace]
+default-features = false
+package = 'support-nft-marketplace'
+version = '4.0.0-dev'
+path = '../../pallets/support/nft-marketplace'
+
+[dev-dependencies.sp-core]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dev-dependencies.sp-io]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dev-dependencies.pallet-balances]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dev-dependencies.pallet-utility]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	'scale-info/std',
+	"enumflags2/serde",
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+	"bholdus-primitives/std",
+	"bholdus-support/std",
+	"bholdus-support-nft/std",
+	"bholdus-support-nft-marketplace/std",
+	"enumflags2/serde",
+]
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+]
+try-runtime = ["frame-support/try-runtime"]
