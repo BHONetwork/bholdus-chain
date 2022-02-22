@@ -1,0 +1,91 @@
+[package]
+authors = ["Bholdus Technologies"]
+description = "FRAME Support NFT marketplace pallet"
+edition = '2018'
+homepage = 'https://substrate.dev'
+license = 'Unlicense'
+name = "support-nft-marketplace"
+readme = 'README.md'
+repository = 'https://github.com/bholdus/bholdus-chain.git'
+version = '4.0.0-dev'
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies.num-traits]
+default-features = false
+version = "0.2.14"
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
+[dependencies.serde]
+optional = true
+version = '1.0.124'
+
+[dependencies.codec]
+default-features = false
+features = ['derive', 'max-encoded-len']
+package = 'parity-scale-codec'
+version = '2.0.0'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.bholdus-primitives]
+default-features = false
+version = '4.0.0-dev'
+path = '../../../primitives/bholdus'
+
+[dependencies.bholdus-support-nft]
+default-features = false
+package = 'support-nft'
+version = '4.0.0-dev'
+path = '../nft'
+
+[dev-dependencies.sp-io]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dev-dependencies.sp-core]
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	'scale-info/std',
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+	"bholdus-support-nft/std",
+	"bholdus-primitives/std",
+]
+try-runtime = ["frame-support/try-runtime"]
