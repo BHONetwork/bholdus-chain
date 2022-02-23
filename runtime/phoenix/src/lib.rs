@@ -1256,7 +1256,7 @@ construct_runtime!(
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
-        SupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
+        BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
         // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // SupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},

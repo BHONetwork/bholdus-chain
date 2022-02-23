@@ -16,9 +16,9 @@ use sp_runtime::{
 };
 use ulas_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
-    BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig, GenesisAccount,
-    GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, StakerStatus,
-    StakingConfig, SudoConfig, BholdusSupportNFTConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS,
+    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig,
+    GenesisAccount, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
+    StakerStatus, StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS,
     TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 

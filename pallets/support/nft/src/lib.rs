@@ -28,12 +28,16 @@ use sp_runtime::{
 
 use sp_std::{convert::TryInto, if_std, vec::Vec};
 
+use frame_support::traits::StorageVersion;
+
 #[cfg(test)]
 mod mock;
 #[cfg(test)]
 mod tests;
 
 pub use pallet::*;
+
+mod migrations;
 
 /// Class info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
@@ -226,7 +230,21 @@ pub mod pallet {
     #[pallet::pallet]
     pub struct Pallet<T>(_);
     #[pallet::hooks]
-    impl<T: Config> Hooks<T::BlockNumber> for Pallet<T> {}
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+        fn on_runtime_upgrade() -> Weight {
+            migrations::migrate::<T>()
+        }
+
+        #[cfg(feature = "try-runtime")]
+        fn pre_upgrade() -> Result<(), &'static str> {
+            Ok(())
+        }
+
+        #[cfg(feature = "try-runtime")]
+        fn post_upgrade() -> Result<(), &'static str> {
+            Ok(())
+        }
+    }
     #[pallet::call]
     impl<T: Config> Pallet<T> {}
 }
