@@ -5,7 +5,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 license = "GPL-3.0-only"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.12"
+version = "1.0.13"
 
 [dependencies]
 futures = { version = "0.3", features = ["compat"] }

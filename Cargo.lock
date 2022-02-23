@@ -529,7 +529,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-cli",
  "bholdus-service",
@@ -540,7 +540,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-bridge-native-transfer"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-primitives",
  "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -559,7 +559,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-cli"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-service",
  "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -580,7 +580,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-client-evm-tracing"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-evm-rpc-primitives-debug",
  "ethereum-types",
@@ -594,7 +594,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-currencies"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -612,7 +612,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-template"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-evm-precompile-utils",
  "bholdus-support",
@@ -640,7 +640,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-utils"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-evm-precompile-utils-macro",
  "fp-evm",
@@ -659,7 +659,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-utils-macro"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "num_enum",
  "proc-macro2",
@@ -670,7 +670,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-primitives-ext"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "ethereum-types",
  "evm-tracing-events",
@@ -682,7 +682,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-core-debug"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-types",
@@ -698,7 +698,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-core-trace"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-types",
@@ -713,7 +713,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-core-types"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "ethereum-types",
  "serde",
@@ -722,7 +722,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-debug"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-debug",
@@ -749,7 +749,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-primitives-debug"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "environmental",
  "ethereum",
@@ -767,7 +767,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-trace"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-trace",
@@ -799,7 +799,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-tracer"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-evm-primitives-ext",
  "ethereum-types",
@@ -818,7 +818,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-nft"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-primitives",
  "bholdus-support",
@@ -840,7 +840,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-primitives"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "parity-scale-codec",
  "pretty_assertions",
@@ -854,7 +854,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-service"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "async-trait",
  "beefy-gadget",
@@ -937,7 +937,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-support"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "impl-trait-for-tuples",
@@ -952,7 +952,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-tokens"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-support",
  "enumflags2",
@@ -1131,7 +1131,7 @@ checksum = "771fe0050b883fcc3ea2359b1a96bcfbc090b7116eae7c3c512c7a083fdf23d3"
 
 [[package]]
 name = "bsc-primitives"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "array-bytes",
  "ethbloom",
@@ -1686,7 +1686,7 @@ dependencies = [
 
 [[package]]
 name = "cygnus-runtime"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -2139,7 +2139,7 @@ dependencies = [
 
 [[package]]
 name = "evm-tracing-events"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "environmental",
  "ethereum",
@@ -3406,7 +3406,7 @@ dependencies = [
 
 [[package]]
 name = "integration-tokens"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-primitives",
  "bholdus-support",
@@ -5558,7 +5558,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-integration"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-primitives",
  "bholdus-support",
@@ -5784,7 +5784,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-template"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -6146,7 +6146,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -6897,7 +6897,7 @@ dependencies = [
 
 [[package]]
 name = "runtime-chain-extension"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-currencies",
  "bholdus-primitives",
@@ -7035,7 +7035,7 @@ dependencies = [
 
 [[package]]
 name = "sample-extension"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "bholdus-primitives",
  "bholdus-support",
@@ -9587,7 +9587,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-nft"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
@@ -10074,7 +10074,7 @@ dependencies = [
 
 [[package]]
 name = "ulas-runtime"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",

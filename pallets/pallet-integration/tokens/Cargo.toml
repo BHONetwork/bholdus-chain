@@ -1,6 +1,6 @@
 [package]
 name = "integration-tokens"
-version = "1.0.12"
+version = "1.0.13"
 authors = ["Vu hoang <vuhoang2119@gmail.com>"]
 edition = "2018"
 

@@ -7,6 +7,7 @@ use frame_support::{
 use crate::*;
 
 pub fn migrate<T: crate::Config>() -> Weight {
+    log::info!("Support NFT migrates pallet name from SupportNFT to BholdusSupportNF");
     migration::move_pallet(b"SupportNFT", b"BholdusSupportNFT");
     0
 }
