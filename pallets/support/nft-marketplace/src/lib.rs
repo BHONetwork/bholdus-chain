@@ -25,7 +25,6 @@ use sp_runtime::{
 };
 
 use bholdus_primitives::Balance;
-use num_traits::float::Float;
 use sp_std::fmt::Debug;
 //use sp_std::vec::Vec;
 use sp_std::{convert::TryInto, prelude::*, vec};
@@ -40,7 +39,9 @@ pub use support_module::*;
 pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
 pub type Price = FixedU128;
-pub type RoyaltyRate = (u32, u32);
+pub type Denominator = u32;
+pub type Numerator = u32;
+pub type RoyaltyRate = (Numerator, Denominator);
 
 /// Listing Info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
@@ -149,6 +150,14 @@ impl<T: Config> Pallet<T> {
             royalty,
         };
         ListingOnMarket::<T>::insert(token.0, token.1, listing_info);
+        Ok(())
+    }
+    /// Remove item NFT from market place
+    pub fn remove_item_from_market(
+        owner: &T::AccountId,
+        token: (ClassIdOf<T>, TokenIdOf<T>),
+    ) -> DispatchResult {
+        ListingOnMarket::<T>::remove(token.0, token.1);
         Ok(())
     }
 

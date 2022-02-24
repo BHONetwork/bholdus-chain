@@ -6,15 +6,37 @@
 pub mod currency;
 pub mod dex;
 
+use codec::{Decode, Encode, MaxEncodedLen};
+use scale_info::TypeInfo;
 pub use sp_runtime::OpaqueExtrinsic;
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentifyAccount, Verify},
-    FixedU128, MultiSignature,
+    FixedU128, MultiSignature, RuntimeDebug,
 };
 
 pub use currency::*;
 pub use dex::*;
+
+#[derive(
+    Encode,
+    Decode,
+    Eq,
+    PartialEq,
+    Copy,
+    Clone,
+    RuntimeDebug,
+    PartialOrd,
+    Ord,
+    MaxEncodedLen,
+    TypeInfo,
+)]
+#[repr(u8)]
+pub enum ReserveIdentifier {
+    Nft,
+    // always the last, indicate number of variants
+    Count,
+}
 
 /// An index to a block.
 pub type BlockNumber = u32;

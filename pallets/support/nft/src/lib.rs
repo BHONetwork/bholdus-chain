@@ -386,10 +386,11 @@ impl<T: Config> Pallet<T> {
                         creator: owner.clone(),
                         data,
                     };
-                    if_std!(println!(
+                    /*if_std!(println!(
                         "SupportNFT class_id-token_id-class_token_id {:?}:{:?}:{:?}",
                         class_id, token_id, class_token_id
                     ));
+                    */
 
                     Tokens::<T>::insert(class_id, token_id, token_info);
                     TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));

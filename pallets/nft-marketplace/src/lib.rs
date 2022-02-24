@@ -26,6 +26,8 @@ use sp_runtime::{
     DispatchResult, FixedPointNumber, FixedPointOperand, FixedU128, RuntimeDebug,
 };
 
+use sp_std::if_std;
+
 // #[cfg(feature = "runtime-benchmarks")]
 // pub mod benchmarking;
 #[cfg(test)]
@@ -34,7 +36,9 @@ mod mock;
 mod tests;
 
 use bholdus_primitives::Balance;
-use bholdus_support_nft_marketplace::{ListingInfo, MarketMode, Price, RoyaltyRate};
+use bholdus_support_nft_marketplace::{
+    ListingInfo, ListingOnMarket, MarketMode, Numerator, Price, RoyaltyRate,
+};
 
 pub use support_module::*;
 
@@ -62,6 +66,7 @@ pub mod support_module {
     #[pallet::error]
     pub enum Error<T> {
         IsListing,
+        ItemMustBeListing,
         NoPermission,
         IsBlacklist,
     }
@@ -74,6 +79,11 @@ pub mod support_module {
             owner: T::AccountId,
             token: (ClassIdOf<T>, TokenIdOf<T>),
             market_info: MarketInfo,
+        },
+        /// Cancel item list on marketplace
+        CanceledItemListing {
+            owner: T::AccountId,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
         },
     }
 
@@ -92,17 +102,26 @@ pub mod support_module {
             token: (ClassIdOf<T>, TokenIdOf<T>),
             market_mode: MarketMode,
             price: Price,
-            royalty: Option<RoyaltyRate>,
+            royalty: Option<Numerator>,
         ) -> DispatchResult {
             let owner = ensure_signed(origin)?;
-            let (is_listing, is_item_blacklist) =
-                bholdus_support_nft_marketplace::Pallet::<T>::check_item_status(token);
-            ensure!(!is_listing, Error::<T>::IsListing);
-            ensure!(!is_item_blacklist, Error::<T>::IsBlacklist);
+
+            // Check permission
+
             let (is_creator, is_owner) =
                 bholdus_support_nft_marketplace::Pallet::<T>::check_creator_or_owner(&owner, token);
             let is_passed_role = Self::is_passed_role(is_creator, is_owner);
             ensure!(is_passed_role, Error::<T>::NoPermission);
+
+            // Check status
+
+            let (is_listing, is_item_blacklist) =
+                bholdus_support_nft_marketplace::Pallet::<T>::check_item_status(token);
+            ensure!(!is_listing, Error::<T>::IsListing);
+            ensure!(!is_item_blacklist, Error::<T>::IsBlacklist);
+
+            // Mapping royalty
+
             let royalty_bounded = Self::mapping_royalty(is_creator, is_owner, royalty);
             bholdus_support_nft_marketplace::Pallet::<T>::add_item_to_market(
                 &owner,
@@ -124,6 +143,20 @@ pub mod support_module {
             });
             Ok(())
         }
+
+        #[pallet::weight(0)]
+        #[transactional]
+        pub fn cancel_item_list_on_market(
+            origin: OriginFor<T>,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+        ) -> DispatchResult {
+            let owner = ensure_signed(origin)?;
+            let is_owner = bholdus_support_nft_marketplace::Pallet::<T>::is_owner(&owner, token);
+            ensure!(is_owner, Error::<T>::NoPermission);
+            ListingOnMarket::<T>::take(token.0, token.1).ok_or(Error::<T>::ItemMustBeListing)?;
+            Self::deposit_event(Event::CanceledItemListing { owner, token });
+            Ok(())
+        }
     }
 }
 
@@ -138,11 +171,11 @@ impl<T: Config> Pallet<T> {
     pub fn mapping_royalty(
         is_creator: bool,
         is_owner: bool,
-        royalty: Option<RoyaltyRate>,
+        royalty: Option<Numerator>,
     ) -> RoyaltyRate {
         if is_creator {
             if royalty.is_some() {
-                royalty.unwrap()
+                (royalty.unwrap(), 10_000u32)
             } else {
                 (10_000, 10_000)
             }

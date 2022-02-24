@@ -9,7 +9,9 @@ use frame_support::{
     RuntimeDebug,
 };
 
-use bholdus_primitives::{Amount, Balance, BlockNumber, CurrencyId, TokenSymbol};
+use bholdus_primitives::{
+    Amount, Balance, BlockNumber, CurrencyId, ReserveIdentifier, TokenSymbol,
+};
 use bholdus_support::parameter_type_with_key;
 use sp_core::{crypto::AccountId32, H256};
 use sp_runtime::{
@@ -47,6 +49,23 @@ impl frame_system::Config for Runtime {
     type SystemWeightInfo = ();
     type SS58Prefix = ();
     type OnSetCode = ();
+}
+
+parameter_types! {
+    pub const ExistentialDeposit: u64 = 1;
+    pub const MaxReserves: u32 = 50;
+}
+
+impl pallet_balances::Config for Runtime {
+    type Balance = Balance;
+    type Event = Event;
+    type DustRemoval = ();
+    type ExistentialDeposit = ExistentialDeposit;
+    type AccountStore = frame_system::Pallet<Runtime>;
+    type MaxLocks = ();
+    type MaxReserves = MaxReserves;
+    type ReserveIdentifier = ReserveIdentifier;
+    type WeightInfo = ();
 }
 
 parameter_types! {
@@ -88,6 +107,7 @@ construct_runtime!(
     UncheckedExtrinsic = UncheckedExtrinsic
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         SupportNFT: bholdus_support_nft::{Pallet, Storage},
         SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage},
         NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Storage, Event<T>},
@@ -99,6 +119,8 @@ pub const BOB: AccountId = AccountId::new([2u8; 32]);
 pub const CLASS_ID: <Runtime as bholdus_support_nft::Config>::ClassId = 0;
 pub const TOKEN_ID: <Runtime as bholdus_support_nft::Config>::TokenId = 0;
 pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
+
+pub const ROYALTY_DENOMINATOR: u32 = 10_000u32;
 
 pub struct ExtBuilder;
 impl Default for ExtBuilder {

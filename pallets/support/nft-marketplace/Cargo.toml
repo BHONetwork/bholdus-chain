@@ -10,11 +10,6 @@ repository = 'https://github.com/bholdus/bholdus-chain.git'
 version = '4.0.0-dev'
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies.num-traits]
-default-features = false
-version = "0.2.14"
-
 [dependencies.scale-info]
 default-features = false
 features = ['derive']

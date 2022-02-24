@@ -1069,6 +1069,10 @@ impl bholdus_nft::Config for Runtime {
     type WeightInfo = bholdus_nft::weights::SubstrateWeight<Runtime>;
 }
 
+impl bholdus_nft_marketplace::Config for Runtime {
+    type Event = Event;
+}
+
 parameter_types! {
     pub MaxClassMetadata: u32 = 1024;
     pub MaxTokenMetadata: u32 = 1024;
@@ -1082,6 +1086,14 @@ impl bholdus_support_nft::Config for Runtime {
     type TokenData = bholdus_nft::TokenData;
     type MaxClassMetadata = MaxClassMetadata;
     type MaxTokenMetadata = MaxTokenMetadata;
+}
+
+parameter_types! {
+    pub const RoyaltyValue: (u32, u32) = (10_000, 10_000);
+}
+
+impl bholdus_support_nft_marketplace::Config for Runtime {
+    type GetRoyaltyValue = RoyaltyValue;
 }
 
 /* parameter_types! {
@@ -1256,7 +1268,9 @@ construct_runtime!(
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
+        NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Event<T>},
         SupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
+        SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage},
         // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // SupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
