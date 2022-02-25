@@ -206,3 +206,97 @@ fn cancel_item_list_on_market_should_not_work() {
 
     })
 }
+
+#[test]
+fn configure_pallet_management_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        let controller = ALICE;
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            controller.clone(),
+        ));
+
+        System::assert_last_event(Event::NFTMarketplace(crate::Event::AddedManagementInfo {
+            management_info: PalletManagementInfo {
+                controller: controller.clone(),
+            },
+        }));
+
+        match PalletManagement::<Runtime>::get() {
+            None => assert!(!PalletManagement::<Runtime>::exists()),
+            Some(info) => {
+                assert!(info.controller == controller.clone())
+            }
+        };
+
+        assert!(PalletManagement::<Runtime>::exists());
+
+        let controller = BOB;
+
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            controller.clone()
+        ));
+
+        System::assert_last_event(Event::NFTMarketplace(crate::Event::UpdatedManagementInfo {
+            management_info: PalletManagementInfo {
+                controller: controller.clone(),
+            },
+        }));
+
+        match PalletManagement::<Runtime>::get() {
+            None => assert!(!PalletManagement::<Runtime>::exists()),
+            Some(info) => {
+                assert!(info.controller == controller.clone())
+            }
+        };
+    })
+}
+
+#[test]
+fn configure_pallet_management_should_not_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_eq!(PalletManagement::<Runtime>::exists(), false);
+
+        match PalletManagement::<Runtime>::get() {
+            None => assert!(!PalletManagement::<Runtime>::exists()),
+            Some(info) => {
+                assert!(info.controller == ALICE,)
+            }
+        };
+
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            ALICE
+        ));
+
+        match PalletManagement::<Runtime>::get() {
+            None => assert!(!PalletManagement::<Runtime>::exists()),
+            Some(info) => {
+                assert!(info.controller == ALICE);
+                assert_eq!(info.controller == BOB, false)
+            }
+        };
+        assert_eq!(PalletManagement::<Runtime>::exists(), true);
+
+        assert_noop!(
+            NFTMarketplace::configure_pallet_management(Origin::signed(BOB), ALICE),
+            Error::<Runtime>::AccountIdMustBeController
+        );
+
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            BOB
+        ));
+
+        assert_noop!(
+            NFTMarketplace::configure_pallet_management(Origin::signed(ALICE), ALICE),
+            Error::<Runtime>::AccountIdMustBeController
+        );
+
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(BOB),
+            ALICE
+        ));
+    })
+}

@@ -52,6 +52,11 @@ pub struct MarketInfo {
     pub royalty: RoyaltyRate,
 }
 
+#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
+pub struct PalletManagementInfo<AccountId> {
+    controller: AccountId,
+}
+
 #[frame_support::pallet]
 pub mod support_module {
     use super::*;
@@ -63,17 +68,32 @@ pub mod support_module {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
+    pub type PalletManagementInfoOf<T> =
+        PalletManagementInfo<<T as frame_system::Config>::AccountId>;
     #[pallet::error]
     pub enum Error<T> {
         IsListing,
         ItemMustBeListing,
+        AccountIdMustBeController,
         NoPermission,
         IsBlacklist,
+        BadRequest,
     }
+    #[pallet::storage]
+    #[pallet::getter(fn pallet_management)]
+    pub type PalletManagement<T: Config> = StorageValue<_, PalletManagementInfoOf<T>>;
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
     pub enum Event<T: Config> {
+        /// Add pallet management info
+        AddedManagementInfo {
+            management_info: PalletManagementInfo<T::AccountId>,
+        },
+        /// Update pallet management info
+        UpdatedManagementInfo {
+            management_info: PalletManagementInfo<T::AccountId>,
+        },
         /// Add item on marketplace
         ListedItem {
             owner: T::AccountId,
@@ -95,6 +115,45 @@ pub mod support_module {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
+        #[pallet::weight(0)]
+        #[transactional]
+        pub fn configure_pallet_management(
+            origin: OriginFor<T>,
+            controller: T::AccountId,
+        ) -> DispatchResult {
+            let who = ensure_signed(origin)?;
+            if PalletManagement::<T>::exists() {
+                PalletManagement::<T>::try_mutate(|management_info| -> DispatchResult {
+                    let info = management_info.as_mut().ok_or(Error::<T>::BadRequest)?;
+                    ensure!(
+                        info.controller == who,
+                        Error::<T>::AccountIdMustBeController
+                    );
+                    if info.controller == controller.clone() {
+                        // no change needed
+                        return Ok(());
+                    }
+                    info.controller = controller.clone();
+                    Self::deposit_event(Event::UpdatedManagementInfo {
+                        management_info: PalletManagementInfo {
+                            controller: controller.clone(),
+                        },
+                    });
+                    Ok(())
+                })
+            } else {
+                PalletManagement::<T>::put(PalletManagementInfo {
+                    controller: controller.clone(),
+                });
+                Self::deposit_event(Event::AddedManagementInfo {
+                    management_info: PalletManagementInfo {
+                        controller: controller.clone(),
+                    },
+                });
+                Ok(())
+            }
+        }
+
         #[pallet::weight(0)]
         #[transactional]
         pub fn list_item_on_market(
