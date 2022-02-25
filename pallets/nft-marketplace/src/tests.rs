@@ -26,20 +26,20 @@ fn list_item_on_market_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         create_nft();
         let price = Price::saturating_from_integer(10000u128);
-        let royalty_numerator = 1000u32;
+        let royalty = (1000u32, 1000u32);
 
         assert_ok!(NFTMarketplace::list_item_on_market(
             Origin::signed(ALICE),
             (CLASS_ID, TOKEN_ID),
             MarketMode::SellNow,
             price,
-            Some(royalty_numerator)
+            Some(royalty.clone())
         ));
 
         let market_info = MarketInfo {
             market_mode: MarketMode::SellNow,
             price,
-            royalty: (royalty_numerator, ROYALTY_DENOMINATOR),
+            royalty: royalty.clone(),
         };
 
         System::assert_last_event(Event::NFTMarketplace(crate::Event::ListedItem {
@@ -60,14 +60,14 @@ fn list_item_on_market_should_work() {
                 buyer: None,
                 market_mode: MarketMode::SellNow,
                 price,
-                royalty: (royalty_numerator, ROYALTY_DENOMINATOR)
+                royalty: royalty.clone()
             }
         );
 
         let (numerator, denominator) = (listing_info.royalty.0, listing_info.royalty.1);
         let rate = FixedU128::from((numerator, denominator));
         let royalty_reward = listing_info.price * rate;
-        let royalty = Price::saturating_from_integer(10000u128 / 10u128);
+        let royalty = Price::saturating_from_integer(10000u128);
         assert_eq!(royalty_reward, royalty);
     });
 }
@@ -82,7 +82,7 @@ fn list_item_on_market_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 MarketMode::SellNow,
                 price,
-                Some(100u32)
+                Some((100u32, 100u32))
             ),
             Error::<Runtime>::NoPermission
         );
@@ -111,7 +111,7 @@ fn list_item_on_market_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 MarketMode::SellNow,
                 price,
-                Some(100u32)
+                Some((100u32, 100u32))
             ),
             Error::<Runtime>::NoPermission
         );
@@ -120,7 +120,7 @@ fn list_item_on_market_should_not_work() {
             (CLASS_ID, TOKEN_ID),
             MarketMode::SellNow,
             price,
-            Some(100u32)
+            Some((100u32, 100u32))
         ));
 
         assert_noop!(
@@ -129,7 +129,7 @@ fn list_item_on_market_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 MarketMode::SellNow,
                 price,
-                Some(100u32)
+                Some((100u32, 100u32))
             ),
             Error::<Runtime>::IsListing
         );
@@ -146,7 +146,7 @@ fn cancel_item_list_on_market_should_work() {
             (CLASS_ID, TOKEN_ID),
             MarketMode::SellNow,
             price.clone(),
-            Some(100u32)
+            Some((100u32, 100u32))
         ));
         assert_ok!(NFTMarketplace::cancel_item_list_on_market(
             Origin::signed(ALICE),
@@ -190,7 +190,7 @@ fn cancel_item_list_on_market_should_not_work() {
         (CLASS_ID, TOKEN_ID),
         MarketMode::SellNow,
         price.clone(),
-        Some(100u32)
+        Some((100u32, 100u32))
     ));
 
     // Cancel item listing on NFT marketplace
@@ -297,6 +297,85 @@ fn configure_pallet_management_should_not_work() {
         assert_ok!(NFTMarketplace::configure_pallet_management(
             Origin::signed(BOB),
             ALICE
+        ));
+    })
+}
+
+#[test]
+fn set_marketplace_fee_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        let service_fee = (1000u32, 10_000u32);
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            ALICE
+        ));
+        assert_ok!(NFTMarketplace::set_marketplace_fee(
+            Origin::signed(ALICE),
+            service_fee.clone(),
+            BOB,
+        ));
+
+        System::assert_last_event(Event::NFTMarketplace(
+            crate::Event::ConfiguredMarketplaceFee {
+                controller: ALICE,
+                marketplace_fee_info: MarketplaceFeeInfo {
+                    service_fee: service_fee.clone(),
+                    beneficiary: BOB,
+                },
+            },
+        ));
+
+        assert_ok!(NFTMarketplace::set_marketplace_fee(
+            Origin::signed(ALICE),
+            service_fee.clone(),
+            ALICE
+        ));
+
+        System::assert_last_event(Event::NFTMarketplace(
+            crate::Event::ConfiguredMarketplaceFee {
+                controller: ALICE,
+                marketplace_fee_info: MarketplaceFeeInfo {
+                    service_fee: service_fee.clone(),
+                    beneficiary: ALICE,
+                },
+            },
+        ));
+
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            BOB
+        ));
+        assert_ok!(NFTMarketplace::set_marketplace_fee(
+            Origin::signed(BOB),
+            service_fee.clone(),
+            BOB,
+        ));
+    })
+}
+
+#[test]
+fn set_marketplace_fee_should_not_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        let service_fee = (1000u32, 10_000u32);
+        assert_noop!(
+            NFTMarketplace::set_marketplace_fee(Origin::signed(ALICE), service_fee.clone(), BOB),
+            Error::<Runtime>::NotFoundPalletManagementInfo
+        );
+
+        assert_ok!(NFTMarketplace::configure_pallet_management(
+            Origin::signed(ALICE),
+            ALICE
+        ));
+
+        assert_noop!(
+            NFTMarketplace::set_marketplace_fee(Origin::signed(BOB), service_fee.clone(), BOB),
+            Error::<Runtime>::NoPermission
+        );
+
+        assert_ok!(NFTMarketplace::set_marketplace_fee(
+            Origin::signed(ALICE),
+            service_fee.clone(),
+            BOB,
         ));
     })
 }

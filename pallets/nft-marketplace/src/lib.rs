@@ -37,7 +37,7 @@ mod tests;
 
 use bholdus_primitives::Balance;
 use bholdus_support_nft_marketplace::{
-    ListingInfo, ListingOnMarket, MarketMode, Numerator, Price, RoyaltyRate,
+    Denominator, ListingInfo, ListingOnMarket, MarketMode, Numerator, Price, RoyaltyRate,
 };
 
 pub use support_module::*;
@@ -57,6 +57,13 @@ pub struct PalletManagementInfo<AccountId> {
     controller: AccountId,
 }
 
+/// MarketPlace Fee Information
+#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
+pub struct MarketplaceFeeInfo<AccountId> {
+    service_fee: (Numerator, Denominator),
+    beneficiary: AccountId,
+}
+
 #[frame_support::pallet]
 pub mod support_module {
     use super::*;
@@ -70,11 +77,13 @@ pub mod support_module {
 
     pub type PalletManagementInfoOf<T> =
         PalletManagementInfo<<T as frame_system::Config>::AccountId>;
+    pub type MarketplaceFeeInfoOf<T> = MarketplaceFeeInfo<<T as frame_system::Config>::AccountId>;
     #[pallet::error]
     pub enum Error<T> {
         IsListing,
         ItemMustBeListing,
         AccountIdMustBeController,
+        NotFoundPalletManagementInfo,
         NoPermission,
         IsBlacklist,
         BadRequest,
@@ -82,6 +91,10 @@ pub mod support_module {
     #[pallet::storage]
     #[pallet::getter(fn pallet_management)]
     pub type PalletManagement<T: Config> = StorageValue<_, PalletManagementInfoOf<T>>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn marketplace_fee)]
+    pub type MarketplaceFee<T: Config> = StorageValue<_, MarketplaceFeeInfoOf<T>>;
 
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
@@ -93,6 +106,12 @@ pub mod support_module {
         /// Update pallet management info
         UpdatedManagementInfo {
             management_info: PalletManagementInfo<T::AccountId>,
+        },
+
+        /// Set Marketplace Fee Information
+        ConfiguredMarketplaceFee {
+            controller: T::AccountId,
+            marketplace_fee_info: MarketplaceFeeInfo<T::AccountId>,
         },
         /// Add item on marketplace
         ListedItem {
@@ -156,12 +175,36 @@ pub mod support_module {
 
         #[pallet::weight(0)]
         #[transactional]
+        pub fn set_marketplace_fee(
+            origin: OriginFor<T>,
+            service_fee: (Numerator, Denominator),
+            beneficiary: T::AccountId,
+        ) -> DispatchResult {
+            let who = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(management_info.controller == who, Error::<T>::NoPermission);
+            let fee_info = MarketplaceFeeInfo {
+                service_fee,
+                beneficiary: beneficiary.clone(),
+            };
+            MarketplaceFee::<T>::put(fee_info.clone());
+            Self::deposit_event(Event::ConfiguredMarketplaceFee {
+                controller: management_info.controller,
+                marketplace_fee_info: fee_info.clone(),
+            });
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        #[transactional]
         pub fn list_item_on_market(
             origin: OriginFor<T>,
             token: (ClassIdOf<T>, TokenIdOf<T>),
             market_mode: MarketMode,
             price: Price,
-            royalty: Option<Numerator>,
+            royalty: Option<(Numerator, Denominator)>,
         ) -> DispatchResult {
             let owner = ensure_signed(origin)?;
 
@@ -230,11 +273,11 @@ impl<T: Config> Pallet<T> {
     pub fn mapping_royalty(
         is_creator: bool,
         is_owner: bool,
-        royalty: Option<Numerator>,
+        royalty: Option<(Numerator, Denominator)>,
     ) -> RoyaltyRate {
         if is_creator {
             if royalty.is_some() {
-                (royalty.unwrap(), 10_000u32)
+                royalty.unwrap()
             } else {
                 (10_000, 10_000)
             }
