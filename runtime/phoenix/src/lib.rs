@@ -81,7 +81,7 @@ pub use pallet_sudo::Call as SudoCall;
 pub use sp_runtime::BuildStorage;
 
 /// Bholdus dependencies
-use bholdus_currencies::BasicCurrencyAdapter;
+// use bholdus_currencies::BasicCurrencyAdapter;
 pub use bholdus_primitives::*;
 use bholdus_primitives::{CurrencyId, TokenId};
 use bholdus_support::parameter_type_with_key;
@@ -1003,11 +1003,12 @@ parameter_type_with_key! {
     };
 }
 
-impl bholdus_currencies::Config for Runtime {
+/*impl bholdus_currencies::Config for Runtime {
     type Event = Event;
     type MultiCurrency = Tokens;
     type WeightInfo = ();
 }
+*/
 
 impl bholdus_tokens::Config for Runtime {
     type Event = Event;
@@ -1197,7 +1198,7 @@ impl pallet_base_fee::Config for Runtime {
     type Threshold = BaseFeeThreshold;
 }
 
-impl sample_extension::Config for Runtime {
+/*impl sample_extension::Config for Runtime {
     type Event = Event;
     type Currency = Currencies;
     type WeightInfo = sample_extension::weights::SubstrateWeight<Runtime>;
@@ -1208,9 +1209,11 @@ impl integration_tokens::Config for Runtime {
     type Currency = Currencies;
     type WeightInfo = integration_tokens::weights::SubstrateWeight<Runtime>;
 }
+
 impl bholdus_pallet_integration::Config for Runtime {
     type Event = Event;
 }
+*/
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -1254,7 +1257,7 @@ construct_runtime!(
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
-        Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+        // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
         BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
         // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
@@ -1269,10 +1272,11 @@ construct_runtime!(
         Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin},
         BaseFee: pallet_base_fee::{Pallet, Call, Storage, Config<T>, Event},
 
-        // Ink Extension
+        /*// Ink Extension
         SampleExtension: sample_extension::{Pallet, Call, Storage, Event<T>},
         IntegrationTokens: integration_tokens::{Pallet, Call, Storage, Event<T>},
         PalletIntegration: bholdus_pallet_integration::{Pallet, Call, Storage, Event<T>},
+        */
     }
 );
 

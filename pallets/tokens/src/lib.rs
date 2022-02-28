@@ -82,7 +82,7 @@ mod imbalances;
 #[cfg(test)]
 pub mod mock;
 #[cfg(test)]
-mod tests;
+mod tests_functions;
 pub mod weights;
 
 mod extra_mutator;
@@ -90,6 +90,7 @@ pub use extra_mutator::*;
 mod functions;
 mod impl_fungibles;
 mod impl_stored_map;
+mod internal_functions;
 mod types;
 pub use types::*;
 
@@ -488,6 +489,7 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config<I>, I: 'static> Pallet<T, I> {
+        /*
         /// Issue a new class of fungible assets from a public origin.
         ///
         /// This new asset class has no assets initially and its owner is the origin.
@@ -856,6 +858,7 @@ pub mod pallet {
 
             Ok(())
         }
+        */
 
         /// Move some assets from the sender account to another.
         ///
