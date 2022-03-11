@@ -104,14 +104,14 @@ pub(super) struct TransferFlags {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, TypeInfo)]
-pub(super) struct DebitFlags {
+pub struct DebitFlags {
     /// The debited account must stay alive at the end of the operation; an error is returned if
     /// this cannot be achieved legally.
-    pub(super) keep_alive: bool,
+    pub keep_alive: bool,
     /// Less than the amount specified needs be debited by the operation for it to be considered
     /// successful. If `false`, then the amount debited will always be at least the amount
     /// specified.
-    pub(super) best_effort: bool,
+    pub best_effort: bool,
 }
 
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default, TypeInfo)]

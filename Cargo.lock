@@ -839,6 +839,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-pools"
+version = "1.0.14"
+dependencies = [
+ "bholdus-primitives",
+ "bholdus-support",
+ "bholdus-tokens",
+ "frame-benchmarking 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-io 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-runtime 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+ "sp-std 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
+]
+
+[[package]]
 name = "bholdus-primitives"
 version = "1.0.14"
 dependencies = [
@@ -6150,10 +6169,10 @@ version = "1.0.14"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
- "bholdus-currencies",
  "bholdus-evm-rpc-primitives-debug",
  "bholdus-evm-tracer",
  "bholdus-nft",
+ "bholdus-pools",
  "bholdus-primitives",
  "bholdus-support",
  "bholdus-tokens",
@@ -6170,7 +6189,6 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "hex-literal",
- "integration-tokens",
  "log",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -6199,7 +6217,6 @@ dependencies = [
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
- "pallet-integration",
  "pallet-mmr",
  "pallet-multisig",
  "pallet-offences",
@@ -6220,7 +6237,6 @@ dependencies = [
  "parity-scale-codec",
  "rlp",
  "runtime-chain-extension",
- "sample-extension",
  "scale-info",
  "sha3 0.8.2",
  "smallvec 1.7.0",

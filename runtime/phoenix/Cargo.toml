@@ -116,6 +116,7 @@ bholdus-support-nft = { package = "support-nft", path = "../../pallets/support/n
 bholdus-support = { path = "../../pallets/support", default-features = false }
 # bholdus-currencies = { path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { path = "../../pallets/bridge/native-transfer", default-features = false }
+bholdus-pools = { path = "../../pallets/pools", default-features = false }
 # sample-extension = { path = "../../pallets/pallet-integration/sample-extension", default-features = false }
 # integration-tokens = { path = "../../pallets/pallet-integration/tokens", default-features = false }
 
@@ -191,6 +192,7 @@ std = [
 	"pallet-beefy-mmr/std",
 
 	"bholdus-tokens/std",
+	"bholdus-pools/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
 	"bholdus-support/std",

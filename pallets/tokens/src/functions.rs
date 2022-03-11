@@ -325,7 +325,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
     /// This alters the registered supply of the asset and emits an event.
     ///
     /// Will return an error or will increase the amount by exactly `amount`.
-    pub(super) fn do_mint(
+    pub fn do_mint(
         id: T::AssetId,
         beneficiary: &T::AccountId,
         amount: T::Balance,
@@ -433,7 +433,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
     ///
     /// Will return an error and do nothing or will decrease the amount and return the amount
     /// reduced by.
-    pub(super) fn do_burn(
+    pub fn do_burn(
         id: T::AssetId,
         target: &T::AccountId,
         amount: T::Balance,

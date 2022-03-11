@@ -1112,6 +1112,17 @@ impl pallet_template::Config for Runtime {
     type Event = Event;
 }
 
+parameter_types! {
+    pub const PoolPalletId: PalletId = PalletId(*b"bho/pool");
+}
+/// Configure the bholdus-pools
+impl bholdus_pools::Config for Runtime {
+    type Event = Event;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
+    type PalletId = PoolPalletId;
+    type CurrencyTrait = Balances;
+}
+
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
 impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
     fn find_author<'a, I>(digests: I) -> Option<H160>
@@ -1256,6 +1267,7 @@ construct_runtime!(
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
+        Pools: bholdus_pools::{Pallet, Call, Storage, Event<T>},
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         // Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
