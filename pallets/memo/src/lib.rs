@@ -21,19 +21,28 @@ mod benchmarking;
 mod types;
 pub use types::*;
 
+pub mod weights;
+pub use weights::WeightInfo;
+
 #[frame_support::pallet]
 pub mod pallet {
     use super::*;
-    use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
+    use frame_support::{dispatch::DispatchResult, pallet_prelude::*, traits::UnixTime};
     use frame_system::pallet_prelude::*;
 
     /// Configure the pallet by specifying the parameters and types on which it depends.
     #[pallet::config]
     pub trait Config: frame_system::Config {
+        type UnixTime: UnixTime;
+
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
         /// Native Currency trait
         type Currency: Currency<Self::AccountId, Balance = Balance>;
+
+        /// Weight information for extrinsics in this pallet.
+        type WeightInfo: weights::WeightInfo;
     }
 
     #[pallet::pallet]
@@ -97,7 +106,7 @@ pub mod pallet {
     // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::create(content.len() as u32, txn_hash.len() as u32))]
         #[transactional]
         pub fn create(
             origin: OriginFor<T>,
@@ -110,12 +119,14 @@ pub mod pallet {
             let sender = T::Lookup::lookup(sender)?;
             let receiver = T::Lookup::lookup(receiver)?;
             let operator = ensure_signed(origin)?;
+            let time_now = T::UnixTime::now().as_millis() as u64;
 
             let memo_info = MemoInfo {
                 content,
                 sender,
                 receiver,
                 operator,
+                time: time_now,
             };
 
             Memo::<T>::insert(&chain_id, &txn_hash, memo_info.clone());
@@ -123,7 +134,7 @@ pub mod pallet {
             Ok(())
         }
 
-        #[pallet::weight(0)]
+        #[pallet::weight(T::WeightInfo::update(content.len() as u32))]
         #[transactional]
         pub fn update(
             origin: OriginFor<T>,

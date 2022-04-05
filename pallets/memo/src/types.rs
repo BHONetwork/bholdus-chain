@@ -8,6 +8,7 @@ pub struct MemoInfo<AccountId> {
     pub(super) sender: AccountId,
     pub(super) receiver: AccountId,
     pub(super) operator: AccountId,
+    pub(super) time: u64,
 }
 
 pub type ChainId = u16;

@@ -1114,7 +1114,9 @@ impl pallet_template::Config for Runtime {
 /// Configure the bholdus-memo in pallets/memo.
 impl bholdus_memo::Config for Runtime {
     type Event = Event;
+    type UnixTime = Timestamp;
     type Currency = Balances;
+    type WeightInfo = bholdus_memo::weights::SubstrateWeight<Runtime>;
 }
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);

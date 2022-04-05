@@ -26,6 +26,7 @@ frame-support = { default-features = false, git = 'https://github.com/bholdus/su
 frame-system = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 sp-runtime = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 sp-std = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 bholdus-primitives = { default-features = false, path = '../../primitives/bholdus' }
 
 [dev-dependencies]
@@ -35,10 +36,15 @@ sp-io = { default-features = false, git = 'https://github.com/bholdus/substrate.
 sp-runtime = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 sp-std = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 pallet-balances = { git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 
 [features]
 default = ['std']
-runtime-benchmarks = ['frame-benchmarking']
+runtime-benchmarks = [
+	'frame-benchmarking',
+	'sp-runtime/runtime-benchmarks',
+	'pallet-timestamp/runtime-benchmarks',
+]
 std = [
 	'codec/std',
 	'scale-info/std',
@@ -48,8 +54,9 @@ std = [
 	'sp-std/std',
 	'sp-runtime/std',
 	'bholdus-primitives/std',
+	'pallet-timestamp/std',
 ]
 try-runtime = [
-	"sp-runtime/runtime-benchmarks",
 	'frame-support/try-runtime',
+	'pallet-timestamp/try-runtime',
 ]

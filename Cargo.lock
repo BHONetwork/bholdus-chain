@@ -825,6 +825,7 @@ dependencies = [
  "frame-support 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "frame-system 4.0.0-dev (git+https://github.com/bholdus/substrate.git?branch=bholdus-monthly-2021-11)",
  "pallet-balances",
+ "pallet-timestamp",
  "parity-scale-codec",
  "scale-info",
  "serde",

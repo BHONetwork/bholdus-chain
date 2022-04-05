@@ -33,6 +33,7 @@ fn create_should_work() {
                 sender,
                 receiver,
                 operator,
+                time: memo_created.time,
             };
             assert_eq!(memo_input, memo_created);
 
@@ -86,6 +87,7 @@ fn update_should_work() {
                 sender,
                 receiver,
                 operator,
+                time: memo_updated.time,
             };
             assert_eq!(memo_input, memo_updated);
 

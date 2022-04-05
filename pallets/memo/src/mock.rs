@@ -22,6 +22,7 @@ frame_support::construct_runtime!(
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         Memo: bholdus_memo::{Pallet, Call, Storage, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Event<T>, Config<T>},
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
     }
 );
 
@@ -71,9 +72,21 @@ impl pallet_balances::Config for Runtime {
     type WeightInfo = ();
 }
 
+frame_support::parameter_types! {
+    pub const MinimumPeriod: u64 = 5;
+}
+impl pallet_timestamp::Config for Runtime {
+    type Moment = u64;
+    type OnTimestampSet = ();
+    type MinimumPeriod = MinimumPeriod;
+    type WeightInfo = ();
+}
+
 impl bholdus_memo::Config for Runtime {
     type Event = Event;
+    type UnixTime = Timestamp;
     type Currency = Balances;
+    type WeightInfo = ();
 }
 
 pub const ALICE: AccountId = 1;
