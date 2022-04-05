@@ -1906,7 +1906,7 @@ impl_runtime_apis! {
             add_benchmark!(params, batches, integration_tokens, IntegrationTokens::<Runtime>);
             add_benchmark!(params, batches, bholdus_nft, NFTBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
-            list_benchmark!(list, extra, bholdus_memo, Memo);
+            add_benchmark!(params, batches, bholdus_memo, Memo);
 
             Ok(batches)
         }
