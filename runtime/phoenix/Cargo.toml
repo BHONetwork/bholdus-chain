@@ -111,6 +111,7 @@ sp-io = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git
 # local dependencies
 bholdus-primitives = { path = "../../primitives/bholdus", default-features = false }
 bholdus-tokens = { path = "../../pallets/tokens", default-features = false }
+bholdus-memo = { path = "../../pallets/memo", default-features = false }
 bholdus-nft = { path = "../../pallets/non-fungible-token", default-features = false }
 bholdus-support-nft = { package = "support-nft", path = "../../pallets/support/nft", default-features = false }
 bholdus-support = { path = "../../pallets/support", default-features = false }
@@ -141,6 +142,7 @@ runtime-benchmarks = [
 	"pallet-ethereum/runtime-benchmarks",
 
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
+	"bholdus-memo/runtime-benchmarks",
 	"bholdus-tokens/runtime-benchmarks",
 	"integration-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
@@ -191,6 +193,7 @@ std = [
 	"pallet-beefy-mmr/std",
 
 	"bholdus-tokens/std",
+	"bholdus-memo/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
 	"bholdus-support/std",
@@ -273,4 +276,5 @@ try-runtime = [
 	"pallet-recovery/try-runtime",
 
 	"bholdus-bridge-native-transfer/try-runtime",
+	"bholdus-memo/try-runtime",
 ]
