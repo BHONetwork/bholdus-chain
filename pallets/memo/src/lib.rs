@@ -134,34 +134,28 @@ pub mod pallet {
             Ok(())
         }
 
-        #[pallet::weight(T::WeightInfo::update(content.len() as u32))]
-        #[transactional]
-        pub fn update(
-            origin: OriginFor<T>,
-            chain_id: ChainId,
-            txn_hash: TxnHash,
-            content: Vec<u8>,
-            sender: <T::Lookup as StaticLookup>::Source,
-            receiver: <T::Lookup as StaticLookup>::Source,
-        ) -> DispatchResult {
-            let sender = T::Lookup::lookup(sender)?;
-            let receiver = T::Lookup::lookup(receiver)?;
-            let who = ensure_signed(origin)?;
+        // #[pallet::weight(T::WeightInfo::update(content.len() as u32))]
+        // #[transactional]
+        // pub fn update(
+        //     origin: OriginFor<T>,
+        //     chain_id: ChainId,
+        //     txn_hash: TxnHash,
+        //     content: Vec<u8>,
+        // ) -> DispatchResult {
+        //     let who = ensure_signed(origin)?;
 
-            let memo_info = Memo::<T>::get(&chain_id, &txn_hash);
+        //     let memo_info = Memo::<T>::get(&chain_id, &txn_hash);
 
-            ensure!(memo_info.is_some(), Error::<T>::NotExisted);
+        //     ensure!(memo_info.is_some(), Error::<T>::NotExisted);
 
-            let mut memo_info = memo_info.unwrap();
+        //     let mut memo_info = memo_info.unwrap();
 
-            ensure!(who == memo_info.operator, Error::<T>::NoPermission);
+        //     ensure!(who == memo_info.operator, Error::<T>::NoPermission);
 
-            memo_info.content = content;
-            memo_info.sender = sender;
-            memo_info.receiver = receiver;
-            Memo::<T>::insert(&chain_id, &txn_hash, memo_info.clone());
-            Self::deposit_event(Event::MemoUpdated(chain_id, txn_hash, memo_info));
-            Ok(())
-        }
+        //     memo_info.content = content;
+        //     Memo::<T>::insert(&chain_id, &txn_hash, memo_info.clone());
+        //     Self::deposit_event(Event::MemoUpdated(chain_id, txn_hash, memo_info));
+        //     Ok(())
+        // }
     }
 }

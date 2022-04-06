@@ -41,26 +41,26 @@ benchmarks! {
 
     }: _(SystemOrigin::Signed(caller.clone()), chain_id, txn_hash, content, sender_lookup.clone(), receiver_lookup.clone())
 
-    update {
-        let n in 0 .. 1000;
+    // update {
+    //     let n in 0 .. 1000;
 
-        let caller: T::AccountId = whitelisted_caller();
-        let caller_lookup = T::Lookup::unlookup(caller.clone());
+    //     let caller: T::AccountId = whitelisted_caller();
+    //     let caller_lookup = T::Lookup::unlookup(caller.clone());
 
-        let content: Vec<u8> = String::from("TEST").into_bytes();
-        let chain_id: ChainId = 10;
-        let txn_hash: TxnHash = String::from("HASH").into_bytes();
-        let sender: T::AccountId = whitelisted_caller();
-        let sender_lookup = T::Lookup::unlookup(sender.clone());
-        let receiver: T::AccountId = whitelisted_caller();
-        let receiver_lookup = T::Lookup::unlookup(receiver.clone());
-        funded_account::<T>(&caller, UNIT);
+    //     let content: Vec<u8> = String::from("TEST").into_bytes();
+    //     let chain_id: ChainId = 10;
+    //     let txn_hash: TxnHash = String::from("HASH").into_bytes();
+    //     let sender: T::AccountId = whitelisted_caller();
+    //     let sender_lookup = T::Lookup::unlookup(sender.clone());
+    //     let receiver: T::AccountId = whitelisted_caller();
+    //     let receiver_lookup = T::Lookup::unlookup(receiver.clone());
+    //     funded_account::<T>(&caller, UNIT);
 
-        Pallet::<T>::create(SystemOrigin::Signed(caller.clone()).into(), chain_id, txn_hash.clone(), content, sender_lookup.clone(), receiver_lookup.clone())?;
+    //     Pallet::<T>::create(SystemOrigin::Signed(caller.clone()).into(), chain_id, txn_hash.clone(), content, sender_lookup.clone(), receiver_lookup.clone())?;
 
-        let new_content: Vec<u8> = vec![0u8; n as usize];
+    //     let new_content: Vec<u8> = vec![0u8; n as usize];
 
-    }: _(SystemOrigin::Signed(caller.clone()), chain_id, txn_hash, new_content, sender_lookup.clone(), receiver_lookup.clone())
+    // }: _(SystemOrigin::Signed(caller.clone()), chain_id, txn_hash, new_content)
 }
 
 impl_benchmark_test_suite!(
