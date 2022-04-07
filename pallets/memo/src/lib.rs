@@ -1,13 +1,16 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use bholdus_primitives::Balance;
-use frame_support::{traits::Currency, transactional};
+use frame_support::{traits::Currency, BoundedVec, transactional};
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 use sp_runtime::traits::StaticLookup;
-use sp_std::vec::Vec;
+use sp_std::{
+    convert::{TryInto},
+    vec::Vec,
+};
 
 #[cfg(test)]
 mod mock;
@@ -43,6 +46,9 @@ pub mod pallet {
 
         /// Weight information for extrinsics in this pallet.
         type WeightInfo: weights::WeightInfo;
+
+        /// The maximum length of a name or symbol stored on-chain.
+        type ContentLimit: Get<u32>;
     }
 
     #[pallet::pallet]
@@ -60,7 +66,7 @@ pub mod pallet {
         ChainId,
         Blake2_128Concat,
         TxnHash,
-        MemoInfo<T::AccountId>,
+        MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>,
         OptionQuery,
     >;
 
@@ -70,9 +76,9 @@ pub mod pallet {
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Some memo class was created \[chain_id, txn_hash, memo_info\]
-        MemoCreated(ChainId, TxnHash, MemoInfo<T::AccountId>),
+        MemoCreated(ChainId, TxnHash, MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>),
         /// Some memo class was updated \[chain_id, txn_hash, memo_info\]
-        MemoUpdated(ChainId, TxnHash, MemoInfo<T::AccountId>),
+        MemoUpdated(ChainId, TxnHash, MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>),
     }
 
     // Errors inform users that something went wrong.
@@ -86,6 +92,8 @@ pub mod pallet {
         NotExisted,
         /// The operator is not the operator of the memo
         NoPermission,
+        /// Invalid memo info given.
+        BadMemoInfo,
     }
 
     #[pallet::hooks]
@@ -120,8 +128,12 @@ pub mod pallet {
             let operator = ensure_signed(origin)?;
             let time_now = T::UnixTime::now().as_millis() as u64;
 
+            let bounded_content: BoundedVec<u8, T::ContentLimit> = content.clone()
+                .try_into()
+                .map_err(|_| Error::<T>::BadMemoInfo)?;
+
             let memo_info = MemoInfo {
-                content,
+                content: bounded_content,
                 sender,
                 receiver,
                 operator,

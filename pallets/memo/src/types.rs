@@ -2,9 +2,9 @@ use super::*;
 use frame_support::pallet_prelude::*;
 use scale_info::TypeInfo;
 
-#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct MemoInfo<AccountId> {
-    pub(super) content: Vec<u8>,
+#[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, Default, TypeInfo)]
+pub struct MemoInfo<AccountId, BoundedString> {
+    pub(super) content: BoundedString,
     pub(super) sender: Vec<u8>,
     pub(super) receiver: Vec<u8>,
     pub(super) operator: AccountId,

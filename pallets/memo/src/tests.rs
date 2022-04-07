@@ -1,4 +1,4 @@
-use super::{ChainId, MemoInfo, TxnHash};
+use super::{ChainId, MemoInfo, TxnHash, BoundedVec, TryInto};
 use crate::mock::*;
 use frame_support::assert_ok;
 #[test]
@@ -30,8 +30,12 @@ fn create_should_work() {
 
             let memo_created = Memo::memo(chain_id, &txn_hash).unwrap();
 
+            let bounded_content: BoundedVec<u8, ContentLimit> = content.clone()
+                .try_into()
+                .unwrap();
+
             let memo_input = MemoInfo {
-                content,
+                content: bounded_content,
                 sender,
                 receiver,
                 operator,

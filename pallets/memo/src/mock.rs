@@ -82,11 +82,16 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = ();
 }
 
+parameter_types! {
+    pub const ContentLimit: u32 = 320;
+}
+
 impl bholdus_memo::Config for Runtime {
     type Event = Event;
     type UnixTime = Timestamp;
     type Currency = Balances;
     type WeightInfo = ();
+    type ContentLimit = ContentLimit;
 }
 
 pub const ALICE: AccountId = 1;

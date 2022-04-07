@@ -24,8 +24,8 @@ fn funded_account<T: Config>(caller: &T::AccountId, amount: u128) -> T::AccountI
 
 benchmarks! {
     create {
-        let n in 0 .. 1000;
-        let s in 0 .. 1000;
+        let n in 0 .. T::ContentLimit::get();
+        let s in 0 .. T::ContentLimit::get();
 
         let caller: T::AccountId = whitelisted_caller();
         let caller_lookup = T::Lookup::unlookup(caller.clone());
@@ -33,13 +33,11 @@ benchmarks! {
         let content: Vec<u8> = vec![0u8; n as usize];
         let chain_id: ChainId = 10;
         let txn_hash: TxnHash = vec![0u8; s as usize];
-        let sender: T::AccountId = whitelisted_caller();
-        let sender_lookup = T::Lookup::unlookup(sender.clone());
-        let receiver: T::AccountId = whitelisted_caller();
-        let receiver_lookup = T::Lookup::unlookup(receiver.clone());
+        let sender = String::from("ALICE").into_bytes();
+        let receiver = String::from("BOB").into_bytes();;
         funded_account::<T>(&caller, UNIT);
 
-    }: _(SystemOrigin::Signed(caller.clone()), chain_id, txn_hash, content, sender_lookup.clone(), receiver_lookup.clone())
+    }: _(SystemOrigin::Signed(caller.clone()), chain_id, txn_hash, content, sender.clone(), receiver.clone())
 
     // update {
     //     let n in 0 .. 1000;
