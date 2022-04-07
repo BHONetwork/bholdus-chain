@@ -113,11 +113,10 @@ pub mod pallet {
             chain_id: ChainId,
             txn_hash: TxnHash,
             content: Vec<u8>,
-            sender: <T::Lookup as StaticLookup>::Source,
-            receiver: <T::Lookup as StaticLookup>::Source,
+            sender: Vec<u8>,
+            receiver: Vec<u8>,
         ) -> DispatchResult {
-            let sender = T::Lookup::lookup(sender)?;
-            let receiver = T::Lookup::lookup(receiver)?;
+            
             let operator = ensure_signed(origin)?;
             let time_now = T::UnixTime::now().as_millis() as u64;
 

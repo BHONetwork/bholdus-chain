@@ -11,8 +11,8 @@ fn create_should_work() {
             let chain_id: ChainId = 10;
             let txn_hash: TxnHash = String::from("HASH").into_bytes();
             let operator = ALICE;
-            let sender = ALICE;
-            let receiver = BOB;
+            let sender = String::from("ALICE").into_bytes();
+            let receiver = String::from("BOB").into_bytes();
 
             assert_ok!(Memo::create(
                 Origin::signed(ALICE),
@@ -25,6 +25,8 @@ fn create_should_work() {
 
             let content: Vec<u8> = String::from("TEST").into_bytes();
             let txn_hash: TxnHash = String::from("HASH").into_bytes();
+            let sender = String::from("ALICE").into_bytes();
+            let receiver = String::from("BOB").into_bytes();
 
             let memo_created = Memo::memo(chain_id, &txn_hash).unwrap();
 
