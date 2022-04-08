@@ -96,8 +96,6 @@ pub mod constants;
 pub mod weights;
 pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
-/// Import the template pallet.
-pub use pallet_template;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -1104,11 +1102,6 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type Currency = Balances;
     type MinimumDeposit = ExistentialDeposit;
     type WeightInfo = bholdus_bridge_native_transfer::weights::SubstrateWeight<Runtime>;
-}
-
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
-    type Event = Event;
 }
 
 /// Configure the bholdus-memo in pallets/memo.
