@@ -31,7 +31,7 @@ use pallet_ethereum::{
 };
 use pallet_evm::{
     Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, FeeCalculator,
-    HashedAddressMapping, Runner,
+    HashedAddressMapping, IdentityAddressMapping, Runner,
 };
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
@@ -1111,6 +1111,19 @@ impl pallet_template::Config for Runtime {
     type Event = Event;
 }
 
+/// Configure the bholdus-memo in pallets/memo.
+parameter_types! {
+    pub const ContentLimit: u32 = 320;
+}
+
+impl bholdus_memo::Config for Runtime {
+    type Event = Event;
+    type UnixTime = Timestamp;
+    type Currency = Balances;
+    type WeightInfo = bholdus_memo::weights::SubstrateWeight<Runtime>;
+    type ContentLimit = ContentLimit;
+}
+
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
 impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
     fn find_author<'a, I>(digests: I) -> Option<H160>
@@ -1263,6 +1276,7 @@ construct_runtime!(
         BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
         // Include the custom logic from the pallet-template in the runtime.
         TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+        Memo: bholdus_memo::{Pallet, Call, Storage, Event<T>},
 
         // Frontier EVM
         EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>},
@@ -1852,6 +1866,7 @@ impl_runtime_apis! {
             list_benchmark!(list, extra, integration_tokens, IntegrationTokens::<Runtime>);
             list_benchmark!(list, extra, bholdus_nft, NFTBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
+            list_benchmark!(list, extra, bholdus_memo, Memo);
 
             let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1898,6 +1913,7 @@ impl_runtime_apis! {
             add_benchmark!(params, batches, integration_tokens, IntegrationTokens::<Runtime>);
             add_benchmark!(params, batches, bholdus_nft, NFTBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
+            add_benchmark!(params, batches, bholdus_memo, Memo);
 
             Ok(batches)
         }
