@@ -4,7 +4,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "runtime-chain-extension"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.14"
+version = "1.0.15"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

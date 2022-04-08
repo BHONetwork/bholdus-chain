@@ -132,7 +132,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_000_014,
+    spec_version: 1_000_015,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -1259,6 +1259,7 @@ construct_runtime!(
         Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>},
         Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>},
         Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>},
+        BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
 
         // Bridge support
         Mmr: pallet_mmr::{Pallet, Storage},
@@ -1266,6 +1267,7 @@ construct_runtime!(
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
+        // DeFi
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
@@ -1273,9 +1275,8 @@ construct_runtime!(
         // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // SupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
-        BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
-        // Include the custom logic from the pallet-template in the runtime.
-        TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+
+        // Others
         Memo: bholdus_memo::{Pallet, Call, Storage, Event<T>},
 
         // Frontier EVM
