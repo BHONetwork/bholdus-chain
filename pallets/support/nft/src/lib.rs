@@ -117,6 +117,8 @@ pub mod pallet {
         NoAvailableGroupId,
         /// No available token ID
         NoAvailableTokenId,
+        /// Lock NFT
+        IsLocked,
         /// Token(ClassId, TokenId) not found
         TokenNotFound,
         /// Class not found
@@ -126,6 +128,8 @@ pub mod pallet {
         /// Can not destroy class
         /// Total issuance is not 0
         CannotDestroyClass,
+        /// Can not unlock token
+        AlreadyUnlocked,
         /// Failed because the Maximum amount of metadata was exceeded
         MaxMetadataExceeded,
     }
@@ -180,20 +184,6 @@ pub mod pallet {
         ValueQuery,
     >;
 
-    /// Token existence check by creator
-    #[pallet::storage]
-    #[pallet::getter(fn tokens_by_creator)]
-    pub type TokensByCreator<T: Config> = StorageNMap<
-        _,
-        (
-            NMapKey<Blake2_128Concat, T::AccountId>,
-            NMapKey<Blake2_128Concat, T::ClassId>,
-            NMapKey<Blake2_128Concat, T::TokenId>,
-        ),
-        (),
-        ValueQuery,
-    >;
-
     /// Store group info
     #[pallet::storage]
     #[pallet::getter(fn tokens_by_group)]
@@ -206,6 +196,20 @@ pub mod pallet {
         ),
         T::TokenId,
         //ValueQuery,
+    >;
+
+    /// Lock NFT on account
+    #[pallet::storage]
+    #[pallet::getter(fn set_lock)]
+    pub type LockableNFT<T: Config> = StorageNMap<
+        _,
+        (
+            NMapKey<Blake2_128Concat, T::AccountId>,
+            NMapKey<Blake2_128Concat, T::ClassId>,
+            NMapKey<Blake2_128Concat, T::TokenId>,
+        ),
+        (),
+        ValueQuery,
     >;
 
     #[pallet::genesis_config]
@@ -298,6 +302,10 @@ impl<T: Config> Pallet<T> {
         Tokens::<T>::try_mutate(token.0, token.1, |token_info| -> DispatchResult {
             let mut info = token_info.as_mut().ok_or(Error::<T>::TokenNotFound)?;
             ensure!(info.owner == *from, Error::<T>::NoPermission);
+            ensure!(
+                !Self::is_lock(&info.owner, (token.0, token.1)),
+                Error::<T>::IsLocked
+            );
             if from == to {
                 // no change needed
                 return Ok(());
@@ -344,7 +352,6 @@ impl<T: Config> Pallet<T> {
 
             Tokens::<T>::insert(class_id, token_id, token_info);
             TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
-            TokensByCreator::<T>::insert((owner, class_id, token_id), ());
             Ok(token_id)
         })
     }
@@ -394,7 +401,6 @@ impl<T: Config> Pallet<T> {
 
                     Tokens::<T>::insert(class_id, token_id, token_info);
                     TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
-                    TokensByCreator::<T>::insert((owner, class_id, token_id), ());
                     TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
                     Ok(token_id)
                 });
@@ -408,6 +414,11 @@ impl<T: Config> Pallet<T> {
         Tokens::<T>::try_mutate_exists(token.0, token.1, |token_info| -> DispatchResult {
             let t = token_info.take().ok_or(Error::<T>::TokenNotFound)?;
             ensure!(t.owner == *owner, Error::<T>::NoPermission);
+
+            ensure!(
+                !Self::is_lock(&t.owner, (token.0, token.1)),
+                Error::<T>::IsLocked
+            );
 
             Classes::<T>::try_mutate(token.0, |class_info| -> DispatchResult {
                 let info = class_info.as_mut().ok_or(Error::<T>::ClassNotFound)?;
@@ -437,12 +448,19 @@ impl<T: Config> Pallet<T> {
             Ok(())
         })
     }
+}
 
+impl<T: Config> Pallet<T> {
     pub fn is_owner(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
         TokensByOwner::<T>::contains_key((account, token.0, token.1))
     }
 
-    pub fn is_creator(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
-        TokensByCreator::<T>::contains_key((account, token.0, token.1))
+    pub fn is_lock(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
+        LockableNFT::<T>::contains_key((account, token.0, token.1))
+    }
+
+    pub fn unlock(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> DispatchResult {
+        LockableNFT::<T>::take(&(account, token.0, token.1));
+        Ok(())
     }
 }
