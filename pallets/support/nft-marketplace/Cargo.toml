@@ -60,6 +60,18 @@ package = 'support-nft'
 version = '4.0.0-dev'
 path = '../nft'
 
+[dependencies.bholdus-tokens]
+default-features = false
+package = 'bholdus-tokens'
+version = '4.0.0-dev'
+path = '../../tokens'
+
+[dependencies.bholdus-support]
+default-features = false
+package = 'bholdus-support'
+version = '4.0.0-dev'
+path = '../../support'
+
 [dev-dependencies.sp-io]
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-11'
@@ -80,6 +92,7 @@ std = [
 	"sp-runtime/std",
 	"frame-support/std",
 	"frame-system/std",
+	"bholdus-tokens/std",
 	"bholdus-support-nft/std",
 	"bholdus-primitives/std",
 ]

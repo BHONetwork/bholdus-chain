@@ -8,6 +8,7 @@ use frame_support::{
     traits::{Everything, Filter, InstanceFilter},
     RuntimeDebug,
 };
+use frame_system::EnsureRoot;
 
 use bholdus_primitives::{
     Amount, Balance, BlockNumber, CurrencyId, ReserveIdentifier, TokenSymbol,
@@ -24,6 +25,7 @@ parameter_types! {
 }
 
 pub type AccountId = AccountId32;
+// pub type CurrencyId = u64;
 
 impl frame_system::Config for Runtime {
     type BaseCallFilter = Everything;
@@ -68,6 +70,53 @@ impl pallet_balances::Config for Runtime {
     type WeightInfo = ();
 }
 
+parameter_type_with_key! {
+    pub ExistentialDeposits: |_currency_id: u64| -> Balance {
+        Default::default()
+    };
+}
+
+parameter_types! {
+    pub const BasicDeposit: u64 = 10;
+    pub const FieldDeposit: u64 = 10;
+    pub const SubAccountDeposit: u64 = 10;
+    pub const MaxSubAccounts: u32 = 2;
+    pub const MaxAdditionalFields: u32 = 2;
+    pub const MaxRegistrars: u32 = 20;
+    pub const MaxDecimals: u8 = 18;
+}
+
+parameter_types! {
+    pub const TokenDeposit: u64 = 0;
+    pub const ApprovalDeposit: u64 = 0;
+    pub const StringLimit: u32 = 50;
+    pub const MetadataDepositBase: u64 = 1;
+    pub const MetadataDepositPerByte: u64 = 1;
+}
+
+impl bholdus_tokens::Config for Runtime {
+    type Event = Event;
+    type Balance = Balance;
+    type Amount = i64;
+    type AssetId = u64;
+    type Currency = Balances;
+    type ForceOrigin = EnsureRoot<AccountId>;
+    type AssetDeposit = TokenDeposit;
+    type BasicDeposit = BasicDeposit;
+    type ApprovalDeposit = ApprovalDeposit;
+    type StringLimit = StringLimit;
+    type MaxAdditionalFields = MaxAdditionalFields;
+    type MaxRegistrars = MaxRegistrars;
+    type FieldDeposit = FieldDeposit;
+    type MetadataDepositBase = MetadataDepositBase;
+    type MetadataDepositPerByte = MetadataDepositPerByte;
+    type Freezer = ();
+    type Extra = ();
+    type WeightInfo = ();
+    type ExistentialDeposits = ExistentialDeposits;
+    type MaxDecimals = MaxDecimals;
+}
+
 parameter_types! {
     pub const MaxClassMetadata: u32 = 1024;
     pub const MaxTokenMetadata: u32 = 1024;
@@ -108,6 +157,7 @@ construct_runtime!(
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+        Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         SupportNFT: bholdus_support_nft::{Pallet, Storage},
         SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage},
         NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Storage, Event<T>},
@@ -116,6 +166,7 @@ construct_runtime!(
 
 pub const ALICE: AccountId = AccountId::new([1u8; 32]);
 pub const BOB: AccountId = AccountId::new([2u8; 32]);
+pub const EVE: AccountId = AccountId::new([3u8; 32]);
 pub const CLASS_ID: <Runtime as bholdus_support_nft::Config>::ClassId = 0;
 pub const TOKEN_ID: <Runtime as bholdus_support_nft::Config>::TokenId = 0;
 pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
@@ -134,6 +185,11 @@ impl ExtBuilder {
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Runtime>()
             .unwrap();
+        pallet_balances::GenesisConfig::<Runtime> {
+            balances: vec![(ALICE, 100_000)],
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
         let mut ext = sp_io::TestExternalities::new(t);
         ext.execute_with(|| System::set_block_number(1));
         ext

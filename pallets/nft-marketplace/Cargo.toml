@@ -60,6 +60,18 @@ git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
 
+[dependencies.sp-core]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.pallet-balances]
+default-features = false
+git = 'https://github.com/bholdus/substrate.git'
+branch = 'bholdus-monthly-2021-11'
+version = '4.0.0-dev'
+
 ## Bholdus pallets
 
 # Local dependencies
@@ -75,6 +87,11 @@ default-features = false
 version = '4.0.0-dev'
 path = '../../pallets/support'
 
+[dependencies.bholdus-tokens]
+default-features = false
+version = '4.0.0-dev'
+path = '../../pallets/tokens'
+
 [dependencies.bholdus-support-nft]
 default-features = false
 package = 'support-nft'
@@ -87,17 +104,7 @@ package = 'support-nft-marketplace'
 version = '4.0.0-dev'
 path = '../../pallets/support/nft-marketplace'
 
-[dev-dependencies.sp-core]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
 [dev-dependencies.sp-io]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
-[dev-dependencies.pallet-balances]
 git = 'https://github.com/bholdus/substrate.git'
 branch = 'bholdus-monthly-2021-11'
 version = '4.0.0-dev'
@@ -118,8 +125,10 @@ std = [
 	"sp-runtime/std",
 	"frame-support/std",
 	"frame-system/std",
+	"pallet-balances/std",
 	"bholdus-primitives/std",
 	"bholdus-support/std",
+	"bholdus-tokens/std",
 	"bholdus-support-nft/std",
 	"bholdus-support-nft-marketplace/std",
 	"enumflags2/serde",

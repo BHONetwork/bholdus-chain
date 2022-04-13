@@ -451,6 +451,10 @@ impl<T: Config> Pallet<T> {
 }
 
 impl<T: Config> Pallet<T> {
+    pub fn owner(token: (T::ClassId, T::TokenId)) -> T::AccountId {
+        Tokens::<T>::get(token.0, token.1).unwrap().owner
+    }
+
     pub fn is_owner(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
         TokensByOwner::<T>::contains_key((account, token.0, token.1))
     }

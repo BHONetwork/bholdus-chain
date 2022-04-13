@@ -26,6 +26,8 @@ use sp_runtime::{
     DispatchResult, FixedPointNumber, FixedPointOperand, FixedU128, RuntimeDebug,
 };
 
+use sp_core::U256;
+use sp_std::convert::TryInto;
 use sp_std::if_std;
 
 // #[cfg(feature = "runtime-benchmarks")]
@@ -36,8 +38,11 @@ mod mock;
 mod tests;
 
 use bholdus_primitives::Balance;
+use bholdus_support::MultiCurrency;
+
 use bholdus_support_nft_marketplace::{
-    Denominator, ListingInfo, ListingOnMarket, MarketMode, Numerator, Price, RoyaltyRate,
+    BHC20TokenIdOf, Blacklist as NFTBlacklist, Denominator, FixedPriceListing,
+    FixedPriceListingInfo, MarketMode, NFTCurrencyId, Numerator, Price, RoyaltyRate, UserBlacklist,
 };
 
 pub use support_module::*;
@@ -46,8 +51,8 @@ pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
 
 #[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
-pub struct MarketInfo {
-    pub market_mode: MarketMode,
+pub struct PendingListingInfo<NFTCurrencyId> {
+    pub currency_id: NFTCurrencyId,
     pub price: Price,
     pub royalty: RoyaltyRate,
 }
@@ -70,7 +75,11 @@ pub mod support_module {
 
     #[pallet::config]
     pub trait Config:
-        frame_system::Config + bholdus_support_nft::Config + bholdus_support_nft_marketplace::Config
+        frame_system::Config
+        + bholdus_support_nft::Config
+        + bholdus_tokens::Config<Balance = Balance>
+        + bholdus_support_nft_marketplace::Config
+        + pallet_balances::Config<Balance = Balance>
     {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
@@ -84,8 +93,13 @@ pub mod support_module {
         ItemMustBeListing,
         AccountIdMustBeController,
         NotFoundPalletManagementInfo,
+        NotFoundMarketplaceFeeInfo,
+        BadPrice,
         NoPermission,
-        IsBlacklist,
+        InsufficientBalance,
+        UserBanned,
+        NotFoundUserInBlacklist,
+        NFTBanned,
         BadRequest,
     }
     #[pallet::storage]
@@ -114,15 +128,41 @@ pub mod support_module {
             marketplace_fee_info: MarketplaceFeeInfo<T::AccountId>,
         },
         /// Add item on marketplace
-        ListedItem {
+        NewFixedPriceNFTListing {
             owner: T::AccountId,
             token: (ClassIdOf<T>, TokenIdOf<T>),
-            market_info: MarketInfo,
+            listing_info: PendingListingInfo<NFTCurrencyId<BHC20TokenIdOf<T>>>,
         },
         /// Cancel item list on marketplace
-        CanceledItemListing {
+        CanceledFixedPriceTokenList {
             owner: T::AccountId,
             token: (ClassIdOf<T>, TokenIdOf<T>),
+        },
+
+        /// Add a NFT item to blacklist
+        NFTBanned {
+            controller: T::AccountId,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+            reason: Vec<u8>,
+        },
+
+        /// Remove a NFT from blacklist
+        NFTUnbanned {
+            controller: T::AccountId,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+        },
+
+        /// Remove user from blacklist
+        UserUnbanned {
+            controller: T::AccountId,
+            account: T::AccountId,
+        },
+
+        /// Add a user to blacklist
+        UserBanned {
+            controller: T::AccountId,
+            account: T::AccountId,
+            reason: Vec<u8>,
         },
     }
 
@@ -199,90 +239,164 @@ pub mod support_module {
 
         #[pallet::weight(0)]
         #[transactional]
-        pub fn list_item_on_market(
+        pub fn ban_user(
             origin: OriginFor<T>,
-            token: (ClassIdOf<T>, TokenIdOf<T>),
-            market_mode: MarketMode,
-            price: Price,
-            royalty: Option<(Numerator, Denominator)>,
+            account: T::AccountId,
+            reason: Vec<u8>,
         ) -> DispatchResult {
-            let owner = ensure_signed(origin)?;
+            let who = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(management_info.controller == who, Error::<T>::NoPermission);
 
-            // Check permission
+            ensure!(!Self::is_banned_user(&account), Error::<T>::UserBanned);
 
-            let (is_creator, is_owner) =
-                bholdus_support_nft_marketplace::Pallet::<T>::check_creator_or_owner(&owner, token);
-            let is_passed_role = Self::is_passed_role(is_creator, is_owner);
-            ensure!(is_passed_role, Error::<T>::NoPermission);
-
-            // Check status
-
-            let (is_listing, is_item_blacklist) =
-                bholdus_support_nft_marketplace::Pallet::<T>::check_item_status(token);
-            ensure!(!is_listing, Error::<T>::IsListing);
-            ensure!(!is_item_blacklist, Error::<T>::IsBlacklist);
-
-            // Mapping royalty
-
-            let royalty_bounded = Self::mapping_royalty(is_creator, is_owner, royalty);
-            bholdus_support_nft_marketplace::Pallet::<T>::add_item_to_market(
-                &owner,
-                &owner,
-                token,
-                market_mode.clone(),
-                price.clone(),
-                royalty_bounded.clone(),
-            );
-            let market_info = MarketInfo {
-                market_mode: market_mode.clone(),
-                price: price.clone(),
-                royalty: royalty_bounded.clone(),
-            };
-            Self::deposit_event(Event::ListedItem {
-                owner,
-                token,
-                market_info,
+            Self::add_user_to_blacklist(&account, reason.clone())?;
+            Self::deposit_event(Event::UserBanned {
+                controller: management_info.controller,
+                account,
+                reason: reason.clone(),
             });
             Ok(())
         }
 
         #[pallet::weight(0)]
         #[transactional]
-        pub fn cancel_item_list_on_market(
+        pub fn unban_user(origin: OriginFor<T>, account: T::AccountId) -> DispatchResult {
+            let controller = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(
+                management_info.controller == controller,
+                Error::<T>::NoPermission
+            );
+            UserBlacklist::<T>::take(&account).ok_or(Error::<T>::NotFoundUserInBlacklist)?;
+            Self::deposit_event(Event::UserUnbanned {
+                controller,
+                account,
+            });
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        #[transactional]
+        pub fn ban(
             origin: OriginFor<T>,
             token: (ClassIdOf<T>, TokenIdOf<T>),
+            reason: Vec<u8>,
         ) -> DispatchResult {
-            let owner = ensure_signed(origin)?;
-            let is_owner = bholdus_support_nft_marketplace::Pallet::<T>::is_owner(&owner, token);
-            ensure!(is_owner, Error::<T>::NoPermission);
-            ListingOnMarket::<T>::take(token.0, token.1).ok_or(Error::<T>::ItemMustBeListing)?;
-            Self::deposit_event(Event::CanceledItemListing { owner, token });
+            let who = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(management_info.controller == who, Error::<T>::NoPermission);
+            ensure!(!Self::is_banned(token), Error::<T>::NFTBanned);
+            Self::add_item_to_blacklist(token, reason.clone())?;
+            Self::deposit_event(Event::NFTBanned {
+                controller: management_info.controller,
+                token,
+                reason: reason.clone(),
+            });
+
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        #[transactional]
+        pub fn unban(origin: OriginFor<T>, token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
+            let controller = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(
+                management_info.controller == controller,
+                Error::<T>::NoPermission
+            );
+
+            NFTBlacklist::<T>::take(&token).ok_or(Error::<T>::NFTBanned)?;
+            Self::deposit_event(Event::NFTUnbanned {
+                controller: management_info.controller,
+                token,
+            });
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        #[transactional]
+        pub fn create_fixed_price_listing(
+            origin: OriginFor<T>,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+            price: Price,
+            currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>,
+            royalty: Option<(Numerator, Denominator)>,
+        ) -> DispatchResult {
+            let account = ensure_signed(origin)?;
+
+            ensure!(Self::is_owner(&account, token), Error::<T>::NoPermission);
+            ensure!(!Self::is_banned_user(&account), Error::<T>::UserBanned);
+            ensure!(!Self::is_banned(token), Error::<T>::NFTBanned);
+            ensure!(
+                !Self::is_listing(&account, token, MarketMode::FixedPrice),
+                Error::<T>::IsListing
+            );
+
+            let royalty_value = Self::get_royalty_value(royalty);
+            bholdus_support_nft_marketplace::Pallet::<T>::create_fixed_price_listing(
+                &account,
+                token,
+                price.clone(),
+                currency_id.clone(),
+                royalty_value,
+            )?;
+
+            let listing_info = PendingListingInfo {
+                currency_id: currency_id.clone(),
+                price: price.clone(),
+                royalty: royalty_value,
+            };
+
+            Self::deposit_event(Event::NewFixedPriceNFTListing {
+                owner: account,
+                token,
+                listing_info,
+            });
             Ok(())
         }
     }
 }
 
 impl<T: Config> Pallet<T> {
-    pub fn is_passed_role(is_creator: bool, is_owner: bool) -> bool {
-        if is_creator == false && is_owner == false {
-            false
-        } else {
-            true
-        }
+    pub fn is_owner(account: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> bool {
+        bholdus_support_nft_marketplace::Pallet::<T>::is_owner(account, token)
     }
-    pub fn mapping_royalty(
-        is_creator: bool,
-        is_owner: bool,
-        royalty: Option<(Numerator, Denominator)>,
-    ) -> RoyaltyRate {
-        if is_creator {
-            if royalty.is_some() {
-                royalty.unwrap()
-            } else {
-                (10_000, 10_000)
-            }
-        } else {
-            (10_000, 10_000)
-        }
+
+    pub fn is_banned_user(account: &T::AccountId) -> bool {
+        bholdus_support_nft_marketplace::Pallet::<T>::is_user_blacklist(account)
+    }
+
+    pub fn is_banned(token: (ClassIdOf<T>, TokenIdOf<T>)) -> bool {
+        bholdus_support_nft_marketplace::Pallet::<T>::is_item_blacklist(token)
+    }
+
+    pub fn is_listing(
+        account: &T::AccountId,
+        token: (ClassIdOf<T>, TokenIdOf<T>),
+        mode: MarketMode,
+    ) -> bool {
+        bholdus_support_nft_marketplace::Pallet::<T>::is_listing(account, token, mode)
+    }
+
+    pub fn get_royalty_value(royalty: Option<(Numerator, Denominator)>) -> RoyaltyRate {
+        bholdus_support_nft_marketplace::Pallet::<T>::get_loyalty_value(royalty)
+    }
+
+    pub fn add_user_to_blacklist(account: &T::AccountId, reason: Vec<u8>) -> DispatchResult {
+        bholdus_support_nft_marketplace::Pallet::<T>::add_user_to_blacklist(account, reason)
+    }
+
+    pub fn add_item_to_blacklist(
+        token: (ClassIdOf<T>, TokenIdOf<T>),
+        reason: Vec<u8>,
+    ) -> DispatchResult {
+        bholdus_support_nft_marketplace::Pallet::<T>::add_item_to_blacklist(token, reason.clone())
     }
 }
