@@ -133,6 +133,12 @@ pub mod support_module {
             token: (ClassIdOf<T>, TokenIdOf<T>),
             listing_info: PendingListingInfo<NFTCurrencyId<BHC20TokenIdOf<T>>>,
         },
+        /// Approve listing
+        ListingApproved {
+            controller: T::AccountId,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+        },
+
         /// Cancel item list on marketplace
         CanceledFixedPriceTokenList {
             owner: T::AccountId,
@@ -361,6 +367,24 @@ pub mod support_module {
             });
             Ok(())
         }
+
+        #[pallet::weight(0)]
+        #[transactional]
+        pub fn approve_listing(
+            origin: OriginFor<T>,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+        ) -> DispatchResult {
+            let who = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(management_info.controller == who, Error::<T>::NoPermission);
+            Self::approve_item_listing(token)?;
+            Self::deposit_event(Event::ListingApproved {
+                controller: management_info.controller,
+                token,
+            });
+            Ok(())
+        }
     }
 }
 
@@ -398,5 +422,9 @@ impl<T: Config> Pallet<T> {
         reason: Vec<u8>,
     ) -> DispatchResult {
         bholdus_support_nft_marketplace::Pallet::<T>::add_item_to_blacklist(token, reason.clone())
+    }
+
+    pub fn approve_item_listing(token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
+        bholdus_support_nft_marketplace::Pallet::<T>::approve_item_listing(token)
     }
 }

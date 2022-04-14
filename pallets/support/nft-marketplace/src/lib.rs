@@ -51,6 +51,12 @@ pub struct FixedPriceListingInfo<AccountId, CurrencyId> {
     pub status: NFTState,
 }
 
+#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
+pub struct ItemListingInfo<AccountId> {
+    pub owner: AccountId,
+    pub mode: MarketMode,
+}
+
 /// Trading Information
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub struct TradingInfo<AccountId> {
@@ -93,6 +99,7 @@ pub mod support_module {
         NFTCurrencyId<<T as bholdus_tokens::Config>::AssetId>,
     >;
     pub type TradingInfoOf<T> = TradingInfo<<T as frame_system::Config>::AccountId>;
+    pub type ItemListingOf<T> = ItemListingInfo<<T as frame_system::Config>::AccountId>;
     pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
     pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
     pub type BHC20TokenIdOf<T> = <T as bholdus_tokens::Config>::AssetId;
@@ -104,6 +111,8 @@ pub mod support_module {
         NFTBanned,
         NoPermission,
         IsListing,
+        UnknownMode,
+        IsApproved,
     }
 
     /// Listing NFT on marketplace
@@ -117,6 +126,18 @@ pub mod support_module {
             NMapKey<Blake2_128Concat, T::TokenId>,
         ),
         FixedPriceListingInfoOf<T>,
+    >;
+
+    #[pallet::storage]
+    #[pallet::getter(fn item_listing)]
+    pub type ItemListing<T: Config> = StorageNMap<
+        _,
+        (
+            NMapKey<Blake2_128Concat, T::AccountId>, // owner
+            NMapKey<Blake2_128Concat, T::ClassId>,
+            NMapKey<Blake2_128Concat, T::TokenId>,
+        ),
+        ItemListingOf<T>,
     >;
 
     /// NFT listed on market check by owner, class ID, token ID
@@ -171,21 +192,28 @@ pub mod support_module {
 impl<T: Config> Pallet<T> {
     /// Create fixed price listing
     pub fn create_fixed_price_listing(
-        account: &T::AccountId,
+        owner: &T::AccountId,
         token: (ClassIdOf<T>, TokenIdOf<T>),
         price: Price,
         currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>,
         royalty: RoyaltyRate,
     ) -> DispatchResult {
         let listing_info = FixedPriceListingInfo {
-            owner: account.clone(),
+            owner: owner.clone(),
             price,
             currency_id,
             royalty,
             status: NFTState::Pending,
         };
 
-        FixedPriceListing::<T>::insert((account, token.0, token.1), listing_info);
+        FixedPriceListing::<T>::insert((owner, token.0, token.1), listing_info);
+        ItemListing::<T>::insert(
+            (owner, token.0, token.1),
+            ItemListingInfo {
+                owner: owner.clone(),
+                mode: MarketMode::FixedPrice,
+            },
+        );
         Ok(())
     }
 
@@ -201,11 +229,30 @@ impl<T: Config> Pallet<T> {
     }
 
     /// Add user to blacklist
+    /// Remove all listing NFTs on market
     pub fn add_user_to_blacklist(account: &T::AccountId, reason: Vec<u8>) -> DispatchResult {
         UserBlacklist::<T>::insert(account, reason);
-        // remove all listing NFTs on market
-        Self::remove_tokens_by_owner(account);
+        Self::remove_by_owner(account);
         Ok(())
+    }
+
+    /// Approve Listing
+    pub fn approve_item_listing(token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
+        let owner = Self::owner(token);
+        let item_info =
+            ItemListing::<T>::get((owner, token.0, token.1)).ok_or(Error::<T>::UnknownMode)?;
+        match item_info.mode {
+            MarketMode::FixedPrice => FixedPriceListing::<T>::try_mutate_exists(
+                (item_info.owner, token.0, token.1),
+                |listing_info| -> DispatchResult {
+                    let info = listing_info.as_mut().ok_or(Error::<T>::UnknownMode)?;
+                    ensure!(info.status == NFTState::Pending, Error::<T>::IsApproved);
+                    info.status = NFTState::Listing;
+                    Ok(())
+                },
+            ),
+            _ => Ok(()),
+        }
     }
 }
 
@@ -231,22 +278,29 @@ impl<T: Config> Pallet<T> {
         owner: &T::AccountId,
         token: (ClassIdOf<T>, TokenIdOf<T>),
     ) -> DispatchResult {
-        FixedPriceListing::<T>::remove((owner, token.0, token.1));
-        // TODO
-        // AuctionListing::<T>::remove((owner, token.0, token.1));
-        Ok(())
-    }
-
-    pub fn remove_tokens_from_market(owner: &[T::AccountId]) {
-        for removed in owner {
-            TokenListingByOwner::<T>::remove_prefix((removed,), None);
+        if ItemListing::<T>::contains_key((owner, token.0, token.1)) {
+            let item_info =
+                ItemListing::<T>::take((owner, token.0, token.1)).ok_or(Error::<T>::UnknownMode)?;
+            match item_info.mode {
+                MarketMode::FixedPrice => {
+                    FixedPriceListing::<T>::remove((owner, token.0, token.1));
+                    Ok(())
+                }
+                _ =>
+                // TODO
+                // AuctionListing::<T>::remove((owner, token.0, token.1));
+                {
+                    Ok(())
+                }
+            }
+        } else {
+            Ok(())
         }
     }
 
-    pub fn remove_tokens_by_owner(owner: &T::AccountId) {
-        // remove fixed price token
+    pub fn remove_by_owner(owner: &T::AccountId) {
+        ItemListing::<T>::remove_prefix((owner,), None);
         FixedPriceListing::<T>::remove_prefix((owner,), None);
-        // remove EnglishAuctionListingInfo
     }
 }
 
