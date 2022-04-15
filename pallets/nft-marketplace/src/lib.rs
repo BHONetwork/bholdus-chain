@@ -11,7 +11,7 @@ use frame_support::{
     traits::{
         Currency,
         ExistenceRequirement::{AllowDeath, KeepAlive},
-        NamedReservableCurrency,
+        NamedReservableCurrency, Time,
     },
     transactional, PalletId,
 };
@@ -51,10 +51,11 @@ pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
 
 #[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
-pub struct PendingListingInfo<NFTCurrencyId> {
+pub struct PendingListingInfo<NFTCurrencyId, Moment> {
     pub currency_id: NFTCurrencyId,
     pub price: Price,
     pub royalty: RoyaltyRate,
+    pub expired_time: Moment,
 }
 
 #[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
@@ -84,9 +85,13 @@ pub mod support_module {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
     }
 
+    pub type MomentOf<T> = <<T as bholdus_support_nft_marketplace::Config>::Time as Time>::Moment;
+
     pub type PalletManagementInfoOf<T> =
         PalletManagementInfo<<T as frame_system::Config>::AccountId>;
     pub type MarketplaceFeeInfoOf<T> = MarketplaceFeeInfo<<T as frame_system::Config>::AccountId>;
+    pub type PendingListingInfoOf<T> =
+        PendingListingInfo<NFTCurrencyId<BHC20TokenIdOf<T>>, MomentOf<T>>;
     #[pallet::error]
     pub enum Error<T> {
         IsListing,
@@ -131,7 +136,7 @@ pub mod support_module {
         NewFixedPriceNFTListing {
             owner: T::AccountId,
             token: (ClassIdOf<T>, TokenIdOf<T>),
-            listing_info: PendingListingInfo<NFTCurrencyId<BHC20TokenIdOf<T>>>,
+            listing_info: PendingListingInfoOf<T>,
         },
         /// Approve listing
         ListingApproved {
@@ -334,6 +339,7 @@ pub mod support_module {
             price: Price,
             currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>,
             royalty: Option<(Numerator, Denominator)>,
+            expired_time: MomentOf<T>,
         ) -> DispatchResult {
             let account = ensure_signed(origin)?;
 
@@ -352,12 +358,14 @@ pub mod support_module {
                 price.clone(),
                 currency_id.clone(),
                 royalty_value,
+                expired_time,
             )?;
 
             let listing_info = PendingListingInfo {
                 currency_id: currency_id.clone(),
                 price: price.clone(),
                 royalty: royalty_value,
+                expired_time,
             };
 
             Self::deposit_event(Event::NewFixedPriceNFTListing {

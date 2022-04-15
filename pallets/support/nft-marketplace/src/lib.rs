@@ -13,7 +13,12 @@
 
 use bholdus_support::MultiCurrency;
 use codec::{Decode, Encode};
-use frame_support::{ensure, pallet_prelude::*, traits::Get, BoundedVec, Parameter};
+use frame_support::{
+    ensure,
+    pallet_prelude::*,
+    traits::{Get, Time},
+    BoundedVec, Parameter,
+};
 
 use scale_info::TypeInfo;
 use sp_runtime::{
@@ -27,7 +32,7 @@ use sp_runtime::{
 
 use bholdus_primitives::Balance;
 use sp_std::fmt::Debug;
-use sp_std::{convert::TryInto, prelude::*, vec};
+use sp_std::{convert::TryInto, if_std, prelude::*, vec};
 
 // #[cfg(test)]
 // mod mock;
@@ -43,12 +48,13 @@ pub type RoyaltyRate = (Numerator, Denominator);
 
 /// Listing Info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct FixedPriceListingInfo<AccountId, CurrencyId> {
+pub struct FixedPriceListingInfo<AccountId, CurrencyId, Moment> {
     pub owner: AccountId,
     pub price: Price,
     pub currency_id: CurrencyId,
     pub royalty: RoyaltyRate,
     pub status: NFTState,
+    pub expired_time: Moment,
 }
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
@@ -93,16 +99,19 @@ pub mod support_module {
         frame_system::Config + bholdus_support_nft::Config + bholdus_tokens::Config
     {
         type GetRoyaltyValue: Get<RoyaltyRate>;
+        type Time: Time;
     }
     pub type FixedPriceListingInfoOf<T> = FixedPriceListingInfo<
         <T as frame_system::Config>::AccountId,
         NFTCurrencyId<<T as bholdus_tokens::Config>::AssetId>,
+        MomentOf<T>,
     >;
     pub type TradingInfoOf<T> = TradingInfo<<T as frame_system::Config>::AccountId>;
     pub type ItemListingOf<T> = ItemListingInfo<<T as frame_system::Config>::AccountId>;
     pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
     pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
     pub type BHC20TokenIdOf<T> = <T as bholdus_tokens::Config>::AssetId;
+    pub type MomentOf<T> = <<T as Config>::Time as Time>::Moment;
 
     /// Error for NFT Marketplace
     #[pallet::error]
@@ -113,6 +122,7 @@ pub mod support_module {
         IsListing,
         UnknownMode,
         IsApproved,
+        ExpiredListing,
     }
 
     /// Listing NFT on marketplace
@@ -197,6 +207,7 @@ impl<T: Config> Pallet<T> {
         price: Price,
         currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>,
         royalty: RoyaltyRate,
+        expired_time: MomentOf<T>,
     ) -> DispatchResult {
         let listing_info = FixedPriceListingInfo {
             owner: owner.clone(),
@@ -204,6 +215,7 @@ impl<T: Config> Pallet<T> {
             currency_id,
             royalty,
             status: NFTState::Pending,
+            expired_time,
         };
 
         FixedPriceListing::<T>::insert((owner, token.0, token.1), listing_info);
@@ -238,6 +250,7 @@ impl<T: Config> Pallet<T> {
 
     /// Approve Listing
     pub fn approve_item_listing(token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
+        let now = T::Time::now();
         let owner = Self::owner(token);
         let item_info =
             ItemListing::<T>::get((owner, token.0, token.1)).ok_or(Error::<T>::UnknownMode)?;
@@ -246,6 +259,12 @@ impl<T: Config> Pallet<T> {
                 (item_info.owner, token.0, token.1),
                 |listing_info| -> DispatchResult {
                     let info = listing_info.as_mut().ok_or(Error::<T>::UnknownMode)?;
+                    /*if_std!(println!(
+                        "expired_time: ExpiredTime: {:?}, Now: {:?}",
+                        info.expired_time, now
+                    ));
+                    */
+                    ensure!(info.expired_time > now, Error::<T>::ExpiredListing);
                     ensure!(info.status == NFTState::Pending, Error::<T>::IsApproved);
                     info.status = NFTState::Listing;
                     Ok(())

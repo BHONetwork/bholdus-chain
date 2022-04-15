@@ -20,6 +20,8 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentityLookup},
 };
 
+use std::cell::RefCell;
+
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
 }
@@ -138,6 +140,7 @@ parameter_types! {
 
 impl bholdus_support_nft_marketplace::Config for Runtime {
     type GetRoyaltyValue = RoyaltyRate;
+    type Time = Timestamp;
 }
 
 impl Config for Runtime {
@@ -172,6 +175,25 @@ pub const TOKEN_ID: <Runtime as bholdus_support_nft::Config>::TokenId = 0;
 pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
 
 pub const ROYALTY_DENOMINATOR: u32 = 10_000u32;
+pub const EXPIRED_TIME: MomentOf<Runtime> = 12345;
+
+thread_local! {
+    static TIME: RefCell<u32> = RefCell::new(0);
+}
+
+pub struct Timestamp;
+impl Time for Timestamp {
+    type Moment = u32;
+    fn now() -> Self::Moment {
+        TIME.with(|v| *v.borrow())
+    }
+}
+
+impl Timestamp {
+    pub fn set_timestamp(val: u32) {
+        TIME.with(|v| *v.borrow_mut() = val);
+    }
+}
 
 pub struct ExtBuilder;
 impl Default for ExtBuilder {

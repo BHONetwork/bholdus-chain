@@ -54,13 +54,15 @@ fn create_fixed_price_listing_should_work() {
             (CLASS_ID, TOKEN_ID),
             price,
             NFTCurrencyId::Native,
-            Some(royalty.clone())
+            Some(royalty.clone()),
+            EXPIRED_TIME
         ));
 
         let listing_info = PendingListingInfo {
             currency_id: NFTCurrencyId::Native,
             price,
             royalty: royalty.clone(),
+            expired_time: EXPIRED_TIME,
         };
 
         System::assert_last_event(Event::NFTMarketplace(
@@ -94,6 +96,7 @@ fn create_fixed_price_listing_should_work() {
                 currency_id: NFTCurrencyId::Native,
                 royalty: royalty.clone(),
                 status: NFTState::Pending,
+                expired_time: EXPIRED_TIME,
             }
         );
     });
@@ -106,12 +109,15 @@ fn approve_listing_should_work() {
         let price = 10000u128;
         let royalty = (1000u32, 1000u32);
 
+        Timestamp::set_timestamp(100);
+
         assert_ok!(NFTMarketplace::create_fixed_price_listing(
             Origin::signed(ALICE),
             (CLASS_ID, TOKEN_ID),
             price,
             NFTCurrencyId::Native,
-            Some(royalty.clone())
+            Some(royalty.clone()),
+            EXPIRED_TIME,
         ));
 
         assert_eq!(
@@ -146,6 +152,7 @@ fn approve_listing_should_not_work() {
         create_nft();
         let price = 10000u128;
         let royalty = (1000u32, 1000u32);
+        Timestamp::set_timestamp(20000);
 
         assert_noop!(
             NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
@@ -169,8 +176,16 @@ fn approve_listing_should_not_work() {
             (CLASS_ID, TOKEN_ID),
             price,
             NFTCurrencyId::Native,
-            Some(royalty.clone())
+            Some(royalty.clone()),
+            EXPIRED_TIME,
         ));
+
+        assert_noop!(
+            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
+            SupportNFTMarketplaceError::<Runtime>::ExpiredListing
+        );
+
+        Timestamp::set_timestamp(10000);
 
         assert_ok!(NFTMarketplace::approve_listing(
             Origin::signed(ALICE),
@@ -194,7 +209,8 @@ fn create_fixed_price_listing_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 price,
                 NFTCurrencyId::Native,
-                Some((100u32, 100u32))
+                Some((100u32, 100u32)),
+                EXPIRED_TIME,
             ),
             Error::<Runtime>::NoPermission
         );
@@ -210,7 +226,8 @@ fn create_fixed_price_listing_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 price,
                 NFTCurrencyId::Native,
-                Some((100u32, 100u32))
+                Some((100u32, 100u32)),
+                EXPIRED_TIME,
             ),
             Error::<Runtime>::NoPermission
         );
@@ -225,6 +242,7 @@ fn create_fixed_price_listing_should_not_work() {
                 price,
                 NFTCurrencyId::Native,
                 Some((100u32, 100u32)),
+                EXPIRED_TIME,
             ),
             Error::<Runtime>::UserBanned,
         );
@@ -245,7 +263,8 @@ fn create_fixed_price_listing_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 price,
                 NFTCurrencyId::Native,
-                Some((100u32, 100u32))
+                Some((100u32, 100u32)),
+                EXPIRED_TIME,
             ),
             Error::<Runtime>::NFTBanned
         );
@@ -261,7 +280,8 @@ fn create_fixed_price_listing_should_not_work() {
             (CLASS_ID, TOKEN_ID),
             price,
             NFTCurrencyId::Native,
-            Some((100u32, 100u32))
+            Some((100u32, 100u32)),
+            EXPIRED_TIME,
         ));
 
         assert_noop!(
@@ -270,7 +290,8 @@ fn create_fixed_price_listing_should_not_work() {
                 (CLASS_ID, TOKEN_ID),
                 price,
                 NFTCurrencyId::Native,
-                Some((100u32, 100u32))
+                Some((100u32, 100u32)),
+                EXPIRED_TIME,
             ),
             Error::<Runtime>::IsListing
         );
@@ -460,7 +481,8 @@ fn ban_user_should_work() {
             (CLASS_ID, TOKEN_ID),
             price.clone(),
             NFTCurrencyId::Native,
-            Some((100u32, 100u32))
+            Some((100u32, 100u32)),
+            EXPIRED_TIME,
         ));
 
         assert!(NFTMarketplace::is_owner(&ALICE, (CLASS_ID, TOKEN_ID)));
@@ -533,6 +555,7 @@ fn ban_user_should_not_work() {
                 price.clone(),
                 NFTCurrencyId::Native,
                 None,
+                EXPIRED_TIME
             ),
             Error::<Runtime>::UserBanned
         );
@@ -602,7 +625,8 @@ fn ban_should_work() {
             (CLASS_ID, TOKEN_ID),
             price.clone(),
             NFTCurrencyId::Native,
-            Some((100u32, 100u32))
+            Some((100u32, 100u32)),
+            EXPIRED_TIME
         ));
 
         assert!(NFTMarketplace::is_listing(
@@ -656,6 +680,7 @@ fn ban_should_not_work() {
             price.clone(),
             NFTCurrencyId::Native,
             Some((100u32, 100u32)),
+            EXPIRED_TIME
         ));
 
         assert!(NFTMarketplace::is_listing(
