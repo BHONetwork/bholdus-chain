@@ -115,9 +115,7 @@ bholdus-support-nft = { package = "support-nft", path = "../../pallets/support/n
 bholdus-support = { path = "../../pallets/support", default-features = false }
 bholdus-currencies = { path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { path = "../../pallets/bridge/native-transfer", default-features = false }
-
-
-pallet-template = { path = "../../pallets/template", default-features = false }
+bholdus-memo = { path = "../../pallets/memo", default-features = false }
 
 runtime-chain-extension = { path = "../chain-extension", default-features = false }
 
@@ -136,6 +134,7 @@ runtime-benchmarks = [
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
 	"bholdus-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
+	"bholdus-memo/runtime-benchmarks",
 	"pallet-ethereum/runtime-benchmarks",
 ]
 
@@ -151,7 +150,6 @@ std = [
 	"pallet-grandpa/std",
 	"pallet-randomness-collective-flip/std",
 	"pallet-sudo/std",
-	"pallet-template/std",
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
@@ -185,6 +183,7 @@ std = [
 	"bholdus-primitives/std",
 	"bholdus-bridge-native-transfer/std",
 	"bholdus-bridge-native-transfer/std",
+	"bholdus-memo/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-core/std",
@@ -232,7 +231,6 @@ try-runtime = [
 	"pallet-grandpa/try-runtime",
 	"pallet-randomness-collective-flip/try-runtime",
 	"pallet-sudo/try-runtime",
-	"pallet-template/try-runtime",
 	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
 	"pallet-staking/try-runtime",
@@ -256,5 +254,6 @@ try-runtime = [
 	"pallet-recovery/try-runtime",
 
 	"bholdus-bridge-native-transfer/try-runtime",
+	"bholdus-memo/try-runtime",
 ]
 
