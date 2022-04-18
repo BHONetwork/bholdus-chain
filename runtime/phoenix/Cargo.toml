@@ -4,7 +4,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "phoenix-runtime"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.11"
+version = "1.0.15"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -109,23 +109,22 @@ sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/bholdus/
 sp-io = { version = "4.0.0-dev", git = "https://github.com/bholdus/substrate.git", default-features = false, branch = "bholdus-monthly-2021-11" }
 
 # local dependencies
-bholdus-primitives = { version = "4.0.0-dev", path = "../../primitives/bholdus", default-features = false }
-bholdus-tokens = { version = "4.0.0-dev", path = "../../pallets/tokens", default-features = false }
-bholdus-nft = { version = "4.0.0-dev", path = "../../pallets/non-fungible-token", default-features = false }
-bholdus-nft-marketplace = { version = "4.0.0-dev", path = "../../pallets/nft-marketplace", default-features = false }
-bholdus-support-nft = { package = "support-nft", version = "4.0.0-dev", path = "../../pallets/support/nft", default-features = false }
-bholdus-support-nft-marketplace = { package = "support-nft-marketplace", version = "4.0.0-dev", path = "../../pallets/support/nft-marketplace", default-features = false }
-bholdus-support = { version = "4.0.0-dev", path = "../../pallets/support", default-features = false }
-bholdus-currencies = { version = "4.0.0-dev", path = "../../pallets/currencies", default-features = false }
-bholdus-bridge-native-transfer = { version = "4.0.0-dev", path = "../../pallets/bridge/native-transfer", default-features = false }
-sample-extension = { version = "4.0.0-dev", path = "../../pallets/pallet-integration/sample-extension", default-features = false }
-integration-tokens = { version = "4.0.0-dev", path = "../../pallets/pallet-integration/tokens", default-features = false }
+bholdus-primitives = { path = "../../primitives/bholdus", default-features = false }
+bholdus-tokens = { path = "../../pallets/tokens", default-features = false }
+bholdus-memo = { path = "../../pallets/memo", default-features = false }
+bholdus-nft = { path = "../../pallets/non-fungible-token", default-features = false }
+bholdus-nft-marketplace = { path = "../../pallets/nft-marketplace", default-features = false }
+bholdus-support-nft = { package = "support-nft", path = "../../pallets/support/nft", default-features = false }
+bholdus-support-nft-marketplace = { package = "support-nft-marketplace", path = "../../pallets/support/nft-marketplace", default-features = false }
+bholdus-support = { path = "../../pallets/support", default-features = false }
+bholdus-currencies = { path = "../../pallets/currencies", default-features = false }
+bholdus-bridge-native-transfer = { path = "../../pallets/bridge/native-transfer", default-features = false }
+sample-extension = { path = "../../pallets/pallet-integration/sample-extension", default-features = false }
+integration-tokens = { path = "../../pallets/pallet-integration/tokens", default-features = false }
 
-bholdus-pallet-integration = {package = 'pallet-integration',version = "4.0.0-dev", path = "../../pallets/pallet-integration", default-features = false }
+bholdus-pallet-integration = {package = 'pallet-integration' , path = "../../pallets/pallet-integration", default-features = false }
 
-pallet-template = { version = "4.0.0-dev", path = "../../pallets/template", default-features = false }
-
-runtime-chain-extension = { version = "4.0.0-dev", path = "../chain-extension", default-features = false }
+runtime-chain-extension = { path = "../chain-extension", default-features = false }
 
 [features]
 default = ["std"]
@@ -143,6 +142,7 @@ runtime-benchmarks = [
 	"pallet-ethereum/runtime-benchmarks",
 
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
+	"bholdus-memo/runtime-benchmarks",
 	"bholdus-tokens/runtime-benchmarks",
 	"integration-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
@@ -165,7 +165,6 @@ std = [
 	"pallet-grandpa/std",
 	"pallet-randomness-collective-flip/std",
 	"pallet-sudo/std",
-	"pallet-template/std",
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
@@ -193,6 +192,7 @@ std = [
 	"pallet-beefy-mmr/std",
 
 	"bholdus-tokens/std",
+	"bholdus-memo/std",
 	"bholdus-nft/std",
 	"bholdus-nft-marketplace/std",
 	"bholdus-support-nft/std",
@@ -253,7 +253,6 @@ try-runtime = [
 	"pallet-grandpa/try-runtime",
 	"pallet-randomness-collective-flip/try-runtime",
 	"pallet-sudo/try-runtime",
-	"pallet-template/try-runtime",
 	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
 	"pallet-staking/try-runtime",
@@ -277,4 +276,5 @@ try-runtime = [
 	"pallet-recovery/try-runtime",
 
 	"bholdus-bridge-native-transfer/try-runtime",
+	"bholdus-memo/try-runtime",
 ]

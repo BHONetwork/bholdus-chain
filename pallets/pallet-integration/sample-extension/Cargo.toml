@@ -1,6 +1,6 @@
 [package]
 name = "sample-extension"
-version = "4.0.0-dev"
+version = "1.0.15"
 authors = ["Vu hoang <vuhoang2119@gmail.com>"]
 edition = "2018"
 
@@ -36,17 +36,18 @@ version = '4.0.0-dev'
 # Local dependencies
 [dependencies.bholdus-primitives]
 default-features = false
-version = '4.0.0-dev'
 path = '../../../primitives/bholdus'
 
 [dependencies.bholdus-support]
 default-features = false
-version = '4.0.0-dev'
 path = '../../support'
 
 
 [dev-dependencies]
 serde = '1.0.119'
+sp-core = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+sp-io = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
+sp-runtime = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 
 
 [features]

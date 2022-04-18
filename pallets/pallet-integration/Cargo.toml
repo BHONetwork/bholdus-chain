@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = "pallet-integration"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
-version = '4.0.0-dev'
+version = "1.0.15"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies.scale-info]
@@ -70,23 +70,19 @@ version = '4.0.0-dev'
 # Local dependencies
 [dependencies.bholdus-primitives]
 default-features = false
-version = '4.0.0-dev'
 path = '../../primitives/bholdus'
 
 [dependencies.bholdus-support]
 default-features = false
-version = '4.0.0-dev'
 path = '../support'
 
 [dependencies.sample-extension]
 default-features = false
-version = '4.0.0-dev'
 package = 'sample-extension'
 path = 'sample-extension'
 
 [dependencies.integration-tokens]
 default-features = false
-version = '4.0.0-dev'
 package = 'integration-tokens'
 path = 'tokens'
 

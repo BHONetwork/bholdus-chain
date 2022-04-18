@@ -31,7 +31,7 @@ use pallet_ethereum::{
 };
 use pallet_evm::{
     Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, FeeCalculator,
-    HashedAddressMapping, Runner,
+    HashedAddressMapping, IdentityAddressMapping, Runner,
 };
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
@@ -96,8 +96,6 @@ pub mod constants;
 pub mod weights;
 pub use constants::{currency::*, fee, time::*};
 mod voter_bags;
-/// Import the template pallet.
-pub use pallet_template;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -132,7 +130,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     //   `spec_version`, and `authoring_version` are the same between Wasm and native.
     // This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
     //   the compatible custom types.
-    spec_version: 1_000_011,
+    spec_version: 1_000_015,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -1119,9 +1117,17 @@ impl bholdus_bridge_native_transfer::Config for Runtime {
     type WeightInfo = bholdus_bridge_native_transfer::weights::SubstrateWeight<Runtime>;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
+/// Configure the bholdus-memo in pallets/memo.
+parameter_types! {
+    pub const ContentLimit: u32 = 320;
+}
+
+impl bholdus_memo::Config for Runtime {
     type Event = Event;
+    type UnixTime = Timestamp;
+    type Currency = Balances;
+    type WeightInfo = bholdus_memo::weights::SubstrateWeight<Runtime>;
+    type ContentLimit = ContentLimit;
 }
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
@@ -1259,6 +1265,7 @@ construct_runtime!(
         Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>},
         Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>},
         Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>},
+        BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
 
         // Bridge support
         Mmr: pallet_mmr::{Pallet, Storage},
@@ -1266,18 +1273,19 @@ construct_runtime!(
         MmrLeaf: pallet_beefy_mmr::{Pallet, Storage},
         BridgeNativeTransfer: bholdus_bridge_native_transfer::{Pallet, Call, Storage, Event<T>, Config<T>},
 
+        // DeFi
         Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
         Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
         NFT: bholdus_nft::{Pallet, Call, Event<T>},
         NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Event<T>},
-        SupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
-        SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage},
+        BholdusSupportNFT: bholdus_support_nft::{Pallet, Storage, Config<T>},
+        SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage, Config<T>},
         // StakingTokens: bholdus_staking_tokens::{Pallet, Call, Storage, Event<T>},
         // SupportRewards: bholdus_support_rewards::{Pallet, Storage, Call},
         // Dex: bholdus_dex::{Pallet, Call, Storage, Config<T>, Event<T>},
-        BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>},
-        // Include the custom logic from the pallet-template in the runtime.
-        TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+
+        // Others
+        Memo: bholdus_memo::{Pallet, Call, Storage, Event<T>},
 
         // Frontier EVM
         EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>},
@@ -1867,6 +1875,7 @@ impl_runtime_apis! {
             list_benchmark!(list, extra, integration_tokens, IntegrationTokens::<Runtime>);
             list_benchmark!(list, extra, bholdus_nft, NFTBench::<Runtime>);
             list_benchmark!(list, extra, bholdus_bridge_native_transfer, BridgeNativeTransfer);
+            list_benchmark!(list, extra, bholdus_memo, Memo);
 
             let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -1913,6 +1922,7 @@ impl_runtime_apis! {
             add_benchmark!(params, batches, integration_tokens, IntegrationTokens::<Runtime>);
             add_benchmark!(params, batches, bholdus_nft, NFTBench::<Runtime>);
             add_benchmark!(params, batches, bholdus_bridge_native_transfer, BridgeNativeTransfer);
+            add_benchmark!(params, batches, bholdus_memo, Memo);
 
             Ok(batches)
         }

@@ -28,6 +28,8 @@ use sp_runtime::{
 
 use sp_std::{convert::TryInto, if_std, vec::Vec};
 
+use frame_support::traits::StorageVersion;
+
 #[cfg(test)]
 mod mock;
 #[cfg(test)]
@@ -246,7 +248,7 @@ pub mod pallet {
     #[pallet::pallet]
     pub struct Pallet<T>(_);
     #[pallet::hooks]
-    impl<T: Config> Hooks<T::BlockNumber> for Pallet<T> {}
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
     #[pallet::call]
     impl<T: Config> Pallet<T> {}
 }

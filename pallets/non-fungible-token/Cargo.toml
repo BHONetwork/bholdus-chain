@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = "bholdus-nft"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
-version = '4.0.0-dev'
+version = "1.0.15"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -73,20 +73,17 @@ version = '4.0.0-dev'
 # Local dependencies
 [dependencies.bholdus-primitives]
 default-features = false
-version = '4.0.0-dev'
 path = '../../primitives/bholdus'
 
 ## Bholdus libs
 
 [dependencies.bholdus-support]
 default-features = false
-version = '4.0.0-dev'
 path = '../../pallets/support'
 
 [dependencies.bholdus-support-nft]
 default-features = false
 package = 'support-nft'
-version = '4.0.0-dev'
 path = '../../pallets/support/nft'
 
 [dev-dependencies.sp-core]

@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = 'bholdus-bridge-native-transfer'
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
-version = '4.0.0-dev'
+version = "1.0.15"
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -28,7 +28,7 @@ frame-system = { default-features = false, git = 'https://github.com/bholdus/sub
 sp-std = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 sp-runtime = { default-features = false, git = 'https://github.com/bholdus/substrate.git', branch = 'bholdus-monthly-2021-11', version = '4.0.0-dev' }
 
-bholdus-primitives = { version = '4.0.0-dev', default-features = false, path = '../../../primitives/bholdus' }
+bholdus-primitives = { default-features = false, path = '../../../primitives/bholdus' }
 
 [dev-dependencies]
 hex = "0.4.3"

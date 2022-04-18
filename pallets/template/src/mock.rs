@@ -18,7 +18,7 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-        SmartContract: bholdus_smart_contract::{Pallet, Call, Storage, Event<T>},
+        Template: pallet_template::{Pallet, Call, Storage, Event<T>}
     }
 );
 

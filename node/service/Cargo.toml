@@ -5,7 +5,7 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "bholdus-service"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "4.0.0-dev"
+version = "1.0.15"
 
 [dependencies]
 structopt = "0.3.8"
@@ -94,10 +94,10 @@ bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug" }
 bholdus-evm-rpc-trace = { path = "../../client/evm/rpc/trace" }
 bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
 
-ulas-runtime = { version = "1.0.0", optional = true, path = "../../runtime/ulas" }
-cygnus-runtime = { version = "1.0.0", optional = true, path = "../../runtime/cygnus" }
-phoenix-runtime = { version = "1.0.0", optional = true, path = "../../runtime/phoenix" }
-bholdus-primitives = { version = "4.0.0-dev", path = "../../primitives/bholdus" }
+ulas-runtime = { optional = true, path = "../../runtime/ulas" }
+cygnus-runtime = { optional = true, path = "../../runtime/cygnus" }
+phoenix-runtime = { optional = true, path = "../../runtime/phoenix" }
+bholdus-primitives = { path = "../../primitives/bholdus" }
 
 [features]
 default = ["std"]

@@ -6,7 +6,7 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = '4.0.0-dev'
+version = "1.0.15"
 
 [[bin]]
 name = 'bholdus'
@@ -24,8 +24,8 @@ version = '3.0.0'
 futures = { version = "0.3.9", features = ["compat"] }
 hex = '0.4.3'
 
-bholdus-cli = { version = '4.0.0-dev', path = 'cli' }
-bholdus-service = { version = '4.0.0-dev', path = 'service' }
+bholdus-cli = { path = 'cli' }
+bholdus-service = { path = 'service' }
 
 [features]
 default = []
