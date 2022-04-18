@@ -227,7 +227,7 @@ fn burn_should_fail() {
 
         LockableNFT::<Runtime>::insert((&BOB, CLASS_ID, TOKEN_ID), ());
         assert_noop!(
-            BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+            BholdusNFT::burn(&BOB, (CLASS_ID, TOKEN_ID)),
             Error::<Runtime>::IsLocked
         );
     });
@@ -307,6 +307,10 @@ fn set_lock_should_work() {
             &BOB, CLASS_ID, TOKEN_ID
         )));
         assert!(BholdusNFT::is_lock(&BOB, (CLASS_ID, TOKEN_ID)));
+        assert_noop!(
+            BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+            Error::<Runtime>::IsLocked
+        );
     })
 }
 
@@ -316,7 +320,12 @@ fn unlock_should_work() {
         assert_ok!(BholdusNFT::create_class(&ALICE, ()));
         assert_ok!(BholdusNFT::mint(&BOB, CLASS_ID, vec![1], ()));
         LockableNFT::<Runtime>::insert((&BOB, CLASS_ID, TOKEN_ID), ());
+        assert_noop!(
+            BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+            Error::<Runtime>::IsLocked
+        );
         BholdusNFT::unlock(&BOB, (CLASS_ID, TOKEN_ID));
+        assert_ok!(BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)));
         assert!(!LockableNFT::<Runtime>::contains_key((
             &BOB, CLASS_ID, TOKEN_ID
         )));

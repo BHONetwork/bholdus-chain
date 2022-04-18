@@ -455,16 +455,19 @@ impl<T: Config> Pallet<T> {
         Tokens::<T>::get(token.0, token.1).unwrap().owner
     }
 
+    pub fn lock(account: &T::AccountId, token: (T::ClassId, T::TokenId)) {
+        LockableNFT::<T>::insert((account, token.0, token.1), ())
+    }
+
+    pub fn unlock(owner: &T::AccountId, token: (T::ClassId, T::TokenId)) {
+        LockableNFT::<T>::remove((owner, token.0, token.1))
+    }
+
     pub fn is_owner(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
         TokensByOwner::<T>::contains_key((account, token.0, token.1))
     }
 
     pub fn is_lock(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
         LockableNFT::<T>::contains_key((account, token.0, token.1))
-    }
-
-    pub fn unlock(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> DispatchResult {
-        LockableNFT::<T>::take(&(account, token.0, token.1));
-        Ok(())
     }
 }

@@ -5,9 +5,9 @@ use frame_support::{assert_noop, assert_ok};
 use mock::{Event, *};
 
 use bholdus_primitives::Balance;
-use bholdus_support_nft::TokenInfo;
+use bholdus_support_nft::{Error as SupportNFTError, TokenInfo};
 use bholdus_support_nft_marketplace::{
-    Error as SupportNFTMarketplaceError, ItemListing as SupportNFTMarketplaceItemListing, NFTState,
+    Error as SupportNFTMarketplaceError, ItemListing as SupportNFTMItemListing, NFTState,
 };
 use sp_runtime::{traits::BlakeTwo256, ArithmeticError};
 
@@ -42,12 +42,24 @@ fn set_controller() {
     ));
 }
 
+fn set_service_fee() {
+    set_controller();
+    assert_ok!(NFTMarketplace::set_marketplace_fee(
+        Origin::signed(ALICE),
+        (10_000, 10_000),
+        BOB,
+    ));
+}
+
 #[test]
 fn create_fixed_price_listing_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         create_nft();
         let price = 10000u128;
         let royalty = (1000u32, 1000u32);
+
+        Timestamp::set_timestamp(100);
+        set_service_fee();
 
         assert_ok!(NFTMarketplace::create_fixed_price_listing(
             Origin::signed(ALICE),
@@ -58,11 +70,14 @@ fn create_fixed_price_listing_should_work() {
             EXPIRED_TIME
         ));
 
+        assert!(NFTMarketplace::is_lock(&ALICE, (CLASS_ID, TOKEN_ID)));
+
         let listing_info = PendingListingInfo {
             currency_id: NFTCurrencyId::Native,
             price,
             royalty: royalty.clone(),
             expired_time: EXPIRED_TIME,
+            service_fee: (10_000, 10_000),
         };
 
         System::assert_last_event(Event::NFTMarketplace(
@@ -97,105 +112,10 @@ fn create_fixed_price_listing_should_work() {
                 royalty: royalty.clone(),
                 status: NFTState::Pending,
                 expired_time: EXPIRED_TIME,
+                service_fee: (10_000, 10_000),
             }
         );
     });
-}
-
-#[test]
-fn approve_listing_should_work() {
-    ExtBuilder::default().build().execute_with(|| {
-        create_nft();
-        let price = 10000u128;
-        let royalty = (1000u32, 1000u32);
-
-        Timestamp::set_timestamp(100);
-
-        assert_ok!(NFTMarketplace::create_fixed_price_listing(
-            Origin::signed(ALICE),
-            (CLASS_ID, TOKEN_ID),
-            price,
-            NFTCurrencyId::Native,
-            Some(royalty.clone()),
-            EXPIRED_TIME,
-        ));
-
-        assert_eq!(
-            FixedPriceListing::<Runtime>::get((ALICE, CLASS_ID, TOKEN_ID))
-                .unwrap()
-                .status,
-            NFTState::Pending
-        );
-
-        set_controller();
-        assert_ok!(NFTMarketplace::approve_listing(
-            Origin::signed(ALICE),
-            (CLASS_ID, TOKEN_ID)
-        ));
-
-        assert!(FixedPriceListing::<Runtime>::contains_key((
-            ALICE, CLASS_ID, TOKEN_ID
-        )));
-
-        assert_eq!(
-            FixedPriceListing::<Runtime>::get((ALICE, CLASS_ID, TOKEN_ID))
-                .unwrap()
-                .status,
-            NFTState::Listing
-        );
-    })
-}
-
-#[test]
-fn approve_listing_should_not_work() {
-    ExtBuilder::default().build().execute_with(|| {
-        create_nft();
-        let price = 10000u128;
-        let royalty = (1000u32, 1000u32);
-        Timestamp::set_timestamp(20000);
-
-        assert_noop!(
-            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
-            Error::<Runtime>::NotFoundPalletManagementInfo
-        );
-
-        set_controller();
-
-        assert_noop!(
-            NFTMarketplace::approve_listing(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)),
-            Error::<Runtime>::NoPermission
-        );
-
-        assert_noop!(
-            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
-            SupportNFTMarketplaceError::<Runtime>::UnknownMode
-        );
-
-        assert_ok!(NFTMarketplace::create_fixed_price_listing(
-            Origin::signed(ALICE),
-            (CLASS_ID, TOKEN_ID),
-            price,
-            NFTCurrencyId::Native,
-            Some(royalty.clone()),
-            EXPIRED_TIME,
-        ));
-
-        assert_noop!(
-            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
-            SupportNFTMarketplaceError::<Runtime>::ExpiredListing
-        );
-
-        Timestamp::set_timestamp(10000);
-
-        assert_ok!(NFTMarketplace::approve_listing(
-            Origin::signed(ALICE),
-            (CLASS_ID, TOKEN_ID)
-        ));
-        assert_noop!(
-            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
-            SupportNFTMarketplaceError::<Runtime>::IsApproved
-        );
-    })
 }
 
 #[test]
@@ -275,6 +195,8 @@ fn create_fixed_price_listing_should_not_work() {
             (CLASS_ID, TOKEN_ID)
         ));
 
+        set_service_fee();
+
         assert_ok!(NFTMarketplace::create_fixed_price_listing(
             Origin::signed(EVE),
             (CLASS_ID, TOKEN_ID),
@@ -283,6 +205,11 @@ fn create_fixed_price_listing_should_not_work() {
             Some((100u32, 100u32)),
             EXPIRED_TIME,
         ));
+
+        assert_noop!(
+            SupportNFT::transfer(&EVE, &ALICE, (CLASS_ID, TOKEN_ID)),
+            SupportNFTError::<Runtime>::IsLocked
+        );
 
         assert_noop!(
             NFTMarketplace::create_fixed_price_listing(
@@ -294,6 +221,164 @@ fn create_fixed_price_listing_should_not_work() {
                 EXPIRED_TIME,
             ),
             Error::<Runtime>::IsListing
+        );
+    })
+}
+
+#[test]
+fn approve_listing_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft();
+        let price = 10000u128;
+        let royalty = (1000u32, 1000u32);
+
+        Timestamp::set_timestamp(100);
+        set_service_fee();
+
+        assert_ok!(NFTMarketplace::create_fixed_price_listing(
+            Origin::signed(ALICE),
+            (CLASS_ID, TOKEN_ID),
+            price,
+            NFTCurrencyId::Native,
+            Some(royalty.clone()),
+            EXPIRED_TIME,
+        ));
+
+        assert_eq!(
+            FixedPriceListing::<Runtime>::get((ALICE, CLASS_ID, TOKEN_ID))
+                .unwrap()
+                .status,
+            NFTState::Pending
+        );
+
+        set_controller();
+        assert_ok!(NFTMarketplace::approve_listing(
+            Origin::signed(ALICE),
+            (CLASS_ID, TOKEN_ID)
+        ));
+
+        assert!(FixedPriceListing::<Runtime>::contains_key((
+            ALICE, CLASS_ID, TOKEN_ID
+        )));
+
+        assert_eq!(
+            FixedPriceListing::<Runtime>::get((ALICE, CLASS_ID, TOKEN_ID))
+                .unwrap()
+                .status,
+            NFTState::Listing
+        );
+    })
+}
+
+#[test]
+fn approve_listing_should_not_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft();
+        let price = 10000u128;
+        let royalty = (1000u32, 1000u32);
+
+        assert_noop!(
+            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
+            Error::<Runtime>::NotFoundPalletManagementInfo
+        );
+
+        set_controller();
+
+        assert_noop!(
+            NFTMarketplace::approve_listing(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)),
+            Error::<Runtime>::NoPermission
+        );
+
+        assert_noop!(
+            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
+            SupportNFTMarketplaceError::<Runtime>::NotFound
+        );
+
+        Timestamp::set_timestamp(100);
+        set_service_fee();
+
+        assert_ok!(NFTMarketplace::create_fixed_price_listing(
+            Origin::signed(ALICE),
+            (CLASS_ID, TOKEN_ID),
+            price,
+            NFTCurrencyId::Native,
+            Some(royalty.clone()),
+            EXPIRED_TIME,
+        ));
+        Timestamp::set_timestamp(30000);
+
+        assert_noop!(
+            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
+            SupportNFTMarketplaceError::<Runtime>::ExpiredListing
+        );
+
+        Timestamp::set_timestamp(10000);
+
+        assert_ok!(NFTMarketplace::approve_listing(
+            Origin::signed(ALICE),
+            (CLASS_ID, TOKEN_ID)
+        ));
+        assert_noop!(
+            NFTMarketplace::approve_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
+            SupportNFTMarketplaceError::<Runtime>::IsApproved
+        );
+    })
+}
+
+#[test]
+fn cancel_listing_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft_with_account(&BOB);
+        set_service_fee();
+        assert_ok!(NFTMarketplace::create_fixed_price_listing(
+            Origin::signed(BOB),
+            (CLASS_ID, TOKEN_ID),
+            PRICE,
+            NFTCurrencyId::Native,
+            Some(ROYALTY_VALUE),
+            EXPIRED_TIME,
+        ));
+        assert_noop!(
+            SupportNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+            SupportNFTError::<Runtime>::IsLocked
+        );
+        assert_ok!(NFTMarketplace::cancel_listing(
+            Origin::signed(BOB),
+            (CLASS_ID, TOKEN_ID),
+            vec![]
+        ));
+
+        System::assert_last_event(Event::NFTMarketplace(crate::Event::CancelledListing {
+            account: BOB,
+            token: (CLASS_ID, TOKEN_ID),
+            reason: vec![],
+        }));
+
+        assert!(!NFTMarketplace::is_listing(
+            &BOB,
+            (CLASS_ID, TOKEN_ID),
+            MarketMode::FixedPrice
+        ));
+        assert!(!SupportNFTMItemListing::<Runtime>::contains_key((
+            &ALICE, CLASS_ID, TOKEN_ID
+        )));
+
+        assert_ok!(SupportNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)));
+    })
+}
+
+#[test]
+fn cancel_listing_should_not_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft_with_account(&BOB);
+        assert_noop!(
+            NFTMarketplace::cancel_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
+            Error::<Runtime>::NoPermission
+        );
+
+        assert_noop!(
+            NFTMarketplace::cancel_listing(Origin::signed(BOB), (CLASS_ID, TOKEN_ID), vec![]),
+            SupportNFTMarketplaceError::<Runtime>::NotFound
         );
     })
 }
@@ -476,6 +561,7 @@ fn ban_user_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         create_nft();
         let price = 10_000u128;
+        set_service_fee();
         assert_ok!(NFTMarketplace::create_fixed_price_listing(
             Origin::signed(ALICE),
             (CLASS_ID, TOKEN_ID),
@@ -620,6 +706,7 @@ fn ban_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         create_nft();
         let price = 10_000u128;
+        set_service_fee();
         assert_ok!(NFTMarketplace::create_fixed_price_listing(
             Origin::signed(ALICE),
             (CLASS_ID, TOKEN_ID),
@@ -635,7 +722,7 @@ fn ban_should_work() {
             MarketMode::FixedPrice
         ));
 
-        assert!(SupportNFTMarketplaceItemListing::<Runtime>::contains_key((
+        assert!(SupportNFTMItemListing::<Runtime>::contains_key((
             ALICE, CLASS_ID, TOKEN_ID
         )));
 
@@ -662,9 +749,9 @@ fn ban_should_work() {
             MarketMode::FixedPrice
         ));
 
-        assert!(!SupportNFTMarketplaceItemListing::<Runtime>::contains_key(
-            (ALICE, CLASS_ID, TOKEN_ID)
-        ));
+        assert!(!SupportNFTMItemListing::<Runtime>::contains_key((
+            ALICE, CLASS_ID, TOKEN_ID
+        )));
     })
 }
 
@@ -673,6 +760,12 @@ fn ban_should_not_work() {
     ExtBuilder::default().build().execute_with(|| {
         create_nft();
         let price = 10_000u128;
+        assert_noop!(
+            NFTMarketplace::ban(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
+            Error::<Runtime>::NotFoundPalletManagementInfo
+        );
+
+        set_service_fee();
 
         assert_ok!(NFTMarketplace::create_fixed_price_listing(
             Origin::signed(ALICE),
@@ -688,11 +781,6 @@ fn ban_should_not_work() {
             (CLASS_ID, TOKEN_ID),
             MarketMode::FixedPrice
         ));
-
-        assert_noop!(
-            NFTMarketplace::ban(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
-            Error::<Runtime>::NotFoundPalletManagementInfo
-        );
 
         assert_ok!(NFTMarketplace::configure_pallet_management(
             Origin::signed(ALICE),
@@ -765,5 +853,18 @@ fn unban() {
             vec![]
         ));
         assert!(NFTBlacklist::<Runtime>::contains_key((CLASS_ID, TOKEN_ID)));
+    })
+}
+
+#[test]
+fn set_lock_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft();
+        SupportNFTMarketplace::lock_item(&ALICE, (CLASS_ID, TOKEN_ID));
+        assert!(NFTMarketplace::is_lock(&ALICE, (CLASS_ID, TOKEN_ID)));
+        assert_noop!(
+            SupportNFT::transfer(&ALICE, &BOB, (CLASS_ID, TOKEN_ID)),
+            SupportNFTError::<Runtime>::IsLocked
+        );
     })
 }

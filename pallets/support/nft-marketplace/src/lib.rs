@@ -46,6 +46,18 @@ pub type Denominator = u32;
 pub type Numerator = u32;
 pub type RoyaltyRate = (Numerator, Denominator);
 
+#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
+pub struct PalletManagementInfo<AccountId> {
+    pub controller: AccountId,
+}
+
+/// MarketPlace Fee Information
+#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
+pub struct MarketplaceFeeInfo<AccountId> {
+    pub service_fee: (Numerator, Denominator),
+    pub beneficiary: AccountId,
+}
+
 /// Listing Info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 pub struct FixedPriceListingInfo<AccountId, CurrencyId, Moment> {
@@ -55,6 +67,7 @@ pub struct FixedPriceListingInfo<AccountId, CurrencyId, Moment> {
     pub royalty: RoyaltyRate,
     pub status: NFTState,
     pub expired_time: Moment,
+    pub service_fee: (Numerator, Denominator),
 }
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
@@ -101,6 +114,11 @@ pub mod support_module {
         type GetRoyaltyValue: Get<RoyaltyRate>;
         type Time: Time;
     }
+
+    pub type PalletManagementInfoOf<T> =
+        PalletManagementInfo<<T as frame_system::Config>::AccountId>;
+    pub type MarketplaceFeeInfoOf<T> = MarketplaceFeeInfo<<T as frame_system::Config>::AccountId>;
+
     pub type FixedPriceListingInfoOf<T> = FixedPriceListingInfo<
         <T as frame_system::Config>::AccountId,
         NFTCurrencyId<<T as bholdus_tokens::Config>::AssetId>,
@@ -121,9 +139,18 @@ pub mod support_module {
         NoPermission,
         IsListing,
         UnknownMode,
+        NotFound,
         IsApproved,
         ExpiredListing,
     }
+
+    #[pallet::storage]
+    #[pallet::getter(fn pallet_management)]
+    pub type PalletManagement<T: Config> = StorageValue<_, PalletManagementInfoOf<T>>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn marketplace_fee)]
+    pub type MarketplaceFee<T: Config> = StorageValue<_, MarketplaceFeeInfoOf<T>>;
 
     /// Listing NFT on marketplace
     #[pallet::storage]
@@ -208,7 +235,11 @@ impl<T: Config> Pallet<T> {
         currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>,
         royalty: RoyaltyRate,
         expired_time: MomentOf<T>,
+        service_fee: (Numerator, Denominator),
     ) -> DispatchResult {
+        let now = T::Time::now();
+        ensure!(expired_time >= now, Error::<T>::ExpiredListing);
+
         let listing_info = FixedPriceListingInfo {
             owner: owner.clone(),
             price,
@@ -216,6 +247,7 @@ impl<T: Config> Pallet<T> {
             royalty,
             status: NFTState::Pending,
             expired_time,
+            service_fee,
         };
 
         FixedPriceListing::<T>::insert((owner, token.0, token.1), listing_info);
@@ -226,6 +258,7 @@ impl<T: Config> Pallet<T> {
                 mode: MarketMode::FixedPrice,
             },
         );
+        Self::lock_item(owner, token);
         Ok(())
     }
 
@@ -253,12 +286,12 @@ impl<T: Config> Pallet<T> {
         let now = T::Time::now();
         let owner = Self::owner(token);
         let item_info =
-            ItemListing::<T>::get((owner, token.0, token.1)).ok_or(Error::<T>::UnknownMode)?;
+            ItemListing::<T>::get((&owner, token.0, token.1)).ok_or(Error::<T>::NotFound)?;
         match item_info.mode {
             MarketMode::FixedPrice => FixedPriceListing::<T>::try_mutate_exists(
                 (item_info.owner, token.0, token.1),
                 |listing_info| -> DispatchResult {
-                    let info = listing_info.as_mut().ok_or(Error::<T>::UnknownMode)?;
+                    let info = listing_info.as_mut().ok_or(Error::<T>::NotFound)?;
                     /*if_std!(println!(
                         "expired_time: ExpiredTime: {:?}, Now: {:?}",
                         info.expired_time, now
@@ -270,7 +303,22 @@ impl<T: Config> Pallet<T> {
                     Ok(())
                 },
             ),
-            _ => Ok(()),
+            _ => return Ok(()),
+        }
+    }
+
+    /// Cancel product listing
+    pub fn delist(owner: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
+        let item_info =
+            ItemListing::<T>::take((owner, token.0, token.1)).ok_or(Error::<T>::NotFound)?;
+        match item_info.mode {
+            MarketMode::FixedPrice => {
+                FixedPriceListing::<T>::take((owner, token.0, token.1))
+                    .ok_or(Error::<T>::NotFound)?;
+                Self::unlock_item(&owner, token);
+                Ok(())
+            }
+            _ => return Ok(()),
         }
     }
 }
@@ -278,6 +326,14 @@ impl<T: Config> Pallet<T> {
 impl<T: Config> Pallet<T> {
     pub fn owner(token: (ClassIdOf<T>, TokenIdOf<T>)) -> T::AccountId {
         bholdus_support_nft::Pallet::<T>::owner(token)
+    }
+
+    pub fn lock_item(owner: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) {
+        bholdus_support_nft::Pallet::<T>::lock(owner, token)
+    }
+
+    pub fn unlock_item(owner: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) {
+        bholdus_support_nft::Pallet::<T>::unlock(owner, token)
     }
 
     pub fn get_loyalty_value(value: Option<(Numerator, Denominator)>) -> (Numerator, Denominator) {

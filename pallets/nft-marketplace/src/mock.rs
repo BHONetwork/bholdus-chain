@@ -176,6 +176,8 @@ pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
 
 pub const ROYALTY_DENOMINATOR: u32 = 10_000u32;
 pub const EXPIRED_TIME: MomentOf<Runtime> = 12345;
+pub const PRICE: u128 = 10_000u128;
+pub const ROYALTY_VALUE: (u32, u32) = (10_000u32, 10_000u32);
 
 thread_local! {
     static TIME: RefCell<u32> = RefCell::new(0);
