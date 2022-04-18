@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = "bholdus-nft-marketplace"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
-version = '4.0.0-dev'
+version = "1.0.15"
 
 [dependencies.scale-info]
 default-features = false
@@ -77,31 +77,26 @@ version = '4.0.0-dev'
 # Local dependencies
 [dependencies.bholdus-primitives]
 default-features = false
-version = '4.0.0-dev'
 path = '../../primitives/bholdus'
 
 ## Bholdus libs
 
 [dependencies.bholdus-support]
 default-features = false
-version = '4.0.0-dev'
 path = '../../pallets/support'
 
 [dependencies.bholdus-tokens]
 default-features = false
-version = '4.0.0-dev'
 path = '../../pallets/tokens'
 
 [dependencies.bholdus-support-nft]
 default-features = false
 package = 'support-nft'
-version = '4.0.0-dev'
 path = '../../pallets/support/nft'
 
 [dependencies.bholdus-support-nft-marketplace]
 default-features = false
 package = 'support-nft-marketplace'
-version = '4.0.0-dev'
 path = '../../pallets/support/nft-marketplace'
 
 [dev-dependencies.sp-io]
