@@ -8,8 +8,8 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use phoenix_runtime::{
     opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
     BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig,
-    GenesisAccount, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-    StakerStatus, StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO, MAX_NOMINATIONS,
+    GenesisAccount, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
+    SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO,
     TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
@@ -153,6 +153,8 @@ pub fn development_config() -> Result<ChainSpec, String> {
         ),
         // Protocol ID
         Some(DEFAULT_PROTOCOL_ID),
+        // Fork ID
+        None,
         // Properties
         Some(get_properties()),
         // Extensions
@@ -213,6 +215,8 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
         ),
         // Protocol ID
         Some(DEFAULT_PROTOCOL_ID),
+        // Fork ID
+        None,
         // Properties
         Some(get_properties()),
         // Extensions
@@ -273,6 +277,8 @@ pub fn production_sample_config() -> Result<ChainSpec, String> {
         ),
         // Protocol ID
         Some(DEFAULT_PROTOCOL_ID),
+        // Fork ID
+        None,
         // Properties
         Some(get_properties()),
         // Extensions
@@ -306,7 +312,7 @@ fn testnet_genesis(
         .map(|x| (x.0.clone(), x.1.clone(), stash, StakerStatus::Validator))
         .chain(initial_nominators.iter().map(|x| {
             use rand::{seq::SliceRandom, Rng};
-            let limit = (MAX_NOMINATIONS as usize).min(initial_authorities.len());
+            let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
             let count = rng.gen::<usize>() % limit;
             let nominations = initial_authorities
                 .as_slice()
@@ -327,7 +333,6 @@ fn testnet_genesis(
         system: SystemConfig {
             // Add Wasm runtime to storage.
             code: wasm_binary.to_vec(),
-            changes_trie_config: Default::default(),
         },
         balances: BalancesConfig {
             balances: endowed_accounts
@@ -372,8 +377,9 @@ fn testnet_genesis(
         council: CouncilConfig::default(),
         sudo: SudoConfig {
             // Assign network admin rights.
-            key: root_key,
+            key: Some(root_key),
         },
+        transaction_payment: Default::default(),
         aura: AuraConfig {
             authorities: vec![],
         },

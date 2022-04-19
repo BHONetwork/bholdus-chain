@@ -47,6 +47,7 @@ pub trait RuntimeApiCollection:
     + pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
     + pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
     + fp_rpc::EthereumRuntimeRPCApi<Block>
+    + fp_rpc::ConvertTransactionRuntimeApi<Block>
     + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>
 where
     <Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
@@ -70,6 +71,7 @@ where
         + pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
         + pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
         + fp_rpc::EthereumRuntimeRPCApi<Block>
+        + fp_rpc::ConvertTransactionRuntimeApi<Block>
         + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>,
     <Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
@@ -154,8 +156,6 @@ pub trait ClientHandle {
 pub enum Client {
     #[cfg(feature = "with-ulas-runtime")]
     Ulas(Arc<crate::FullClient<ulas_runtime::RuntimeApi, crate::UlasExecutor>>),
-    #[cfg(feature = "with-cygnus-runtime")]
-    Cygnus(Arc<crate::FullClient<cygnus_runtime::RuntimeApi, crate::CygnusExecutor>>),
     #[cfg(feature = "with-phoenix-runtime")]
     Phoenix(Arc<crate::FullClient<phoenix_runtime::RuntimeApi, crate::PhoenixExecutor>>),
 }
@@ -164,15 +164,6 @@ pub enum Client {
 impl From<Arc<crate::FullClient<ulas_runtime::RuntimeApi, crate::UlasExecutor>>> for Client {
     fn from(client: Arc<crate::FullClient<ulas_runtime::RuntimeApi, crate::UlasExecutor>>) -> Self {
         Self::Ulas(client)
-    }
-}
-
-#[cfg(feature = "with-cygnus-runtime")]
-impl From<Arc<crate::FullClient<cygnus_runtime::RuntimeApi, crate::CygnusExecutor>>> for Client {
-    fn from(
-        client: Arc<crate::FullClient<cygnus_runtime::RuntimeApi, crate::CygnusExecutor>>,
-    ) -> Self {
-        Self::Cygnus(client)
     }
 }
 
@@ -192,10 +183,6 @@ impl ClientHandle for Client {
             Self::Ulas(client) => {
                 T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone())
             }
-            #[cfg(feature = "with-cygnus-runtime")]
-            Self::Cygnus(client) => {
-                T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone())
-            }
             #[cfg(feature = "with-phoenix-runtime")]
             Self::Phoenix(client) => {
                 T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone())
@@ -209,8 +196,6 @@ macro_rules! match_client {
 		match $self {
 			#[cfg(feature = "with-ulas-runtime")]
 			Self::Ulas(client) => client.$method($($param),*),
-			#[cfg(feature = "with-cygnus-runtime")]
-			Self::Cygnus(client) => client.$method($($param),*),
 			#[cfg(feature = "with-phoenix-runtime")]
 			Self::Phoenix(client) => client.$method($($param),*),
 		}
@@ -356,24 +341,6 @@ impl sc_client_api::backend::StorageProvider<Block, crate::FullBackend> for Clie
         key: &StorageKey,
     ) -> sp_blockchain::Result<Option<<Block as BlockT>::Hash>> {
         match_client!(self, child_storage_hash(id, child_info, key))
-    }
-
-    fn max_key_changes_range(
-        &self,
-        first: NumberFor<Block>,
-        last: BlockId<Block>,
-    ) -> sp_blockchain::Result<Option<(NumberFor<Block>, BlockId<Block>)>> {
-        match_client!(self, max_key_changes_range(first, last))
-    }
-
-    fn key_changes(
-        &self,
-        first: NumberFor<Block>,
-        last: BlockId<Block>,
-        storage_key: Option<&PrefixedStorageKey>,
-        key: &StorageKey,
-    ) -> sp_blockchain::Result<Vec<(NumberFor<Block>, u32)>> {
-        match_client!(self, key_changes(first, last, storage_key, key))
     }
 }
 

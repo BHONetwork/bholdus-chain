@@ -21,12 +21,16 @@
 //! PartialComponents: For maintence tasks without a complete node (eg import/export blocks, purge)
 //! Full Service: A complete parachain node including the pool, rpc, network
 
+use beefy_gadget::notification::{
+    BeefyBestBlockSender, BeefyBestBlockStream, BeefySignedCommitmentSender,
+    BeefySignedCommitmentStream,
+};
 pub use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Header, Index};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::EthTask;
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use futures::prelude::*;
-use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider, RemoteBackend};
+use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
 use sc_finality_grandpa::{self as grandpa};
@@ -38,7 +42,6 @@ use sc_service::{
 };
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_api::ConstructRuntimeApi;
-use sp_consensus::SlotData;
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
 use sp_trie::PrefixedMemoryDB;
@@ -56,9 +59,6 @@ pub use client::*;
 
 #[cfg(feature = "with-ulas-runtime")]
 pub use ulas_runtime;
-
-#[cfg(feature = "with-cygnus-runtime")]
-pub use cygnus_runtime;
 
 #[cfg(feature = "with-phoenix-runtime")]
 pub use phoenix_runtime;
@@ -96,30 +96,6 @@ impl sc_executor::NativeExecutionDispatch for UlasExecutor {
     }
 }
 
-#[cfg(feature = "with-cygnus-runtime")]
-pub struct CygnusExecutor;
-
-#[cfg(feature = "with-cygnus-runtime")]
-impl sc_executor::NativeExecutionDispatch for CygnusExecutor {
-    /// Only enable the benchmarking host functions when we actually want to benchmark.
-    #[cfg(feature = "runtime-benchmarks")]
-    type ExtendHostFunctions = (
-        frame_benchmarking::benchmarking::HostFunctions,
-        bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
-    );
-    /// Otherwise we only use the default Substrate host functions.
-    #[cfg(not(feature = "runtime-benchmarks"))]
-    type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
-
-    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-        cygnus_runtime::api::dispatch(method, data)
-    }
-
-    fn native_version() -> sc_executor::NativeVersion {
-        cygnus_runtime::native_version()
-    }
-}
-
 #[cfg(feature = "with-phoenix-runtime")]
 pub struct PhoenixExecutor;
 
@@ -146,7 +122,6 @@ impl sc_executor::NativeExecutionDispatch for PhoenixExecutor {
 
 pub trait IdentifyVariant {
     fn is_ulas(&self) -> bool;
-    fn is_cygnus(&self) -> bool;
     fn is_phoenix(&self) -> bool;
 }
 
@@ -155,17 +130,12 @@ impl IdentifyVariant for Box<dyn ChainSpec> {
         self.id().starts_with("ulas")
     }
 
-    fn is_cygnus(&self) -> bool {
-        self.id().starts_with("cygnus")
-    }
-
     fn is_phoenix(&self) -> bool {
         self.id().starts_with("phoenix")
     }
 }
 
 pub const ULAS_RUNTIME_NOT_AVAILABLE: &str = "Ulas runtime is not available. Please compile the node with `--features with-ulas-runtime` to enable it.";
-pub const CYGNUS_RUNTIME_NOT_AVAILABLE: &str = "Cygnus runtime is not available. Please compile the node with `--features with-cygnus-runtime` to enable it.";
 pub const PHOENIX_RUNTIME_NOT_AVAILABLE: &str = "Phoenix runtime is not available. Please compile the node with `--features with-phoenix-runtime` to enable it.";
 
 pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
@@ -207,10 +177,6 @@ pub fn new_chain_ops(
         #[cfg(feature = "with-ulas-runtime")]
         spec if spec.is_ulas() => {
             new_chain_ops_inner::<ulas_runtime::RuntimeApi, UlasExecutor>(config)
-        }
-        #[cfg(feature = "with-cygnus-runtime")]
-        spec if spec.is_cygnus() => {
-            new_chain_ops_inner::<cygnus_runtime::RuntimeApi, CygnusExecutor>(config)
         }
         #[cfg(feature = "with-phoenix-runtime")]
         _ => new_chain_ops_inner::<phoenix_runtime::RuntimeApi, PhoenixExecutor>(config),
@@ -265,8 +231,6 @@ where
 pub enum TransactionConverters {
     #[cfg(feature = "with-ulas-runtime")]
     Ulas(ulas_runtime::TransactionConverter),
-    #[cfg(feature = "with-cygnus-runtime")]
-    Cygnus(cygnus_runtime::TransactionConverter),
     #[cfg(feature = "with-phoenix-runtime")]
     Phoenix(phoenix_runtime::TransactionConverter),
 }
@@ -278,14 +242,6 @@ impl TransactionConverters {
     }
     #[cfg(not(feature = "with-ulas-runtime"))]
     fn ulas() -> Self {
-        unimplemented!()
-    }
-    #[cfg(feature = "with-cygnus-runtime")]
-    fn cygnus() -> Self {
-        TransactionConverters::Cygnus(cygnus_runtime::TransactionConverter)
-    }
-    #[cfg(not(feature = "with-cygnus-runtime"))]
-    fn cygnus() -> Self {
         unimplemented!()
     }
     #[cfg(feature = "with-phoenix-runtime")]
@@ -306,8 +262,6 @@ impl fp_rpc::ConvertTransaction<bholdus_primitives::OpaqueExtrinsic> for Transac
         match &self {
             #[cfg(feature = "with-ulas-runtime")]
             Self::Ulas(inner) => inner.convert_transaction(transaction),
-            #[cfg(feature = "with-cygnus-runtime")]
-            Self::Cygnus(inner) => inner.convert_transaction(transaction),
             #[cfg(feature = "with-phoenix-runtime")]
             Self::Phoenix(inner) => inner.convert_transaction(transaction),
         }
@@ -336,8 +290,10 @@ pub fn new_partial<RuntimeApi, Executor>(
                     FullClient<RuntimeApi, Executor>,
                     FullSelectChain,
                 >,
-                beefy_gadget::notification::BeefySignedCommitmentSender<Block>,
-                beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
+                BeefySignedCommitmentSender<Block>,
+                BeefySignedCommitmentStream<Block>,
+                BeefyBestBlockSender<Block>,
+                BeefyBestBlockStream<Block>,
             ),
             Arc<fc_db::Backend<Block>>,
             Option<Telemetry>,
@@ -367,6 +323,7 @@ where
         config.wasm_method,
         config.default_heap_pages,
         config.max_runtime_instances,
+        config.runtime_cache_size,
     );
 
     let (client, backend, keystore_container, task_manager) =
@@ -378,7 +335,9 @@ where
     let client = Arc::new(client);
 
     let telemetry = telemetry.map(|(worker, telemetry)| {
-        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        task_manager
+            .spawn_handle()
+            .spawn("telemetry", None, worker.run());
         telemetry
     });
 
@@ -401,10 +360,10 @@ where
         telemetry.as_ref().map(|x| x.handle()),
     )?;
 
-    let slot_duration = sc_consensus_aura::slot_duration(&*client)?.slot_duration();
+    let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 
-    let import_queue =
-        sc_consensus_aura::import_queue::<AuraPair, _, _, _, _, _, _>(ImportQueueParams {
+    let import_queue = sc_consensus_aura::import_queue::<AuraPair, _, _, _, _, _, _>(
+        ImportQueueParams {
             block_import: grandpa_block_import.clone(),
             justification_import: Some(Box::new(grandpa_block_import.clone())),
             client: client.clone(),
@@ -412,7 +371,7 @@ where
                 let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
 
                 let slot =
-                    sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+                    sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
                         *timestamp,
                         slot_duration,
                     );
@@ -426,16 +385,21 @@ where
             registry: config.prometheus_registry(),
             check_for_equivocation: Default::default(),
             telemetry: telemetry.as_ref().map(|x| x.handle()),
-        })?;
+        },
+    )?;
 
     let (beefy_link, beefy_commitment_stream) =
-        beefy_gadget::notification::BeefySignedCommitmentStream::channel();
+        beefy_gadget::notification::BeefySignedCommitmentStream::<Block>::channel();
+    let (beefy_best_block_link, beefy_best_block_stream) =
+        beefy_gadget::notification::BeefyBestBlockStream::<Block>::channel();
 
     let import_setup = (
         grandpa_block_import.clone(),
         grandpa_link,
         beefy_link,
         beefy_commitment_stream,
+        beefy_best_block_link,
+        beefy_best_block_stream,
     );
 
     Ok(sc_service::PartialComponents {
@@ -494,6 +458,7 @@ where
         other: (import_setup, frontier_backend, mut telemetry),
     } = new_partial(&config)?;
 
+    let auth_disc_publish_non_global_ips = config.network.allow_non_globals_in_dht;
     if let Some(url) = &config.keystore_remote {
         match remote_keystore(url) {
             Ok(k) => keystore_container.set_remote_keystore(k),
@@ -506,21 +471,43 @@ where
         };
     }
 
+    let grandpa_protocol_name = sc_finality_grandpa::protocol_standard_name(
+        &client
+            .block_hash(0)
+            .ok()
+            .flatten()
+            .expect("Genesis block exists; qed"),
+        &config.chain_spec,
+    );
     config
         .network
         .extra_sets
-        .push(grandpa::grandpa_peers_set_config());
+        .push(grandpa::grandpa_peers_set_config(
+            grandpa_protocol_name.clone(),
+        ));
 
+    let beefy_protocol_name = beefy_gadget::protocol_standard_name(
+        &client
+            .block_hash(0)
+            .ok()
+            .flatten()
+            .expect("Genesis block exists; qed"),
+        &config.chain_spec,
+    );
     config
         .network
         .extra_sets
-        .push(beefy_gadget::beefy_peers_set_config());
+        .push(beefy_gadget::beefy_peers_set_config(
+            beefy_protocol_name.clone(),
+        ));
 
     let (
         grandpa_block_import,
         grandpa_link,
         beefy_signed_commitment_sender,
         beefy_commitment_stream,
+        beefy_best_block_sender,
+        beefy_best_block_stream,
     ) = import_setup;
 
     let warp_sync = Arc::new(grandpa::warp_proof::NetworkProvider::new(
@@ -536,7 +523,6 @@ where
             transaction_pool: transaction_pool.clone(),
             spawn_handle: task_manager.spawn_handle(),
             import_queue,
-            on_demand: None,
             block_announce_validator_builder: None,
             warp_sync: Some(warp_sync),
         })?;
@@ -618,16 +604,19 @@ where
         let overrides = overrides.clone();
         let rpc_config = rpc_config.clone();
         let filter_pool = filter_pool.clone();
+        let block_data_cache = Arc::new(fc_rpc::EthBlockDataCache::new(
+            task_manager.spawn_handle(),
+            overrides.clone(),
+            rpc_config.eth_log_block_cache,
+            rpc_config.eth_statuses_cache,
+        ));
 
         let is_ulas = config.chain_spec.is_ulas();
-        let is_cygnus = config.chain_spec.is_cygnus();
 
         let rpc_extensions_builder =
             move |deny_unsafe, subscription_executor: rpc::SubscriptionTaskExecutor| {
                 let transaction_converter: TransactionConverters = if is_ulas {
                     TransactionConverters::ulas()
-                } else if is_cygnus {
-                    TransactionConverters::cygnus()
                 } else {
                     TransactionConverters::phoenix()
                 };
@@ -652,6 +641,7 @@ where
                     },
                     beefy: rpc::BeefyDeps {
                         beefy_commitment_stream: beefy_commitment_stream.clone(),
+                        beefy_best_block_stream: beefy_best_block_stream.clone(),
                         subscription_executor: subscription_executor.clone(),
                     },
                     frontier_backend: frontier_backend.clone(),
@@ -660,9 +650,10 @@ where
                     overrides: overrides.clone(),
                     filter_pool: filter_pool.clone(),
                     subscription_executor: subscription_executor.clone(),
+                    block_data_cache: block_data_cache.clone(),
                 };
 
-                let mut io = rpc::create_full(deps);
+                let mut io = rpc::create_full(deps)?;
 
                 // Ethereum Tracing RPC
                 if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace)
@@ -683,17 +674,15 @@ where
     let (shared_voter_state,) = rpc_setup;
 
     let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-        config,
-        backend: backend.clone(),
+        network: network.clone(),
         client: client.clone(),
         keystore: keystore_container.sync_keystore(),
-        network: network.clone(),
-        rpc_extensions_builder: Box::new(rpc_extensions_builder),
-        transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
-        on_demand: None,
-        remote_blockchain: None,
+        transaction_pool: transaction_pool.clone(),
+        rpc_extensions_builder: Box::new(rpc_extensions_builder),
+        backend: backend.clone(),
         system_rpc_tx,
+        config,
         telemetry: telemetry.as_mut(),
     })?;
 
@@ -708,8 +697,8 @@ where
 
         let can_author_with =
             sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
+
         let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-        let raw_duration = slot_duration.slot_duration();
 
         let aura = sc_consensus_aura::start_aura::<AuraPair, _, _, _, _, _, _, _, _, _, _, _>(
             StartAuraParams {
@@ -722,9 +711,9 @@ where
                     let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
 
                     let slot =
-                    sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+                    sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
                         *timestamp,
-                        raw_duration,
+                        slot_duration,
                     );
 
                     Ok((timestamp, slot))
@@ -741,9 +730,11 @@ where
             },
         )?;
 
+        // the AURA authoring task is considered essential, i.e. if it
+        // fails we take down the service with it.
         task_manager
             .spawn_essential_handle()
-            .spawn_blocking("aura-proposer", aura);
+            .spawn_blocking("aura", Some("block-authoring"), aura);
     }
 
     // Spawn authority discovery module.
@@ -759,16 +750,22 @@ where
                         _ => None,
                     }
                 });
-        let (authority_discovery_worker, _service) = sc_authority_discovery::new_worker_and_service(
-            client.clone(),
-            network.clone(),
-            Box::pin(dht_event_stream),
-            authority_discovery_role,
-            prometheus_registry.clone(),
-        );
+        let (authority_discovery_worker, _service) =
+            sc_authority_discovery::new_worker_and_service_with_config(
+                sc_authority_discovery::WorkerConfig {
+                    publish_non_global_ips: auth_disc_publish_non_global_ips,
+                    ..Default::default()
+                },
+                client.clone(),
+                network.clone(),
+                Box::pin(dht_event_stream),
+                authority_discovery_role,
+                prometheus_registry.clone(),
+            );
 
         task_manager.spawn_handle().spawn(
             "authority-discovery-worker",
+            Some("networking"),
             authority_discovery_worker.run(),
         );
     }
@@ -787,25 +784,29 @@ where
         key_store: keystore.clone(),
         network: network.clone(),
         signed_commitment_sender: beefy_signed_commitment_sender,
+        beefy_best_block_sender: beefy_best_block_sender,
         min_block_delta: 4,
         prometheus_registry: prometheus_registry.clone(),
+        protocol_name: beefy_protocol_name,
     };
 
     // Start BEEFY bridge gadget
     task_manager.spawn_essential_handle().spawn_blocking(
         "beefy-gadget",
+        None,
         beefy_gadget::start_beefy_gadget::<_, _, _, _>(beefy_params),
     );
 
     let config = grandpa::Config {
         // FIXME #1578 make this available through chainspec
-        gossip_duration: std::time::Duration::from_millis(333),
+        gossip_duration: Duration::from_millis(333),
         justification_period: 512,
         name: Some(name),
         observer_enabled: false,
         keystore,
         local_role: role,
         telemetry: telemetry.as_ref().map(|x| x.handle()),
+        protocol_name: grandpa_protocol_name,
     };
 
     if enable_grandpa {
@@ -827,9 +828,11 @@ where
 
         // the GRANDPA voter task is considered infallible, i.e.
         // if it fails we take down the service with it.
-        task_manager
-            .spawn_essential_handle()
-            .spawn_blocking("grandpa-voter", grandpa::run_grandpa_voter(grandpa_config)?);
+        task_manager.spawn_essential_handle().spawn_blocking(
+            "grandpa-voter",
+            None,
+            grandpa::run_grandpa_voter(grandpa_config)?,
+        );
     }
 
     network_starter.start_network();

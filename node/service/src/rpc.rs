@@ -14,9 +14,9 @@ use fc_rpc::{
 };
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use fp_rpc::EthereumRuntimeRPCApi;
+use fp_storage::EthereumStorageSchema;
 use futures::prelude::*;
 use jsonrpc_pubsub::manager::SubscriptionManager;
-use pallet_ethereum::EthereumStorageSchema;
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 use sc_client_api::client::BlockchainEvents;
 use sc_client_api::AuxStore;
@@ -45,12 +45,10 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 
-/// A IO handler that uses all Full RPC extensions.
-pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 /// A type representing all RPC extensions.
 pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 /// RPC result.
-pub type RpcResult = Result<RpcExtension, Box<dyn Error + Send + Sync>>;
+pub type RpcResult = Result<RpcExtension, Box<dyn std::error::Error + Send + Sync>>;
 
 pub mod tracing;
 
@@ -68,10 +66,13 @@ pub struct GrandpaDeps<B> {
     pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
 }
 
+use beefy_gadget::notification::{BeefyBestBlockStream, BeefySignedCommitmentStream};
 /// Extra dependencies for BEEFY
 pub struct BeefyDeps {
     /// Receives notifications about signed commitment events from BEEFY.
-    pub beefy_commitment_stream: beefy_gadget::notification::BeefySignedCommitmentStream<Block>,
+    pub beefy_commitment_stream: BeefySignedCommitmentStream<Block>,
+    /// Receives notifications about best block events from BEEFY.
+    pub beefy_best_block_stream: BeefyBestBlockStream<Block>,
     /// Executor to drive the subscription manager in the BEEFY RPC handler.
     pub subscription_executor: sc_rpc::SubscriptionTaskExecutor,
 }
@@ -112,18 +113,8 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub subscription_executor: SubscriptionTaskExecutor,
     /// Ethereum transaction to Extrinsic converter.
     pub transaction_converter: TransactionConverters,
-}
-
-/// Light client extra dependencies.
-pub struct LightDeps<C, F, P> {
-    /// The client instance to use.
-    pub client: Arc<C>,
-    /// Transaction pool instance.
-    pub pool: Arc<P>,
-    /// Remote access to the blockchain (async).
-    pub remote_blockchain: Arc<dyn sc_client_api::light::RemoteBlockchain<Block>>,
-    /// Fetcher instance.
-    pub fetcher: Arc<F>,
+    /// Cache for Ethereum block data.
+    pub block_data_cache: Arc<EthBlockDataCache<Block>>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -158,6 +149,7 @@ pub struct RpcConfig {
     pub ethapi_trace_cache_duration: u64,
     /// Ethereum log block cache
     pub eth_log_block_cache: usize,
+    pub eth_statuses_cache: usize,
     /// Maximum number of logs in a query.
     pub max_past_logs: u32,
     /// Maximum fee history cache size.
@@ -193,12 +185,15 @@ where
     // Maps emulated ethereum data to substrate native data.
     params.task_manager.spawn_essential_handle().spawn(
         "frontier-mapping-sync-worker",
+        Some("frontier"),
         MappingSyncWorker::new(
             params.client.import_notification_stream(),
             Duration::new(6, 0),
             params.client.clone(),
             params.substrate_backend.clone(),
             params.frontier_backend.clone(),
+            3,
+            0,
             SyncStrategy::Normal,
         )
         .for_each(|()| futures::future::ready(())),
@@ -211,6 +206,7 @@ where
         const FILTER_RETAIN_THRESHOLD: u64 = 100;
         params.task_manager.spawn_essential_handle().spawn(
             "frontier-filter-pool",
+            Some("frontier"),
             EthTask::filter_pool_task(
                 Arc::clone(&params.client),
                 filter_pool,
@@ -221,6 +217,7 @@ where
 
     params.task_manager.spawn_essential_handle().spawn(
         "frontier-schema-cache-task",
+        Some("frontier"),
         EthTask::ethereum_schema_cache_task(
             Arc::clone(&params.client),
             Arc::clone(&params.frontier_backend),
@@ -230,6 +227,7 @@ where
     // Spawn Frontier FeeHistory cache maintenance task.
     params.task_manager.spawn_essential_handle().spawn(
         "frontier-fee-history",
+        Some("frontier"),
         EthTask::fee_history_task(
             Arc::clone(&params.client),
             Arc::clone(&params.overrides),
@@ -241,12 +239,14 @@ where
 
 pub fn overrides_handle<C, BE>(client: Arc<C>) -> Arc<OverrideHandle<Block>>
 where
+    BE: Backend<Block> + 'static,
+    BE::State: StateBackend<sp_runtime::traits::HashFor<Block>>,
+    BE::Blockchain: BlockchainBackend<Block>,
     C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
+    C: BlockchainEvents<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError>,
     C: Send + Sync + 'static,
-    C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
-    BE: Backend<Block> + 'static,
-    BE::State: StateBackend<BlakeTwo256>,
+    C::Api: RuntimeApiCollection<StateBackend = BE::State>,
 {
     let mut overrides_map = BTreeMap::new();
     overrides_map.insert(
@@ -267,27 +267,17 @@ where
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B, A>(deps: FullDeps<C, P, SC, B, A>) -> IoHandler
+pub fn create_full<C, P, SC, BE, A>(deps: FullDeps<C, P, SC, BE, A>) -> RpcResult
 where
-    C: ProvideRuntimeApi<Block>
-        + HeaderBackend<Block>
-        + AuxStore
-        + HeaderMetadata<Block, Error = BlockChainError>
-        + Sync
-        + Send
-        + 'static,
-    C: StorageProvider<Block, B>,
+    BE: Backend<Block> + 'static,
+    BE::State: StateBackend<sp_runtime::traits::HashFor<Block>>,
+    BE::Blockchain: BlockchainBackend<Block>,
+    C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
     C: BlockchainEvents<Block>,
-    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
-    C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
-    C::Api: pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>,
-    C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-    C::Api: BlockBuilder<Block>,
-    C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+    C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError>,
+    C: Send + Sync + 'static,
+    C::Api: RuntimeApiCollection<StateBackend = BE::State>,
     P: TransactionPool<Block = Block> + 'static,
-    SC: SelectChain<Block> + 'static,
-    B: sc_client_api::Backend<Block> + Send + Sync + 'static,
-    B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
     A: ChainApi<Block = Block> + 'static,
 {
     use fc_rpc::{
@@ -318,6 +308,7 @@ where
         overrides,
         filter_pool,
         transaction_converter,
+        block_data_cache,
         ..
     } = deps;
 
@@ -354,12 +345,14 @@ where
         ),
     ));
 
-    io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(
+    let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
         beefy_gadget_rpc::BeefyRpcHandler::new(
             beefy.beefy_commitment_stream,
+            beefy.beefy_best_block_stream,
             beefy.subscription_executor,
-        ),
-    ));
+        )?;
+
+    io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
 
     io.extend_with(NetApiServer::to_delegate(NetApi::new(
         client.clone(),
@@ -371,23 +364,16 @@ where
     // Nor any signers
     let signers = Vec::new();
 
-    // Reasonable default caching inspired by the frontier template
-    let block_data_cache = Arc::new(EthBlockDataCache::new(
-        rpc_config.eth_log_block_cache,
-        rpc_config.eth_log_block_cache,
-    ));
-
     io.extend_with(EthApiServer::to_delegate(EthApi::new(
         client.clone(),
         pool.clone(),
         graph,
-        transaction_converter,
+        Some(transaction_converter),
         network.clone(),
         signers,
         overrides.clone(),
         frontier_backend.clone(),
         is_authority,
-        rpc_config.max_past_logs,
         block_data_cache.clone(),
         rpc_config.fee_history_limit,
         fee_history_cache,
@@ -399,7 +385,6 @@ where
             frontier_backend.clone(),
             filter_pool.clone(),
             500 as usize, // max stored filters
-            overrides.clone(),
             rpc_config.max_past_logs,
             block_data_cache.clone(),
         )));
@@ -418,30 +403,5 @@ where
         overrides,
     )));
 
-    io
-}
-
-/// Instantiate all Light RPC extensions.
-pub fn create_light<C, P, M, F>(deps: LightDeps<C, F, P>) -> jsonrpc_core::IoHandler<M>
-where
-    C: sp_blockchain::HeaderBackend<Block>,
-    C: Send + Sync + 'static,
-    F: sc_client_api::light::Fetcher<Block> + 'static,
-    P: TransactionPool + 'static,
-    M: jsonrpc_core::Metadata + Default,
-{
-    use substrate_frame_rpc_system::{LightSystem, SystemApi};
-
-    let LightDeps {
-        client,
-        pool,
-        remote_blockchain,
-        fetcher,
-    } = deps;
-    let mut io = jsonrpc_core::IoHandler::default();
-    io.extend_with(SystemApi::<Hash, AccountId, Index>::to_delegate(
-        LightSystem::new(client, remote_blockchain, fetcher, pool),
-    ));
-
-    io
+    Ok(io)
 }

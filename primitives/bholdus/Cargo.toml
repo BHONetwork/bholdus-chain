@@ -18,31 +18,28 @@ optional = true
 [dependencies.scale-info]
 default-features = false
 features = ['derive']
-version = '1.0'
+version = '2.0.1'
 
 [dependencies.codec]
 default-features = false
 features = ['derive', 'max-encoded-len']
 package = 'parity-scale-codec'
-version = '2.2.0'
+version = '3.0.0'
 
 [dependencies.sp-core]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.sp-runtime]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.sp-std]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.pretty_assertions]
 optional = true
@@ -50,9 +47,8 @@ version = '0.6.1'
 
 [dev-dependencies.sp-serializer]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '3.0.0'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [features]
 default = ["std"]

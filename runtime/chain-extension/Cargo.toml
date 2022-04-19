@@ -11,81 +11,64 @@ version = "1.0.15"
 
 [dependencies]
 enumflags2 = { version = "0.6.2" }
-smallvec = "1.6.1"
+smallvec = "1.8.0"
 
 [dependencies.codec]
 default-features = false
 features = ['derive', 'max-encoded-len']
 package = 'parity-scale-codec'
-version = '2.2.0'
+version = '3.0.0'
 
 [dependencies.scale-info]
 default-features = false
 features = ['derive']
-version = '1.0'
+version = '2.0.1'
 
 [dependencies.frame-benchmarking]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
+git = "https://github.com/BHONetwork/substrate.git"
 optional = true
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.frame-support]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.frame-system]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.sp-runtime]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.sp-std]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.sp-core]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.pallet-contracts]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.pallet-balances]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.pallet-randomness-collective-flip]
 default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
-[dependencies.sample-extension]
-default-features = false
-path = "../../pallets/pallet-integration/sample-extension"
-
-[dependencies.integration-tokens]
-default-features = false
-path = "../../pallets/pallet-integration/tokens"
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies.bholdus-currencies]
 default-features = false
@@ -95,11 +78,6 @@ path = "../../pallets/currencies"
 [dependencies.bholdus-primitives]
 default-features = false
 path = "../../primitives/bholdus"
-
-[dependencies.bholdus-pallet-integration]
-default-features = false
-path = "../../pallets/pallet-integration"
-package = 'pallet-integration'
 
 [features]
 default = ['std']
@@ -114,11 +92,8 @@ std = [
 	'pallet-contracts/std',
 	'pallet-balances/std',
 	'pallet-randomness-collective-flip/std',
-	'sample-extension/std',
-	'integration-tokens/std',
 	'bholdus-currencies/std',
 	'bholdus-primitives/std',
-	'bholdus-pallet-integration/std',
 ]
 runtime-benchmarks = [
 	'frame-benchmarking',

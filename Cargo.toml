@@ -5,11 +5,9 @@ members = [
     'node/service',
 
     'primitives/bholdus',
-    'primitives/bsc',
 
     'runtime/chain-extension',
     'runtime/ulas',
-    'runtime/cygnus',
     'runtime/phoenix',
 
     'pallets/currencies',
@@ -24,9 +22,6 @@ members = [
 
     'precompiles/template',
     'precompiles/utils',
-
-    'pallets/pallet-integration',
-    'pallets/pallet-integration/sample-extension',
 ]
 
 exclude = [

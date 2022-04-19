@@ -12,10 +12,7 @@
 #![allow(clippy::unused_unit)]
 
 use codec::{Decode, Encode};
-use frame_support::{
-    ensure, pallet_prelude::*, require_transactional, traits::Get, transactional, BoundedVec,
-    Parameter,
-};
+use frame_support::{ensure, pallet_prelude::*, traits::Get, BoundedVec, Parameter};
 use frame_system::pallet_prelude::*;
 use scale_info::TypeInfo;
 
@@ -27,8 +24,6 @@ use sp_runtime::{
 };
 
 use sp_std::{convert::TryInto, if_std, vec::Vec};
-
-use frame_support::traits::StorageVersion;
 
 #[cfg(test)]
 mod mock;
@@ -176,7 +171,7 @@ pub mod pallet {
             NMapKey<Blake2_128Concat, T::ClassId>,
             NMapKey<Blake2_128Concat, T::TokenId>,
         ),
-        (T::AccountId, T::TokenId),
+        (),
         ValueQuery,
     >;
 
@@ -190,8 +185,8 @@ pub mod pallet {
             NMapKey<Blake2_128Concat, T::ClassId>,
             NMapKey<Blake2_128Concat, T::TokenId>,
         ),
-        T::TokenId,
-        //ValueQuery,
+        (),
+        ValueQuery,
     >;
 
     #[pallet::genesis_config]
@@ -226,6 +221,7 @@ pub mod pallet {
     }
 
     #[pallet::pallet]
+    #[pallet::without_storage_info]
     pub struct Pallet<T>(_);
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
@@ -291,8 +287,7 @@ impl<T: Config> Pallet<T> {
             info.owner = to.clone();
 
             TokensByOwner::<T>::remove((from, token.0, token.1));
-
-            TokensByOwner::<T>::insert((to, token.0, token.1), (to, token.1));
+            TokensByOwner::<T>::insert((to, token.0, token.1), ());
 
             Ok(())
         })
@@ -328,7 +323,7 @@ impl<T: Config> Pallet<T> {
             };
 
             Tokens::<T>::insert(class_id, token_id, token_info);
-            TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
+            TokensByOwner::<T>::insert((owner, class_id, token_id), ());
             Ok(token_id)
         })
     }
@@ -375,8 +370,8 @@ impl<T: Config> Pallet<T> {
                     ));
 
                     Tokens::<T>::insert(class_id, token_id, token_info);
-                    TokensByOwner::<T>::insert((owner, class_id, token_id), (owner, token_id));
-                    TokensByGroup::<T>::insert((group_id, class_id, token_id), token_id);
+                    TokensByOwner::<T>::insert((owner, class_id, token_id), ());
+                    TokensByGroup::<T>::insert((group_id, class_id, token_id), ());
                     Ok(token_id)
                 });
                 Ok(*class_token_id)

@@ -17,7 +17,6 @@
 
 use crate::cli::{Cli, Subcommand};
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
-use sc_service::PartialComponents;
 use service::{chain_spec, IdentifyVariant};
 
 impl SubstrateCli for Cli {
@@ -56,15 +55,6 @@ impl SubstrateCli for Cli {
             #[cfg(feature = "with-ulas-runtime")]
             "ulas" => Box::new(chain_spec::ulas::config()?),
 
-            #[cfg(feature = "with-cygnus-runtime")]
-            "cygnus-dev" => Box::new(chain_spec::cygnus::development_config()?),
-            #[cfg(feature = "with-cygnus-runtime")]
-            "cygnus-local" => Box::new(chain_spec::cygnus::local_testnet_config()?),
-            #[cfg(feature = "with-cygnus-runtime")]
-            "cygnus-prod-sample" => Box::new(chain_spec::cygnus::production_sample_config()?),
-            #[cfg(feature = "with-cygnus-runtime")]
-            "cygnus" => Box::new(chain_spec::cygnus::config()?),
-
             #[cfg(feature = "with-phoenix-runtime")]
             "phoenix-dev" => Box::new(chain_spec::phoenix::development_config()?),
             #[cfg(feature = "with-phoenix-runtime")]
@@ -88,14 +78,6 @@ impl SubstrateCli for Cli {
 
                     #[cfg(not(feature = "with-ulas-runtime"))]
                     return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
-                } else if chain_spec.is_cygnus() {
-                    #[cfg(feature = "with-cygnus-runtime")]
-                    {
-                        Box::new(chain_spec::cygnus::ChainSpec::from_json_file(path)?)
-                    }
-
-                    #[cfg(not(feature = "with-cygnus-runtime"))]
-                    return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
                 } else {
                     #[cfg(feature = "with-phoenix-runtime")]
                     {
@@ -115,11 +97,6 @@ impl SubstrateCli for Cli {
             return &service::ulas_runtime::VERSION;
             #[cfg(not(feature = "with-ulas-runtime"))]
             panic!("{}", service::ULAS_RUNTIME_NOT_AVAILABLE);
-        } else if spec.is_cygnus() {
-            #[cfg(feature = "with-cygnus-runtime")]
-            return &service::cygnus_runtime::VERSION;
-            #[cfg(not(feature = "with-cygnus-runtime"))]
-            panic!("{}", service::CYGNUS_RUNTIME_NOT_AVAILABLE);
         } else {
             #[cfg(feature = "with-phoenix-runtime")]
             return &service::phoenix_runtime::VERSION;
@@ -140,6 +117,7 @@ pub fn run() -> sc_cli::Result<()> {
                 let chain_spec = &config.chain_spec;
                 let rpc_config = service::rpc::RpcConfig {
                     eth_log_block_cache: cli.run.eth_log_block_cache,
+                    eth_statuses_cache: cli.run.eth_statuses_cache,
                     fee_history_limit: cli.run.fee_history_limit,
                     max_past_logs: cli.run.max_past_logs,
                     ethapi: cli.run.ethapi,
@@ -159,17 +137,6 @@ pub fn run() -> sc_cli::Result<()> {
                     }
                     #[cfg(not(feature = "with-ulas-runtime"))]
                     return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
-                } else if chain_spec.is_cygnus() {
-                    #[cfg(feature = "with-cygnus-runtime")]
-                    {
-                        return service::new_full::<
-                            service::cygnus_runtime::RuntimeApi,
-                            service::CygnusExecutor,
-                        >(config, rpc_config)
-                        .map_err(sc_cli::Error::Service);
-                    }
-                    #[cfg(not(feature = "with-cygnus-runtime"))]
-                    return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
                 } else {
                     #[cfg(feature = "with-phoenix-runtime")]
                     {
@@ -198,16 +165,7 @@ pub fn run() -> sc_cli::Result<()> {
                     }
                     #[cfg(not(feature = "with-ulas-runtime"))]
                     return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
-                } else if chain_spec.is_cygnus() {
-                    #[cfg(feature = "with-cygnus-runtime")]
-                    {
-                        return cmd.run::<service::cygnus_runtime::Block, service::cygnus_runtime::RuntimeApi,service::CygnusExecutor>(
-                            config,
-                        )
-                    }
-                    #[cfg(not(feature = "with-cygnus-runtime"))]
-                    return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
-                } else {
+                }  else {
                     #[cfg(feature = "with-phoenix-runtime")]
                     {
                         return cmd.run::<service::phoenix_runtime::Block, service::phoenix_runtime::RuntimeApi, service::PhoenixExecutor>(
@@ -233,16 +191,6 @@ pub fn run() -> sc_cli::Result<()> {
                         }
                         #[cfg(not(feature = "with-ulas-runtime"))]
                         return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
-                    } else if chain_spec.is_cygnus() {
-                        #[cfg(feature = "with-cygnus-runtime")]
-                        {
-                            return cmd
-                                .run::<service::cygnus_runtime::Block, service::CygnusExecutor>(
-                                    config,
-                                );
-                        }
-                        #[cfg(not(feature = "with-cygnus-runtime"))]
-                        return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
                     } else {
                         #[cfg(feature = "with-phoenix-runtime")]
                         {
@@ -343,29 +291,6 @@ pub fn run() -> sc_cli::Result<()> {
                 }
                 #[cfg(not(feature = "with-ulas-runtime"))]
                 return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
-            } else if chain_spec.is_cygnus() {
-                #[cfg(feature = "with-cygnus-runtime")]
-                {
-                    return runner.async_run(|config| {
-                        // we don't need any of the components of new_partial, just a runtime, or a task
-                        // manager to do `async_run`.
-                        let registry = config.prometheus_config.as_ref().map(|cfg| &cfg.registry);
-                        let task_manager =
-                            sc_service::TaskManager::new(config.tokio_handle.clone(), registry)
-                                .map_err(|e| {
-                                    sc_cli::Error::Service(sc_service::Error::Prometheus(e))
-                                })?;
-
-                        Ok((
-                            cmd.run::<service::cygnus_runtime::Block, service::CygnusExecutor>(
-                                config,
-                            ),
-                            task_manager,
-                        ))
-                    });
-                }
-                #[cfg(not(feature = "with-cygnus-runtime"))]
-                return Err(service::CYGNUS_RUNTIME_NOT_AVAILABLE.into());
             } else {
                 #[cfg(feature = "with-phoenix-runtime")]
                 {
@@ -391,5 +316,9 @@ pub fn run() -> sc_cli::Result<()> {
                 return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
             }
         }
+        #[cfg(not(feature = "try-runtime"))]
+        Some(Subcommand::TryRuntime) => Err("TryRuntime wasn't enabled when building the node. \
+					You can enable it with `--features try-runtime`."
+            .into()),
     }
 }
