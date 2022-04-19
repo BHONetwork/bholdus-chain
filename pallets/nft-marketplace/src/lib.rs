@@ -383,6 +383,28 @@ pub mod support_module {
 
         #[pallet::weight(0)]
         #[transactional]
+        pub fn reject_listing(
+            origin: OriginFor<T>,
+            token: (ClassIdOf<T>, TokenIdOf<T>),
+            reason: Vec<u8>,
+        ) -> DispatchResult {
+            let who = ensure_signed(origin)?;
+            let management_info =
+                PalletManagement::<T>::get().ok_or(Error::<T>::NotFoundPalletManagementInfo)?;
+            ensure!(management_info.controller == who, Error::<T>::NoPermission);
+            let owner = Self::owner(token);
+            Self::delist(&owner, token)?;
+            // Emit Event
+            Self::deposit_event(Event::CancelledListing {
+                account: who,
+                token,
+                reason,
+            });
+            Ok(())
+        }
+
+        #[pallet::weight(0)]
+        #[transactional]
         pub fn cancel_listing(
             origin: OriginFor<T>,
             token: (ClassIdOf<T>, TokenIdOf<T>),
@@ -404,6 +426,10 @@ pub mod support_module {
 }
 
 impl<T: Config> Pallet<T> {
+    pub fn owner(token: (ClassIdOf<T>, TokenIdOf<T>)) -> T::AccountId {
+        bholdus_support_nft_marketplace::Pallet::<T>::owner(token)
+    }
+
     pub fn is_owner(account: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> bool {
         bholdus_support_nft_marketplace::Pallet::<T>::is_owner(account, token)
     }

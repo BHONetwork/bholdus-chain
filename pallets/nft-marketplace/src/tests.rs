@@ -371,6 +371,7 @@ fn cancel_listing_should_work() {
 fn cancel_listing_should_not_work() {
     ExtBuilder::default().build().execute_with(|| {
         create_nft_with_account(&BOB);
+        set_service_fee();
         assert_noop!(
             NFTMarketplace::cancel_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
             Error::<Runtime>::NoPermission
@@ -378,6 +379,108 @@ fn cancel_listing_should_not_work() {
 
         assert_noop!(
             NFTMarketplace::cancel_listing(Origin::signed(BOB), (CLASS_ID, TOKEN_ID), vec![]),
+            SupportNFTMarketplaceError::<Runtime>::NotFound
+        );
+
+        assert_ok!(NFTMarketplace::create_fixed_price_listing(
+            Origin::signed(BOB),
+            (CLASS_ID, TOKEN_ID),
+            PRICE,
+            NFTCurrencyId::Native,
+            Some(ROYALTY_VALUE),
+            EXPIRED_TIME,
+        ));
+
+        assert_ok!(NFTMarketplace::cancel_listing(
+            Origin::signed(BOB),
+            (CLASS_ID, TOKEN_ID),
+            vec![]
+        ));
+        assert_noop!(
+            NFTMarketplace::cancel_listing(Origin::signed(BOB), (CLASS_ID, TOKEN_ID), vec![]),
+            SupportNFTMarketplaceError::<Runtime>::NotFound
+        );
+    })
+}
+
+#[test]
+fn reject_listing_should_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft_with_account(&BOB);
+        set_service_fee();
+        assert_ok!(NFTMarketplace::create_fixed_price_listing(
+            Origin::signed(BOB),
+            (CLASS_ID, TOKEN_ID),
+            PRICE,
+            NFTCurrencyId::Native,
+            Some(ROYALTY_VALUE),
+            EXPIRED_TIME,
+        ));
+        assert_noop!(
+            SupportNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+            SupportNFTError::<Runtime>::IsLocked
+        );
+        assert_ok!(NFTMarketplace::reject_listing(
+            Origin::signed(ALICE),
+            (CLASS_ID, TOKEN_ID),
+            vec![]
+        ));
+
+        System::assert_last_event(Event::NFTMarketplace(crate::Event::CancelledListing {
+            account: ALICE,
+            token: (CLASS_ID, TOKEN_ID),
+            reason: vec![],
+        }));
+
+        assert!(!NFTMarketplace::is_listing(
+            &BOB,
+            (CLASS_ID, TOKEN_ID),
+            MarketMode::FixedPrice
+        ));
+        assert!(!SupportNFTMItemListing::<Runtime>::contains_key((
+            &ALICE, CLASS_ID, TOKEN_ID
+        )));
+
+        assert_ok!(SupportNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)));
+    })
+}
+
+#[test]
+fn reject_listing_should_not_work() {
+    ExtBuilder::default().build().execute_with(|| {
+        create_nft_with_account(&BOB);
+        assert_noop!(
+            NFTMarketplace::reject_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
+            Error::<Runtime>::NotFoundPalletManagementInfo
+        );
+
+        set_service_fee();
+        assert_noop!(
+            NFTMarketplace::reject_listing(Origin::signed(BOB), (CLASS_ID, TOKEN_ID), vec![]),
+            Error::<Runtime>::NoPermission
+        );
+
+        assert_noop!(
+            NFTMarketplace::reject_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
+            SupportNFTMarketplaceError::<Runtime>::NotFound
+        );
+
+        assert_ok!(NFTMarketplace::create_fixed_price_listing(
+            Origin::signed(BOB),
+            (CLASS_ID, TOKEN_ID),
+            PRICE,
+            NFTCurrencyId::Native,
+            Some(ROYALTY_VALUE),
+            EXPIRED_TIME,
+        ));
+        assert_ok!(NFTMarketplace::reject_listing(
+            Origin::signed(ALICE),
+            (CLASS_ID, TOKEN_ID),
+            vec![],
+        ));
+
+        assert_noop!(
+            NFTMarketplace::reject_listing(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID), vec![]),
             SupportNFTMarketplaceError::<Runtime>::NotFound
         );
     })
