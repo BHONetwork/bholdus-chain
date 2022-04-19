@@ -11,6 +11,7 @@ type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Runtime>
 type Block = frame_system::mocking::MockBlock<Runtime>;
 pub type Balance = u128;
 pub type AccountId = u32;
+use system::EnsureRoot;
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
@@ -92,6 +93,7 @@ impl bholdus_memo::Config for Runtime {
     type Currency = Balances;
     type WeightInfo = ();
     type ContentLimit = ContentLimit;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
 }
 
 pub const ALICE: AccountId = 1;

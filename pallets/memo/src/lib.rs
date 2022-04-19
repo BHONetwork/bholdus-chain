@@ -1,16 +1,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use bholdus_primitives::Balance;
-use frame_support::{traits::Currency, BoundedVec, transactional};
+use frame_support::{traits::Currency, transactional, BoundedVec};
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
-use sp_runtime::traits::StaticLookup;
-use sp_std::{
-    convert::{TryInto},
-    vec::Vec,
-};
+use sp_runtime::traits::Zero;
+use sp_std::{convert::TryInto, vec::Vec};
 
 #[cfg(test)]
 mod mock;
@@ -49,6 +46,14 @@ pub mod pallet {
 
         /// The maximum length of a name or symbol stored on-chain.
         type ContentLimit: Get<u32>;
+
+        /// Admin Origin
+        type AdminOrigin: EnsureOrigin<Self::Origin>;
+    }
+
+    #[pallet::type_value]
+    pub fn AmountFreeTxDefault<T: Config>() -> u128 {
+        100
     }
 
     #[pallet::pallet]
@@ -70,15 +75,32 @@ pub mod pallet {
         OptionQuery,
     >;
 
+    #[pallet::storage]
+    #[pallet::getter(fn memo_counter)]
+    pub type MemoCounter<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, u128, ValueQuery>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn amount_free_tx)]
+    pub type AmountFreeTx<T: Config> =
+        StorageValue<Value = u128, QueryKind = ValueQuery, OnEmpty = AmountFreeTxDefault<T>>;
+
     // Pallets use events to inform users when important changes are made.
     // https://docs.substrate.io/v3/runtime/events
     #[pallet::event]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Some memo class was created \[chain_id, txn_hash, memo_info\]
-        MemoCreated(ChainId, TxnHash, MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>),
+        MemoCreated(
+            ChainId,
+            TxnHash,
+            MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>,
+        ),
         /// Some memo class was updated \[chain_id, txn_hash, memo_info\]
-        MemoUpdated(ChainId, TxnHash, MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>),
+        MemoUpdated(
+            ChainId,
+            TxnHash,
+            MemoInfo<T::AccountId, BoundedVec<u8, T::ContentLimit>>,
+        ),
     }
 
     // Errors inform users that something went wrong.
@@ -109,12 +131,24 @@ pub mod pallet {
         }
     }
 
+    impl<T: Config> Pallet<T> {
+        pub fn calc_actual_weight(sender: &Vec<u8>) -> Pays {
+            let counter = Pallet::<T>::memo_counter(sender);
+            if counter < Pallet::<T>::amount_free_tx() {
+                Pays::No
+            } else {
+                Pays::Yes
+            }
+        }
+    }
+
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
     // These functions materialize as "extrinsics", which are often compared to transactions.
     // Dispatchable functions must be annotated with a weight and must return a DispatchResult.
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        #[pallet::weight(T::WeightInfo::create(content.len() as u32, txn_hash.len() as u32))]
+        #[pallet::weight((T::WeightInfo::create(content.len() as u32, txn_hash.len() as u32),
+                            Pallet::<T>::calc_actual_weight(sender)))]
         #[transactional]
         pub fn create(
             origin: OriginFor<T>,
@@ -124,13 +158,22 @@ pub mod pallet {
             sender: Vec<u8>,
             receiver: Vec<u8>,
         ) -> DispatchResult {
-            
             let operator = ensure_signed(origin)?;
+
+            let memo_info = Memo::<T>::get(&chain_id, &txn_hash);
+
+            ensure!(memo_info.is_none(), Error::<T>::BadMemoInfo);
+
             let time_now = T::UnixTime::now().as_millis() as u64;
 
-            let bounded_content: BoundedVec<u8, T::ContentLimit> = content.clone()
+            let bounded_content: BoundedVec<u8, T::ContentLimit> = content
+                .clone()
                 .try_into()
                 .map_err(|_| Error::<T>::BadMemoInfo)?;
+
+            let counter: u128 = MemoCounter::<T>::get(&sender);
+
+            MemoCounter::<T>::insert(&sender, counter.checked_add(1).unwrap_or_else(Zero::zero));
 
             let memo_info = MemoInfo {
                 content: bounded_content,
@@ -141,6 +184,7 @@ pub mod pallet {
             };
 
             Memo::<T>::insert(&chain_id, &txn_hash, memo_info.clone());
+
             Self::deposit_event(Event::MemoCreated(chain_id, txn_hash, memo_info));
             Ok(())
         }
@@ -168,5 +212,14 @@ pub mod pallet {
         //     Self::deposit_event(Event::MemoUpdated(chain_id, txn_hash, memo_info));
         //     Ok(())
         // }
+
+        #[pallet::weight(T::WeightInfo::set_amount_free_tx())]
+        pub fn set_amount_free_tx(origin: OriginFor<T>, amount_free_tx: u128) -> DispatchResult {
+            T::AdminOrigin::ensure_origin(origin)?;
+
+            <AmountFreeTx<T>>::put(amount_free_tx);
+
+            Ok(())
+        }
     }
 }

@@ -1122,6 +1122,7 @@ impl bholdus_memo::Config for Runtime {
     type Currency = Balances;
     type WeightInfo = bholdus_memo::weights::SubstrateWeight<Runtime>;
     type ContentLimit = ContentLimit;
+    type AdminOrigin = EnsureRoot<Self::AccountId>;
 }
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
