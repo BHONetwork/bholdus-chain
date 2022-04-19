@@ -1,4 +1,4 @@
-use super::{ChainId, MemoInfo, TxnHash, BoundedVec, TryInto};
+use super::{BoundedVec, ChainId, MemoInfo, TryInto, TxnHash};
 use crate::mock::*;
 use frame_support::assert_ok;
 #[test]
@@ -30,9 +30,7 @@ fn create_should_work() {
 
             let memo_created = Memo::memo(chain_id, &txn_hash).unwrap();
 
-            let bounded_content: BoundedVec<u8, ContentLimit> = content.clone()
-                .try_into()
-                .unwrap();
+            let bounded_content: BoundedVec<u8, ContentLimit> = content.clone().try_into().unwrap();
 
             let memo_input = MemoInfo {
                 content: bounded_content,
@@ -47,6 +45,15 @@ fn create_should_work() {
                 chain_id, txn_hash, memo_input,
             )));
         })
+}
+
+#[test]
+fn set_amount_free_tx() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Memo::set_amount_free_tx(Origin::root(), 100));
+
+        assert_eq!(Memo::amount_free_tx(), 100);
+    })
 }
 
 // #[test]
