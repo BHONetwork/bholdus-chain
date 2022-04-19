@@ -49,11 +49,11 @@ fn create_should_work() {
 
 #[test]
 fn set_amount_free_tx() {
-	ExtBuilder::default().build().execute_with(|| {
-		assert_ok!(Memo::set_amount_free_tx(Origin::root(), 100));
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Memo::set_amount_free_tx(Origin::root(), 100));
 
-		assert_eq!(Memo::amount_free_tx(), 100);
-	})
+        assert_eq!(Memo::amount_free_tx(), 100);
+    })
 }
 
 // #[test]

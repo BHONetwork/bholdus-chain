@@ -13,8 +13,8 @@ use frame_support::{
 };
 use frame_system::RawOrigin as SystemOrigin;
 use scale_info::prelude::string::String;
-use sp_std::vec;
 use sp_runtime::traits::StaticLookup;
+use sp_std::vec;
 
 const UNIT: u128 = 10_u128.pow(18);
 
@@ -61,9 +61,9 @@ benchmarks! {
 
     // }: _(SystemOrigin::Signed(caller.clone()), chain_id, txn_hash, new_content)
     set_amount_free_tx {
-		let amount_free_tx: u128 = 100;
+        let amount_free_tx: u128 = 100;
 
-	}: _(SystemOrigin::Root, amount_free_tx)
+    }: _(SystemOrigin::Root, amount_free_tx)
 }
 
 impl_benchmark_test_suite!(
