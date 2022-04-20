@@ -127,11 +127,12 @@ fn transfer_should_work() {
 		// let token_owner = TokensByOwner::<Runtime>::get((ALICE, CLASS_ID, TOKEN_ID));
 		// println!("tokens-owner {:#?}", token_owner);
 
-		println!(
+		/*println!(
 			"transferred: tokens {:?} && tokens_owner {:?}",
 			Tokens::<Runtime>::iter_values().collect::<Vec<_>>(),
 			TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>()
 		);
+		*/
 	});
 }
 
@@ -160,17 +161,18 @@ fn transfer_should_fail() {
 			BholdusNFT::transfer(&ALICE, &ALICE, (CLASS_ID, TOKEN_ID)),
 			Error::<Runtime>::NoPermission
 		);
+
+		LockableNFT::<Runtime>::insert((&BOB, CLASS_ID, TOKEN_ID), ());
+		assert_noop!(
+			BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+			Error::<Runtime>::IsLocked
+		);
 	});
 }
 
 #[test]
 fn burn_should_work() {
 	ExtBuilder::default().build().execute_with(|| {
-		// println!(
-		//     "burn: owned_tokens {:?}",
-		//     OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>()
-		// );
-
 		assert_ok!(BholdusNFT::create_class(&ALICE, ()));
 		assert_ok!(BholdusNFT::create_class(&ALICE, ()));
 
@@ -183,67 +185,9 @@ fn burn_should_work() {
 		// token_id = 1
 		assert_ok!(BholdusNFT::mint(&ALICE, 1, vec![2], ()));
 
-		println!(
-			"burn_should_work: tokens list: 1 {:?}",
-			Tokens::<Runtime>::iter_values().collect::<Vec<_>>()
-		);
-
-		println!(
-			"burn: BOB owned tokens {:?}",
-			TokensByOwner::<Runtime>::iter_prefix((BOB,)).collect::<Vec<_>>()
-		);
-
-		// println!(
-		//     "burn: ALICE owned tokens {:?}",
-		//     TokensByOwner::<Runtime>::iter_prefix((ALICE,)).collect::<Vec<_>>()
-		// );
-
 		assert_ok!(BholdusNFT::burn(&BOB, (CLASS_ID, TOKEN_ID)));
 
 		assert_eq!(BholdusNFT::is_owner(&BOB, (CLASS_ID, TOKEN_ID)), false);
-
-		// println!(
-		//     "burned: BOB owned tokens {:?}",
-		//     TokensByOwner::<Runtime>::iter_prefix((BOB,)).collect::<Vec<_>>()
-		// );
-
-		// println!(
-		//     "burned: BOB owned token {:?}",
-		//     TokensByOwner::<Runtime>::take((BOB, CLASS_ID, TOKEN_ID)),
-		// );
-
-		// println!(
-		//     "burned: owned_tokens {:?}",
-		//     OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>()
-		// );
-
-		// println!(
-		//     "burn: token-owners:4 {:?}",
-		//     TokensByOwner::<Runtime>::get((BOB, CLASS_ID, TOKEN_ID))
-		// );
-
-		// println!(
-		//     "burn: token-owners:5 include ALICE {:?}",
-		//     TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>()
-		// );
-
-		// let class_info = Classes::<Runtime>::get(CLASS_ID);
-		// println!("burn: class_info {:#?}", class_info);
-
-		// let classes = Classes::<Runtime>::iter_values().collect::<Vec<_>>();
-
-		//  println!("burn: fetch history classes {:#?}", classes);
-
-		// let token_owner = TokensByOwner::<Runtime>::get((BOB, CLASS_ID, TOKEN_ID));
-		// println!("burn: tokens-owner {:#?}", token_owner);
-
-		// let updated_tokens_owners = TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>();
-		// println!("burn: updated-tokens-owners {:?}", updated_tokens_owners);
-
-		// println!(
-		//     "burned: tokens_by_owner {:?}",
-		//     TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>()
-		// );
 	});
 }
 
@@ -256,6 +200,9 @@ fn burn_should_fail() {
 			BholdusNFT::burn(&ALICE, (CLASS_ID, TOKEN_ID)),
 			Error::<Runtime>::NoPermission
 		);
+
+		LockableNFT::<Runtime>::insert((&BOB, CLASS_ID, TOKEN_ID), ());
+		assert_noop!(BholdusNFT::burn(&BOB, (CLASS_ID, TOKEN_ID)), Error::<Runtime>::IsLocked);
 	});
 
 	ExtBuilder::default().build().execute_with(|| {
@@ -300,21 +247,11 @@ fn destroy_class_should_fail() {
 		assert_ok!(BholdusNFT::destroy_class(&ALICE, CLASS_ID));
 		assert_eq!(Classes::<Runtime>::contains_key(CLASS_ID), false);
 
-		let class_info = Classes::<Runtime>::get(CLASS_ID);
-		println!("destroy_class: class_info {:#?}", class_info);
-
-		let classes = Classes::<Runtime>::iter_values().collect::<Vec<_>>();
-
-		println!("destroy_class: fetch history classes {:#?}", classes);
-
-		let token_owner = TokensByOwner::<Runtime>::get((BOB, CLASS_ID, TOKEN_ID));
-		println!("destory-class: tokens-owner {:#?}", token_owner);
-
-		let tokens = TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>();
-		println!("destroy-class: tokens {:?}", tokens);
-
-		let tokens = Tokens::<Runtime>::iter_values().collect::<Vec<_>>();
-		println!("destroy-class: fetch history tokens {:?}", tokens);
+		Classes::<Runtime>::get(CLASS_ID);
+		Classes::<Runtime>::iter_values().collect::<Vec<_>>();
+		TokensByOwner::<Runtime>::get((BOB, CLASS_ID, TOKEN_ID));
+		TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>();
+		Tokens::<Runtime>::iter_values().collect::<Vec<_>>();
 	});
 }
 
@@ -328,3 +265,35 @@ fn destroy_class_should_fail() {
 //         assert_ok!(BholdusNFT::create_class(&ALICE, vec![1]));
 //     });
 // }
+
+#[test]
+fn set_lock_should_work() {
+	ExtBuilder::default().build().execute_with(|| {
+		assert_ok!(BholdusNFT::create_class(&ALICE, ()));
+		assert_ok!(BholdusNFT::mint(&BOB, CLASS_ID, vec![1], ()));
+		LockableNFT::<Runtime>::insert((&BOB, CLASS_ID, TOKEN_ID), ());
+		BholdusNFT::set_lock((&BOB, CLASS_ID, TOKEN_ID));
+		assert!(LockableNFT::<Runtime>::contains_key((&BOB, CLASS_ID, TOKEN_ID)));
+		assert!(BholdusNFT::is_lock(&BOB, (CLASS_ID, TOKEN_ID)));
+		assert_noop!(
+			BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+			Error::<Runtime>::IsLocked
+		);
+	})
+}
+
+#[test]
+fn unlock_should_work() {
+	ExtBuilder::default().build().execute_with(|| {
+		assert_ok!(BholdusNFT::create_class(&ALICE, ()));
+		assert_ok!(BholdusNFT::mint(&BOB, CLASS_ID, vec![1], ()));
+		LockableNFT::<Runtime>::insert((&BOB, CLASS_ID, TOKEN_ID), ());
+		assert_noop!(
+			BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)),
+			Error::<Runtime>::IsLocked
+		);
+		BholdusNFT::unlock(&BOB, (CLASS_ID, TOKEN_ID));
+		assert_ok!(BholdusNFT::transfer(&BOB, &ALICE, (CLASS_ID, TOKEN_ID)));
+		assert!(!LockableNFT::<Runtime>::contains_key((&BOB, CLASS_ID, TOKEN_ID)));
+	})
+}

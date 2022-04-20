@@ -802,6 +802,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "bholdus-nft-marketplace"
+version = "1.0.15"
+dependencies = [
+ "bholdus-support",
+ "bholdus-tokens",
+ "common-primitives",
+ "enumflags2",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "pallet-utility",
+ "parity-scale-codec 3.1.2",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "support-nft",
+ "support-nft-marketplace",
+]
+
+[[package]]
 name = "bholdus-service"
 version = "1.0.15"
 dependencies = [
@@ -6248,6 +6272,7 @@ dependencies = [
  "bholdus-evm-tracer",
  "bholdus-memo",
  "bholdus-nft",
+ "bholdus-nft-marketplace",
  "bholdus-support",
  "bholdus-tokens",
  "common-primitives",
@@ -6334,6 +6359,7 @@ dependencies = [
  "sp-version",
  "substrate-wasm-builder",
  "support-nft",
+ "support-nft-marketplace",
 ]
 
 [[package]]
@@ -9428,6 +9454,26 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "support-nft-marketplace"
+version = "1.0.15"
+dependencies = [
+ "bholdus-support",
+ "bholdus-tokens",
+ "common-primitives",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec 3.1.2",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "support-nft",
 ]
 
 [[package]]

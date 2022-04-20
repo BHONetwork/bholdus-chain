@@ -2,12 +2,34 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use codec::{Decode, Encode, MaxEncodedLen};
+use scale_info::TypeInfo;
 pub use sp_runtime::OpaqueExtrinsic;
 use sp_runtime::{
 	generic,
 	traits::{BlakeTwo256, IdentifyAccount, Verify},
-	FixedU128, MultiSignature,
+	FixedU128, MultiSignature, RuntimeDebug,
 };
+
+#[derive(
+	Encode,
+	Decode,
+	Eq,
+	PartialEq,
+	Copy,
+	Clone,
+	RuntimeDebug,
+	PartialOrd,
+	Ord,
+	MaxEncodedLen,
+	TypeInfo,
+)]
+#[repr(u8)]
+pub enum ReserveIdentifier {
+	Nft,
+	// always the last, indicate number of variants
+	Count,
+}
 
 /// An index to a block.
 /// 32-bits will allow for 136 years of blocks assuming 1 block per second.

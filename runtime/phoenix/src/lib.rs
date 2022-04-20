@@ -170,7 +170,9 @@ construct_runtime!(
 		// DeFi
 		Tokens: bholdus_tokens,
 		NFT: bholdus_nft,
+		NFTMarketplace: bholdus_nft_marketplace,
 		BholdusSupportNFT: bholdus_support_nft,
+		SupportNFTMarketplace: bholdus_support_nft_marketplace,
 
 		// Others
 		Memo: bholdus_memo,

@@ -116,7 +116,9 @@ runtime-common = { path = "../common", default-features = false }
 bholdus-tokens = { path = "../../pallets/tokens", default-features = false }
 bholdus-memo = { path = "../../pallets/memo", default-features = false }
 bholdus-nft = { path = "../../pallets/non-fungible-token", default-features = false }
+bholdus-nft-marketplace = { path = "../../pallets/nft-marketplace", default-features = false }
 bholdus-support-nft = { package = "support-nft", path = "../../pallets/support/nft", default-features = false }
+bholdus-support-nft-marketplace = { package = "support-nft-marketplace", path = "../../pallets/support/nft-marketplace", default-features = false }
 bholdus-support = { path = "../../pallets/support", default-features = false }
 bholdus-currencies = { path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { path = "../../pallets/bridge/native-transfer", default-features = false }
@@ -194,7 +196,9 @@ std = [
 	"bholdus-tokens/std",
 	"bholdus-memo/std",
 	"bholdus-nft/std",
+	"bholdus-nft-marketplace/std",
 	"bholdus-support-nft/std",
+	"bholdus-support-nft-marketplace/std",
 	"bholdus-support/std",
 	"bholdus-currencies/std",
 	"bholdus-bridge-native-transfer/std",
