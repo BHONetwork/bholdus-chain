@@ -1,7 +1,7 @@
 use common_primitives::Balance;
 use frame_support::weights::{
-    constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
-    WeightToFeePolynomial,
+	constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
+	WeightToFeePolynomial,
 };
 use smallvec::smallvec;
 use sp_runtime::Perbill;
@@ -17,16 +17,16 @@ use sp_runtime::Perbill;
 ///   - Setting it to `1` will cause the literal `#[weight = x]` values to be charged.
 pub struct WeightToFee;
 impl WeightToFeePolynomial for WeightToFee {
-    type Balance = Balance;
-    fn polynomial() -> WeightToFeeCoefficients<Self::Balance> {
-        // in Polkadot, extrinsic base weight (smallest non-zero weight) is mapped to 1/10 CENT:
-        let p = super::constants::currency::UNITS / 1000;
-        let q = Balance::from(ExtrinsicBaseWeight::get());
-        smallvec![WeightToFeeCoefficient {
-            degree: 1,
-            negative: false,
-            coeff_frac: Perbill::from_rational(p % q, q),
-            coeff_integer: p / q,
-        }]
-    }
+	type Balance = Balance;
+	fn polynomial() -> WeightToFeeCoefficients<Self::Balance> {
+		// in Polkadot, extrinsic base weight (smallest non-zero weight) is mapped to 1/10 CENT:
+		let p = super::constants::currency::UNITS / 1000;
+		let q = Balance::from(ExtrinsicBaseWeight::get());
+		smallvec![WeightToFeeCoefficient {
+			degree: 1,
+			negative: false,
+			coeff_frac: Perbill::from_rational(p % q, q),
+			coeff_integer: p / q,
+		}]
+	}
 }
