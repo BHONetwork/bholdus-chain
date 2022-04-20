@@ -70,8 +70,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 						get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
 						10_000_000_000 * BHO,
 					),
-					(get_account_id_from_seed::<sr25519::Public>("Alice"), 10_000_000 * BHO),
-					(get_account_id_from_seed::<sr25519::Public>("Alice"), 10_000_000_000 * BHO),
 				],
 				10_000 * BHO,
 				true,
