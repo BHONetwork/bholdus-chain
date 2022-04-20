@@ -2,5 +2,5 @@
 #![warn(missing_docs)]
 
 fn main() -> bholdus_cli::Result<()> {
-    bholdus_cli::run()
+	bholdus_cli::run()
 }

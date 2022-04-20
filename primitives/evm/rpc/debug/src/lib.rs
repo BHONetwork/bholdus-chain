@@ -22,30 +22,30 @@ use ethereum_types::H256;
 use sp_std::vec::Vec;
 
 sp_api::decl_runtime_apis! {
-    pub trait DebugRuntimeApi {
-        fn trace_transaction(
-            extrinsics: Vec<Block::Extrinsic>,
-            transaction: &Transaction,
-        ) -> Result<(), sp_runtime::DispatchError>;
+	pub trait DebugRuntimeApi {
+		fn trace_transaction(
+			extrinsics: Vec<Block::Extrinsic>,
+			transaction: &Transaction,
+		) -> Result<(), sp_runtime::DispatchError>;
 
-        fn trace_block(
-            extrinsics: Vec<Block::Extrinsic>,
-            known_transactions: Vec<H256>,
-        ) -> Result<(), sp_runtime::DispatchError>;
-    }
+		fn trace_block(
+			extrinsics: Vec<Block::Extrinsic>,
+			known_transactions: Vec<H256>,
+		) -> Result<(), sp_runtime::DispatchError>;
+	}
 }
 
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Encode, Decode)]
 pub enum TracerInput {
-    None,
-    Blockscout,
-    CallTracer,
+	None,
+	Blockscout,
+	CallTracer,
 }
 
 /// DebugRuntimeApi V2 result. Trace response is stored in client and runtime api call response is
 /// empty.
 #[derive(Debug)]
 pub enum Response {
-    Single,
-    Block,
+	Single,
+	Block,
 }

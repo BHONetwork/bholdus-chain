@@ -1,6 +1,6 @@
 use crate as dex;
 use bholdus_currencies::{BasicCurrencyAdapter, NativeCurrencyOf};
-use bholdus_primitives::{CurrencyId, TokenInfo, TokenSymbol, TradingPair};
+use common_primitives::{CurrencyId, TokenInfo, TokenSymbol, TradingPair};
 use bholdus_support::parameter_type_with_key;
 use dex::*;
 use frame_support::{parameter_types, PalletId};

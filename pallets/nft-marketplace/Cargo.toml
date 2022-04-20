@@ -1,0 +1,66 @@
+[package]
+authors = ["Bholdus Technologies"]
+description = "FRAME NFT marketplace pallet"
+edition = '2018'
+homepage = 'https://substrate.dev'
+license = 'Unlicense'
+name = "bholdus-nft-marketplace"
+readme = 'README.md'
+repository = 'https://github.com/bholdus/bholdus-chain.git'
+version = "1.0.15"
+
+[dependencies]
+codec = { default-features = false, features = [
+	"derive",
+	"max-encoded-len",
+], package = "parity-scale-codec", version = "3.0.0" }
+scale-info = { default-features = false, features = [
+	'derive',
+], version = '2.0.1' }
+enumflags2 = "0.6.3"
+serde = { version = "1.0.124", optional = true}
+
+frame-benchmarking = { default-features = false, optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+pallet-balances = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+
+## Bholdus deps
+common-primitives = { default-features = false, path = "../../primitives/common" }
+bholdus-support = { default-features = false, path = "../../pallets/support" }
+bholdus-tokens = { default-features = false, path = "../../pallets/tokens" }
+bholdus-support-nft = { package = "support-nft", default-features = false, path = "../../pallets/support/nft" }
+bholdus-support-nft-marketplace = { package = "support-nft-marketplace", default-features = false, path = "../../pallets/support/nft-marketplace" }
+
+[dev-dependencies]
+sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+pallet-utility = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"codec/std",
+	'scale-info/std',
+	"enumflags2/serde",
+	"sp-std/std",
+	"sp-runtime/std",
+	"frame-support/std",
+	"frame-system/std",
+	"pallet-balances/std",
+	"common-primitives/std",
+	"bholdus-support/std",
+	"bholdus-tokens/std",
+	"bholdus-support-nft/std",
+	"bholdus-support-nft-marketplace/std",
+	"enumflags2/serde",
+]
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+]
+try-runtime = ["frame-support/try-runtime"]

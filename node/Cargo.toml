@@ -16,9 +16,8 @@ path = "src/main.rs"
 targets = ['x86_64-unknown-linux-gnu']
 
 [build-dependencies.substrate-build-script-utils]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '3.0.0'
+git = "https://github.com/BHONetwork/substrate.git"
+branch = "bho-polkadot-v0.9.18"
 
 [dependencies]
 futures = { version = "0.3.9", features = ["compat"] }
@@ -36,10 +35,6 @@ runtime-benchmarks = [
 with-ulas-runtime = [
     "bholdus-service/with-ulas-runtime",
     "bholdus-cli/with-ulas-runtime",
-]
-with-cygnus-runtime = [
-    "bholdus-service/with-cygnus-runtime",
-    "bholdus-cli/with-cygnus-runtime",
 ]
 with-phoenix-runtime = [
     "bholdus-service/with-phoenix-runtime",
