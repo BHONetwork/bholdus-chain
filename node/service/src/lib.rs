@@ -28,9 +28,11 @@ use beefy_gadget::notification::{
 pub use common_primitives::{
     AccountId, Balance, BlockNumber, Hash, Header, Nonce, OpaqueBlock as Block,
 };
+use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+use fc_rpc::EthTask;
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use futures::prelude::*;
-use sc_client_api::{BlockBackend, ExecutorProvider};
+use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
 use sc_finality_grandpa::{self as grandpa};
@@ -549,16 +551,53 @@ where
     let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 
     // Spawning Ethereum tasks
-    rpc::spawn_essential_tasks(rpc::SpawnTasksParams {
-        task_manager: &task_manager,
-        client: client.clone(),
-        substrate_backend: backend.clone(),
-        frontier_backend: frontier_backend.clone(),
-        filter_pool: filter_pool.clone(),
-        overrides: overrides.clone(),
-        fee_history_limit: rpc_config.fee_history_limit,
-        fee_history_cache: fee_history_cache.clone(),
-    });
+    // Frontier offchain DB task. Essential.
+    // Maps emulated ethereum data to substrate native data.
+    task_manager.spawn_essential_handle().spawn(
+        "frontier-mapping-sync-worker",
+        Some("frontier"),
+        MappingSyncWorker::new(
+            client.import_notification_stream(),
+            Duration::new(6, 0),
+            client.clone(),
+            backend.clone(),
+            frontier_backend.clone(),
+            3,
+            0,
+            SyncStrategy::Normal,
+        )
+        .for_each(|()| futures::future::ready(())),
+    );
+
+    // Frontier `EthFilterApi` maintenance.
+    // Manages the pool of user-created Filters.
+    if let Some(filter_pool) = filter_pool.clone() {
+        // Each filter is allowed to stay in the pool for 100 blocks.
+        const FILTER_RETAIN_THRESHOLD: u64 = 100;
+        task_manager.spawn_essential_handle().spawn(
+            "frontier-filter-pool",
+            Some("frontier"),
+            EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
+        );
+    }
+
+    task_manager.spawn_essential_handle().spawn(
+        "frontier-schema-cache-task",
+        Some("frontier"),
+        EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
+    );
+
+    // Spawn Frontier FeeHistory cache maintenance task.
+    task_manager.spawn_essential_handle().spawn(
+        "frontier-fee-history",
+        Some("frontier"),
+        EthTask::fee_history_task(
+            Arc::clone(&client),
+            Arc::clone(&overrides),
+            fee_history_cache.clone(),
+            rpc_config.fee_history_limit,
+        ),
+    );
 
     let ethapi_cmd = rpc_config.ethapi.clone();
     let tracing_requesters =
