@@ -8,14 +8,14 @@ repository = "https://github.com/Bholdus/bholdus-chain/"
 version = "1.0.15"
 
 [dependencies]
-ethereum = { version = "0.10.0", features = ["with-codec"] }
-ethereum-types = "0.12.0"
+ethereum = { version = "0.12.0", features = ["with-codec"] }
+ethereum-types = "0.13.1"
 futures = { version = "0.3" }
 jsonrpc-core = "18.0.0"
 serde = { version = "1.0", features = ["derive"] }
 sha3 = "0.9"
 tokio = { version = "1.10", features = ["sync", "time"] }
-tracing = "0.1.25"
+tracing = "0.1.32"
 
 # Bholdus
 bholdus-client-evm-tracing = { path = "../../evm-tracing" }
@@ -24,21 +24,19 @@ bholdus-evm-rpc-core-types = { path = "../../rpc-core/types" }
 bholdus-evm-rpc-primitives-debug = { path = "../../../../primitives/evm/rpc/debug" }
 
 # Substrate
-sc-client-api = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sc-network = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sc-utils = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-api = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-block-builder = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-blockchain = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-io = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-runtime = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-std = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
-sp-transaction-pool = { git = "https://github.com/bholdus/substrate", branch = "bholdus-monthly-2021-11" }
+sc-client-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sc-network = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sc-utils = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-block-builder = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-blockchain = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-transaction-pool = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
 
 # Frontier
-fc-consensus = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
-fc-rpc = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11", features = [
-    "rpc_binary_search_estimate",
-] }
-fc-rpc-core = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
-fp-rpc = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11" }
+fc-consensus = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", features = ["rpc_binary_search_estimate"] }
+fc-rpc-core = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fp-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }

@@ -10,27 +10,23 @@ version = "1.0.15"
 [dependencies]
 
 # Bholdus
-evm-tracing-events = { path = "../../primitives/evm/rpc/evm-tracing-events", default-features = false, features = [
-	"evm-tracing",
-] }
+evm-tracing-events = { path = "../../primitives/evm/rpc/evm-tracing-events", default-features = false, features = ["evm-tracing"] }
 bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext", default-features = false }
 
 # Substrate
-codec = { package = "parity-scale-codec", version = "2.2", default-features = false }
-sp-core = { git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11", default-features = false }
-sp-io = { git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11", default-features = false }
-sp-runtime = { git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11", default-features = false }
-sp-std = { git = "https://github.com/bholdus/substrate.git", branch = "bholdus-monthly-2021-11", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
+sp-core = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18", default-features = false }
+sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18", default-features = false }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18", default-features = false }
+sp-std = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18", default-features = false }
 
 # Frontier
-ethereum-types = { version = "0.12.0", default-features = false }
-evm = { version = "0.33.0", default-features = false, features = [
-	"with-codec",
-] }
-evm-gasometer = { version = "0.33.0", default-features = false }
-evm-runtime = { version = "0.33.0", default-features = false }
-fp-evm = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11", default-features = false }
-pallet-evm = { git = "https://github.com/bholdus/frontier", branch = "bholdus-monthly-2021-11", default-features = false }
+ethereum-types = { version = "0.13.1", default-features = false }
+evm = { version = "0.35.0", default-features = false, features = ["with-codec"] }
+evm-gasometer = { version = "0.35.0", default-features = false }
+evm-runtime = { version = "0.35.0", default-features = false }
+fp-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
+pallet-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
 
 [features]
 default = ["std"]

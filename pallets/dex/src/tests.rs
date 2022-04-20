@@ -1,5 +1,5 @@
 use crate::{mock::*, Error, ProvisioningParameters, TradingPairStatus};
-use bholdus_primitives::{ExchangeRate, TradingPair};
+use common_primitives::{ExchangeRate, TradingPair};
 use bholdus_support::MultiCurrency;
 use frame_support::{assert_noop, assert_ok, dispatch::DispatchError};
 use sp_runtime::{
