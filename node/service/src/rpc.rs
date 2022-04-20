@@ -273,7 +273,6 @@ where
 			beefy.beefy_best_block_stream,
 			beefy.subscription_executor,
 		)?;
-
 	io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
 
 	io.extend_with(NetApiServer::to_delegate(NetApi::new(
