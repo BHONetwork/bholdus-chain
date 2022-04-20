@@ -18,7 +18,7 @@ use bholdus_support::{
     BasicReservableCurrency, LockIdentifier, MultiCurrency, MultiCurrencyExtended,
     MultiLockableCurrency, MultiReservableCurrency,
 };
-use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
+use frame_system::{ensure_signed, pallet_prelude::*};
 use sp_runtime::{
     traits::{CheckedSub, MaybeSerializeDeserialize, StaticLookup, Zero},
     DispatchError, DispatchResult,
@@ -746,7 +746,7 @@ where
 }
 
 impl<T: Config> TransferAll<T::AccountId> for Pallet<T> {
-    fn transfer_all(source: &T::AccountId, dest: &T::AccountId) -> DispatchResult {
+    fn transfer_all(_source: &T::AccountId, _dest: &T::AccountId) -> DispatchResult {
         // with_transaction_result(|| {
         //     // transfer non-native free to dest
         //     T::MultiCurrency::transfer_all(source, dest)?;

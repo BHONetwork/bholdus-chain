@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Bholdus.  If not, see <http://www.gnu.org/licenses/>.
 use crate::{AccountId, Balance, Block, BlockNumber, Hash, Header, Nonce};
-use sc_client_api::{Backend as BackendT, BlockchainEvents, KeyIterator, PrefixedStorageKey};
+use sc_client_api::{Backend as BackendT, BlockchainEvents, KeyIterator};
 use sp_api::{CallApiAt, NumberFor, ProvideRuntimeApi};
 use sp_blockchain::HeaderBackend;
 use sp_consensus::BlockStatus;

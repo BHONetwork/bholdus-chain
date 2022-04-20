@@ -1,14 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-use common_primitives::{Balance, TokenId};
-use codec::{Decode, Encode, MaxEncodedLen};
-use frame_support::dispatch::Output;
+use codec::Encode;
+use common_primitives::TokenId;
 use frame_support::traits::{Get, Randomness};
 pub type CurrencyId = TokenId;
 
-use frame_support::{
-    log::{error, trace},
-    weights::{constants::RocksDbWeight, Weight},
-};
+use frame_support::log::{error, trace};
 use frame_system::RawOrigin;
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
@@ -45,7 +41,7 @@ where
                     .call_transfer_surcharge;
                 env.charge_weight(base_weight.saturating_add(extension_overhead))?;
 
-                let (from, to, value): (T::AccountId, T::AccountId, T::Balance) = env.read_as()?;
+                let (_from, to, value): (T::AccountId, T::AccountId, T::Balance) = env.read_as()?;
                 let recipient = T::Lookup::unlookup(to);
                 let address = env.ext().address().clone();
 

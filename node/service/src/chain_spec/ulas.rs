@@ -1,23 +1,19 @@
-use crate::chain_spec::{authority_keys_from_seed, get_account_id_from_seed, get_from_seed};
+use crate::chain_spec::{authority_keys_from_seed, get_account_id_from_seed};
 use beefy_primitives::crypto::AuthorityId as BeefyId;
-use common_primitives::{AccountId, Balance, Signature};
-use hex_literal::hex;
+use common_primitives::{AccountId, Balance};
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public, H160, U256};
+use sp_core::{sr25519, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::{
-    traits::{IdentifyAccount, Verify},
-    Perbill,
-};
+use sp_runtime::Perbill;
 use ulas_runtime::{
-    Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
-    BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig,
-    GenesisAccount, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
-    SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-    TokensConfig, BHO, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig, BholdusSupportNFTConfig,
+    CouncilConfig, EVMConfig, EthereumConfig, GenesisAccount, GenesisConfig, GrandpaConfig,
+    ImOnlineConfig, IndicesConfig, MaxNominations, SessionConfig, SessionKeys, StakerStatus,
+    StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO, TOKEN_DECIMALS, TOKEN_SYMBOL,
+    WASM_BINARY,
 };
 
 // The URL for the telemetry server.

@@ -19,7 +19,6 @@
 
 use super::*;
 use scale_info::prelude::string::String;
-use sp_std::if_std;
 
 // The main implementation block for the module.
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
@@ -41,7 +40,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         symbol: Vec<u8>,
         decimals: u8,
     ) -> DispatchResult {
-        let blacklist = AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
+        let _blacklist = AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
         ensure!(
             !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
             Error::<T, I>::AssetBlacklist
@@ -159,7 +158,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
         id: T::AssetId,
         who: &T::AccountId,
         amount: T::Balance,
-        keep_alive: bool,
+        _keep_alive: bool,
         action: Action,
     ) -> WithdrawConsequence<T::Balance> {
         use WithdrawConsequence::*;

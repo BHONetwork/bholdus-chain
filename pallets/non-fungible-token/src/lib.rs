@@ -11,30 +11,19 @@
 #![allow(clippy::unused_unit)]
 #![allow(clippy::unpper_case_acronyms)]
 
-use enumflags2::BitFlags;
-use frame_support::{
-    log,
-    pallet_prelude::*,
-    require_transactional,
-    traits::{
-        Currency,
-        ExistenceRequirement::{AllowDeath, KeepAlive},
-        NamedReservableCurrency,
-    },
-    transactional, PalletId,
-};
+use frame_support::{pallet_prelude::*, require_transactional, transactional, PalletId};
 
 use scale_info::TypeInfo;
 
 use frame_system::pallet_prelude::*;
 
-use common_primitives::NFTBalance;
 use bholdus_support::NFT;
+use common_primitives::NFTBalance;
 
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::{
-    traits::{AccountIdConversion, Hash, Saturating, StaticLookup, Zero},
+    traits::{Saturating, StaticLookup, Zero},
     DispatchResult, RuntimeDebug,
 };
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
@@ -239,9 +228,9 @@ impl<T: Config> Pallet<T> {
         to: &T::AccountId,
         token: (ClassIdOf<T>, TokenIdOf<T>),
     ) -> DispatchResult {
-        let class_info = bholdus_support_nft::Pallet::<T>::classes(token.0)
+        let _class_info = bholdus_support_nft::Pallet::<T>::classes(token.0)
             .ok_or(Error::<T>::ClassIdNotFound)?;
-        let token_info = bholdus_support_nft::Pallet::<T>::tokens(token.0, token.1)
+        let _token_info = bholdus_support_nft::Pallet::<T>::tokens(token.0, token.1)
             .ok_or(Error::<T>::TokenIdNotFound)?;
         bholdus_support_nft::Pallet::<T>::transfer(from, to, token)?;
 
@@ -263,7 +252,7 @@ impl<T: Config> Pallet<T> {
         quantity: u32,
     ) -> DispatchResult {
         ensure!(quantity >= 1, Error::<T>::InvalidQuantity);
-        let class_info = bholdus_support_nft::Pallet::<T>::classes(class_id)
+        let _class_info = bholdus_support_nft::Pallet::<T>::classes(class_id)
             .ok_or(Error::<T>::ClassIdNotFound)?;
         // ensure!(who == class_info.owner, Error::<T>::NoPermission);
         //
@@ -275,7 +264,7 @@ impl<T: Config> Pallet<T> {
         let data = TokenData { attributes };
 
         let group_id = bholdus_support_nft::Pallet::<T>::next_group_id();
-        bholdus_support_nft::Pallet::<T>::create_group();
+        bholdus_support_nft::Pallet::<T>::create_group()?;
 
         let token_id = bholdus_support_nft::Pallet::<T>::next_token_id();
 
@@ -296,7 +285,7 @@ impl<T: Config> Pallet<T> {
     }
 
     fn do_burn(who: T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
-        let class_info = bholdus_support_nft::Pallet::<T>::classes(token.0)
+        let _class_info = bholdus_support_nft::Pallet::<T>::classes(token.0)
             .ok_or(Error::<T>::ClassIdNotFound)?;
 
         let token_info = bholdus_support_nft::Pallet::<T>::tokens(token.0, token.1)

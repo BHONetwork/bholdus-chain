@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use common_primitives::Balance;
 use codec::{Decode, Encode};
+use common_primitives::Balance;
 use frame_support::{
     dispatch::DispatchResult,
     pallet_prelude::*,
@@ -11,7 +11,7 @@ use frame_support::{
 };
 use frame_system::pallet_prelude::*;
 use scale_info::TypeInfo;
-use sp_runtime::{traits::AccountIdConversion, ArithmeticError, FixedPointNumber, FixedU128};
+use sp_runtime::{traits::AccountIdConversion, ArithmeticError};
 use sp_std::prelude::*;
 
 pub use pallet::*;

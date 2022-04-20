@@ -6,7 +6,6 @@ use frame_support::{traits::Currency, transactional, BoundedVec};
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
-use sp_runtime::traits::StaticLookup;
 use sp_std::{convert::TryInto, vec::Vec};
 
 #[cfg(test)]

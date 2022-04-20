@@ -30,13 +30,8 @@ pub use frame_support::{
     },
     ConsensusEngineId, PalletId, RuntimeDebug, StorageValue,
 };
-use frame_system::{
-    limits::{BlockLength, BlockWeights},
-    EnsureRoot,
-};
-use pallet_ethereum::{
-    Call::transact, EthereumBlockHashMapping, Transaction as EthereumTransaction,
-};
+use frame_system::EnsureRoot;
+use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction};
 use pallet_evm::Runner;
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::AuthorityList as GrandpaAuthorityList;
@@ -44,21 +39,20 @@ use pallet_session::historical as pallet_session_historical;
 pub use pallet_staking::StakerStatus;
 use pallet_transaction_payment::CurrencyAdapter;
 use sp_api::impl_runtime_apis;
-use sp_core::crypto::Public;
 use sp_core::{
     crypto::{ByteArray, KeyTypeId},
     OpaqueMetadata, H160, H256, U256,
 };
 use sp_runtime::traits::{
-    self, AccountIdConversion, BlakeTwo256, Block as BlockT, Dispatchable, Keccak256, NumberFor,
-    OpaqueKeys, PostDispatchInfoOf, SaturatedConversion, StaticLookup, Zero,
+    self, BlakeTwo256, Block as BlockT, Dispatchable, Keccak256, NumberFor, PostDispatchInfoOf,
+    Zero,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     transaction_validity::{
         TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError,
     },
-    ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill, Perquintill,
+    ApplyExtrinsicResult, Perbill, Permill,
 };
 use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 

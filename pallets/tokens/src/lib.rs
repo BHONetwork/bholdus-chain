@@ -95,14 +95,13 @@ pub use types::*;
 
 use sp_runtime::{
     traits::{
-        AccountIdConversion, AppendZerosInput, AtLeast32BitUnsigned, Bounded, CheckedAdd,
-        CheckedSub, MaybeSerializeDeserialize, Member, One, Saturating, StaticLookup, Zero,
+        AppendZerosInput, AtLeast32BitUnsigned, Bounded, CheckedAdd, CheckedSub,
+        MaybeSerializeDeserialize, Member, One, Saturating, StaticLookup, Zero,
     },
-    ArithmeticError, DispatchError, DispatchResult, RuntimeDebug, TokenError,
+    ArithmeticError, DispatchError, DispatchResult, TokenError,
 };
 use sp_std::{
     borrow::Borrow,
-    collections::btree_map::BTreeMap,
     collections::btree_set::BTreeSet,
     convert::{Infallible, TryFrom, TryInto},
     marker,
@@ -111,22 +110,18 @@ use sp_std::{
 };
 
 // Identity
-use enumflags2::BitFlags;
-use sp_std::{fmt::Debug, if_std, iter::once, ops::Add};
+use sp_std::{fmt::Debug, iter::once, ops::Add};
 
-use codec::{Decode, Encode, HasCompact};
 use frame_support::{
-    ensure, log,
+    ensure,
     pallet_prelude::*,
     traits::{
         tokens::{fungibles, DepositConsequence, WithdrawConsequence},
-        BalanceStatus as Status,
-        BalanceStatus::Reserved,
-        Currency as PalletCurrency, ExistenceRequirement, Get, Imbalance,
+        BalanceStatus as Status, Currency as PalletCurrency, ExistenceRequirement, Get, Imbalance,
         LockableCurrency as PalletLockableCurrency, ReservableCurrency as PalletReservableCurrency,
         SignedImbalance, StoredMap, WithdrawReasons,
     },
-    transactional, BoundedVec, PalletId,
+    transactional, BoundedVec,
 };
 
 // use frame_support::{
@@ -139,7 +134,7 @@ use bholdus_support::{
     arithmetic::{self, Signed},
     currency::TransferAll,
     BalanceStatus, GetByKey, LockIdentifier, MultiCurrency, MultiCurrencyExtended,
-    MultiLockableCurrency, MultiReservableCurrency, OnDust,
+    MultiLockableCurrency, MultiReservableCurrency,
 };
 
 pub use pallet::*;
@@ -579,7 +574,7 @@ pub mod pallet {
                 Error::<T, I>::InvalidDecimals
             );
 
-            let blacklist =
+            let _blacklist =
                 AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone()));
             ensure!(
                 !AssetsBlacklist::<T, I>::get().contains(&(name.clone(), symbol.clone())),
@@ -1216,7 +1211,7 @@ pub mod pallet {
 
 impl<T: Config<I>, I: 'static> Pallet<T, I> {
     pub(crate) fn set_genesis(who: &T::AccountId, amount: T::Balance) {
-        Self::do_set_genesis(who, amount);
+        Self::do_set_genesis(who, amount).unwrap();
     }
 
     pub(crate) fn try_mutate_account<R, E>(
@@ -1251,7 +1246,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
                 )
             })
         })
-        .map(|(maybe_endowed, existed, exists, maybe_dust, result)| {
+        .map(|(maybe_endowed, existed, exists, _maybe_dust, result)| {
             if existed && !exists {
                 // If existed before, decrease account provider.
                 // Ignore the result, because if it failed means that these’s remain consumers,
@@ -1318,7 +1313,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
                     account.sufficient = Self::new_account(&who, details)?;
                 }
                 Ok(())
-            });
+            })?;
             Ok(())
         })?;
         Ok(())
@@ -1370,7 +1365,7 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
         if amount.is_zero() {
             return Ok(());
         }
-        let new_balance = Self::free_balance(currency_id, who)
+        let _new_balance = Self::free_balance(currency_id, who)
             .checked_sub(&amount)
             .ok_or(Error::<T, I>::BalanceLow)?;
         // ensure!(
@@ -1451,7 +1446,7 @@ impl<T: Config<I>, I: 'static> MultiCurrency<T::AccountId> for Pallet<T, I> {
                 .checked_sub(&amount)
                 .expect("cannot withdraw");
             Ok(())
-        });
+        })?;
 
         Self::set_free_balance(
             currency_id,
@@ -1556,9 +1551,9 @@ impl<T: Config<I>, I: 'static> MultiLockableCurrency<T::AccountId> for Pallet<T,
     // Set a lock on the balance of `who` under `currency_id`.
     // Is a no-op if lock amount is zero.
     fn set_lock(
-        lock_id: LockIdentifier,
-        currency_id: Self::CurrencyId,
-        who: &T::AccountId,
+        _lock_id: LockIdentifier,
+        _currency_id: Self::CurrencyId,
+        _who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
         if amount.is_zero() {
@@ -1588,9 +1583,9 @@ impl<T: Config<I>, I: 'static> MultiLockableCurrency<T::AccountId> for Pallet<T,
     // Extend a lock on the balance of `who` under `currency_id`.
     // Is a no-op if lock amount is zero
     fn extend_lock(
-        lock_id: LockIdentifier,
-        currency_id: Self::CurrencyId,
-        who: &T::AccountId,
+        _lock_id: LockIdentifier,
+        _currency_id: Self::CurrencyId,
+        _who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
         if amount.is_zero() {
@@ -1621,9 +1616,9 @@ impl<T: Config<I>, I: 'static> MultiLockableCurrency<T::AccountId> for Pallet<T,
     }
 
     fn remove_lock(
-        lock_id: LockIdentifier,
-        currency_id: Self::CurrencyId,
-        who: &T::AccountId,
+        _lock_id: LockIdentifier,
+        _currency_id: Self::CurrencyId,
+        _who: &T::AccountId,
     ) -> DispatchResult {
         // let mut locks = Self::locks(who, currency_id);
         // locks.retain(|lock| lock.id != lock_id);
@@ -2038,7 +2033,7 @@ where
 
 impl<T: Config> TransferAll<T::AccountId> for Pallet<T> {
     #[transactional]
-    fn transfer_all(source: &T::AccountId, dest: &T::AccountId) -> DispatchResult {
+    fn transfer_all(_source: &T::AccountId, _dest: &T::AccountId) -> DispatchResult {
         // Account::<T>::iter_prefix(source).try_for_each(
         //     |(currency_id, account_data)| -> DispatchResult {
         //         <Self as MultiCurrency<T::AccountId>>::transfer(

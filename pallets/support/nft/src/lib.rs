@@ -373,7 +373,7 @@ impl<T: Config> Pallet<T> {
                     TokensByOwner::<T>::insert((owner, class_id, token_id), ());
                     TokensByGroup::<T>::insert((group_id, class_id, token_id), ());
                     Ok(token_id)
-                });
+                })?;
                 Ok(*class_token_id)
             },
         )

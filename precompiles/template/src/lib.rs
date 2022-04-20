@@ -19,14 +19,14 @@
 
 use frame_support::dispatch::{Dispatchable, GetDispatchInfo, PostDispatchInfo};
 use frame_support::traits::OriginTrait;
-use pallet_evm::{AddressMapping, ExitError, ExitSucceed, PrecompileSet};
+use pallet_evm::{AddressMapping, ExitSucceed, PrecompileSet};
 use precompile_utils::{
     keccak256, EvmDataReader, EvmDataWriter, EvmResult, Gasometer, LogsBuilder, RuntimeHelper,
 };
 
 use fp_evm::{Context, PrecompileOutput};
 
-use sp_core::{H160, U256};
+use sp_core::H160;
 use sp_std::{fmt::Debug, marker::PhantomData};
 
 #[cfg(test)]
@@ -61,7 +61,7 @@ where
 {
     fn execute(
         &self,
-        address: H160,
+        _address: H160,
         input: &[u8], //Reminder this is big-endian
         target_gas: Option<u64>,
         context: &Context,
@@ -87,7 +87,7 @@ where
         return Some(result);
     }
 
-    fn is_precompile(&self, address: H160) -> bool {
+    fn is_precompile(&self, _address: H160) -> bool {
         false
     }
 }
@@ -110,7 +110,7 @@ where
     fn do_something(
         input: &mut EvmDataReader,
         gasometer: &mut Gasometer,
-        target_gas: Option<u64>,
+        _target_gas: Option<u64>,
         context: &Context,
     ) -> EvmResult<PrecompileOutput> {
         gasometer.record_log_costs_manual(1, 32)?;
@@ -145,7 +145,7 @@ where
     fn get_value(
         input: &mut EvmDataReader,
         gasometer: &mut Gasometer,
-        target_gas: Option<u64>,
+        _target_gas: Option<u64>,
         _context: &Context,
     ) -> EvmResult<PrecompileOutput> {
         // Bound check

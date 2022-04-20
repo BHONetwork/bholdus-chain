@@ -1,5 +1,3 @@
-use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
-
 /// An overarching CLI command definition.
 #[derive(Debug, clap::Parser)]
 pub struct Cli {

@@ -1,15 +1,6 @@
 //! Low-level types used throughout the Substrate code.
 
-#![warn(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
-
-use codec::{Decode, Encode};
-use scale_info::TypeInfo;
-use sp_runtime::RuntimeDebug;
-use sp_std::prelude::*;
-
-#[cfg(feature = "std")]
-use serde::{Deserialize, Serialize};
 
 pub use sp_runtime::OpaqueExtrinsic;
 use sp_runtime::{

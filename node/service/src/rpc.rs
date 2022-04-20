@@ -3,10 +3,10 @@
 //! used by Substrate nodes. This file extends those RPC definitions with
 //! capabilities that are specific to this project's runtime configuration.
 
-#![warn(missing_docs)]
+#![allow(missing_docs)]
 
 use crate::client::RuntimeApiCollection;
-use crate::{AccountId, Balance, Block, BlockNumber, Hash, Nonce, TransactionConverters};
+use crate::{Block, BlockNumber, Hash, TransactionConverters};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{
     EthBlockDataCache, EthTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
@@ -36,11 +36,9 @@ use sp_block_builder::BlockBuilder;
 use sp_blockchain::{
     Backend as BlockchainBackend, Error as BlockChainError, HeaderBackend, HeaderMetadata,
 };
-use sp_consensus::SelectChain;
 use sp_core::H256;
 use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
 use std::collections::BTreeMap;
-use std::error::Error;
 use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -50,6 +48,7 @@ pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 /// RPC result.
 pub type RpcResult = Result<RpcExtension, Box<dyn std::error::Error + Send + Sync>>;
 
+/// Ethereum Tracing
 pub mod tracing;
 
 /// Extra dependencies for GRANDPA
@@ -117,9 +116,12 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
     pub block_data_cache: Arc<EthBlockDataCache<Block>>,
 }
 
+/// Ethereum Api Command
 #[derive(Debug, PartialEq, Clone)]
 pub enum EthApiCmd {
+    /// Enable Ethereum Debug module
     Debug,
+    /// Enable Ethereum Tracing module
     Trace,
 }
 
@@ -237,6 +239,7 @@ where
     );
 }
 
+/// Ethereum Storage Schema overrides
 pub fn overrides_handle<C, BE>(client: Arc<C>) -> Arc<OverrideHandle<Block>>
 where
     BE: Backend<Block> + 'static,
@@ -281,9 +284,8 @@ where
     A: ChainApi<Block = Block> + 'static,
 {
     use fc_rpc::{
-        EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi,
-        EthPubSubApiServer, EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api,
-        Web3ApiServer,
+        EthApi, EthApiServer, EthFilterApi, EthFilterApiServer, EthPubSubApi, EthPubSubApiServer,
+        HexEncodedIdProvider, NetApi, NetApiServer, Web3Api, Web3ApiServer,
     };
     use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_mmr_rpc::{Mmr, MmrApi};
@@ -295,8 +297,6 @@ where
         client,
         pool,
         graph,
-        select_chain,
-        chain_spec,
         deny_unsafe,
         grandpa,
         beefy,

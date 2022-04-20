@@ -28,18 +28,16 @@ use beefy_gadget::notification::{
 pub use common_primitives::{
     AccountId, Balance, BlockNumber, Hash, Header, Nonce, OpaqueBlock as Block,
 };
-use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
-use fc_rpc::EthTask;
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use futures::prelude::*;
-use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider};
+use sc_client_api::{BlockBackend, ExecutorProvider};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
 use sc_finality_grandpa::{self as grandpa};
 use sc_keystore::LocalKeystore;
 use sc_network::{Event, NetworkService};
 use sc_service::{
-    error::Error as ServiceError, BasePath, ChainSpec, Configuration, PartialComponents, Role,
+    error::Error as ServiceError, BasePath, ChainSpec, Configuration, PartialComponents,
     TFullBackend, TFullClient, TaskManager,
 };
 use sc_telemetry::{Telemetry, TelemetryWorker};
