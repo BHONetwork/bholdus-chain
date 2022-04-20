@@ -25,7 +25,9 @@ use beefy_gadget::notification::{
     BeefyBestBlockSender, BeefyBestBlockStream, BeefySignedCommitmentSender,
     BeefySignedCommitmentStream,
 };
-pub use bholdus_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Header, Index};
+pub use common_primitives::{
+    AccountId, Balance, BlockNumber, Hash, Header, Nonce, OpaqueBlock as Block,
+};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::EthTask;
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
@@ -254,11 +256,11 @@ impl TransactionConverters {
     }
 }
 
-impl fp_rpc::ConvertTransaction<bholdus_primitives::OpaqueExtrinsic> for TransactionConverters {
+impl fp_rpc::ConvertTransaction<common_primitives::OpaqueExtrinsic> for TransactionConverters {
     fn convert_transaction(
         &self,
         transaction: pallet_ethereum::Transaction,
-    ) -> bholdus_primitives::OpaqueExtrinsic {
+    ) -> common_primitives::OpaqueExtrinsic {
         match &self {
             #[cfg(feature = "with-ulas-runtime")]
             Self::Ulas(inner) => inner.convert_transaction(transaction),

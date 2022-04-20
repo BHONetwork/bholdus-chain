@@ -13,7 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with Bholdus.  If not, see <http://www.gnu.org/licenses/>.
-use crate::{AccountId, Balance, Block, BlockNumber, Hash, Header, Index};
+use crate::{AccountId, Balance, Block, BlockNumber, Hash, Header, Nonce};
 use sc_client_api::{Backend as BackendT, BlockchainEvents, KeyIterator, PrefixedStorageKey};
 use sp_api::{CallApiAt, NumberFor, ProvideRuntimeApi};
 use sp_blockchain::HeaderBackend;
@@ -42,7 +42,7 @@ pub trait RuntimeApiCollection:
     + sp_offchain::OffchainWorkerApi<Block>
     + sp_session::SessionKeys<Block>
     + sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
-    + frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index>
+    + frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
     + pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
     + pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
     + pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
@@ -66,7 +66,7 @@ where
         + sp_offchain::OffchainWorkerApi<Block>
         + sp_session::SessionKeys<Block>
         + sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
-        + frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index>
+        + frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
         + pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
         + pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
         + pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>

@@ -28,7 +28,7 @@ use scale_info::TypeInfo;
 
 use frame_system::pallet_prelude::*;
 
-use bholdus_primitives::NFTBalance;
+use common_primitives::NFTBalance;
 use bholdus_support::NFT;
 
 #[cfg(feature = "std")]

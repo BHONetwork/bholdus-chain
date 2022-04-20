@@ -1,5 +1,5 @@
 use crate::{mock::*, Bytes, ChainId, OutboundTransferInfo, TransferId};
-use bholdus_primitives::Balance;
+use common_primitives::Balance;
 use frame_support::{assert_noop, assert_ok, error::BadOrigin};
 use sp_runtime::{traits::CheckedAdd, FixedPointNumber, FixedU128};
 

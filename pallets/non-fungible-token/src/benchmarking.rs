@@ -10,7 +10,7 @@ use frame_system::RawOrigin;
 use sp_runtime::traits::{AccountIdConversion, StaticLookup, UniqueSaturatedInto};
 
 pub use crate::*;
-use bholdus_primitives::Balance;
+use common_primitives::Balance;
 
 pub struct Module<T: Config>(crate::Pallet<T>);
 

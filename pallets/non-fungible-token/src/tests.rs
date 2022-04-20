@@ -5,7 +5,7 @@ use frame_support::traits::Currency;
 use frame_support::{assert_noop, assert_ok};
 use mock::{Event, *};
 
-use bholdus_primitives::Balance;
+use common_primitives::Balance;
 use bholdus_support_nft::TokenInfo;
 use sp_runtime::{traits::BlakeTwo256, ArithmeticError};
 use sp_std::convert::TryInto;

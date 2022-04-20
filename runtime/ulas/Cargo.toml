@@ -38,6 +38,7 @@ frame-system-rpc-runtime-api = { git = "https://github.com/BHONetwork/substrate.
 frame-election-provider-support = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 frame-try-runtime = { optional = true, git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 
+pallet-babe = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 pallet-balances = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 pallet-grandpa = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 pallet-randomness-collective-flip = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
@@ -76,12 +77,12 @@ pallet-preimage = { git = "https://github.com/BHONetwork/substrate.git", default
 pallet-child-bounties = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 
 # Frontier
-pallet-evm = { default-features = false, git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+pallet-evm = { default-features = false, version = "6.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
 pallet-ethereum = { default-features = false, git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-pallet-base-fee = { default-features = false, git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fp-self-contained = { default-features = false, git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fp-rpc = { default-features = false, git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fp-evm = { default-features = false, git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+pallet-base-fee = { default-features = false, version = "1.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fp-self-contained = { default-features = false, version = "1.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fp-rpc = { default-features = false, version = "3.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fp-evm = { default-features = false, version = "3.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
 pallet-evm-precompile-blake2 = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
 pallet-evm-precompile-bn128 = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
 pallet-evm-precompile-dispatch = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
@@ -110,14 +111,15 @@ sp-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", defau
 sp-io = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 
 # local dependencies
-bholdus-primitives = { path = "../../primitives/bholdus", default-features = false }
+common-primitives = { path = "../../primitives/common", default-features = false }
+runtime-common = { path = "../common", default-features = false }
 bholdus-tokens = { path = "../../pallets/tokens", default-features = false }
+bholdus-memo = { path = "../../pallets/memo", default-features = false }
 bholdus-nft = { path = "../../pallets/non-fungible-token", default-features = false }
 bholdus-support-nft = { package = "support-nft", path = "../../pallets/support/nft", default-features = false }
 bholdus-support = { path = "../../pallets/support", default-features = false }
 bholdus-currencies = { path = "../../pallets/currencies", default-features = false }
 bholdus-bridge-native-transfer = { path = "../../pallets/bridge/native-transfer", default-features = false }
-bholdus-memo = { path = "../../pallets/memo", default-features = false }
 
 runtime-chain-extension = { path = "../chain-extension", default-features = false }
 
@@ -133,11 +135,17 @@ runtime-benchmarks = [
 	'pallet-timestamp/runtime-benchmarks',
 	'pallet-collective/runtime-benchmarks',
 	"hex-literal",
+
+	"pallet-ethereum/runtime-benchmarks",
+
 	"bholdus-bridge-native-transfer/runtime-benchmarks",
+	"bholdus-memo/runtime-benchmarks",
 	"bholdus-tokens/runtime-benchmarks",
 	"bholdus-nft/runtime-benchmarks",
-	"bholdus-memo/runtime-benchmarks",
-	"pallet-ethereum/runtime-benchmarks",
+]
+
+contracts-unstable-interface = [
+	"pallet-contracts/unstable-interface"
 ]
 
 std = [
@@ -148,6 +156,7 @@ std = [
 	"frame-system-rpc-runtime-api/std",
 	"frame-system/std",
 	"frame-try-runtime/std",
+	"pallet-babe/std",
 	"pallet-balances/std",
 	"pallet-grandpa/std",
 	"pallet-randomness-collective-flip/std",
@@ -179,16 +188,16 @@ std = [
 	"pallet-beefy-mmr/std",
 	"pallet-preimage/std",
 	"pallet-child-bounties/std",
-	
+
+	"common-primitives/std",
+	"runtime-common/std",
 	"bholdus-tokens/std",
+	"bholdus-memo/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
 	"bholdus-support/std",
 	"bholdus-currencies/std",
-	"bholdus-primitives/std",
 	"bholdus-bridge-native-transfer/std",
-	"bholdus-bridge-native-transfer/std",
-	"bholdus-memo/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-core/std",
@@ -232,6 +241,7 @@ try-runtime = [
 	"frame-executive/try-runtime",
 	"frame-system/try-runtime",
 
+	"pallet-babe/try-runtime",
 	"pallet-balances/try-runtime",
 	"pallet-grandpa/try-runtime",
 	"pallet-randomness-collective-flip/try-runtime",
@@ -261,4 +271,3 @@ try-runtime = [
 	"bholdus-bridge-native-transfer/try-runtime",
 	"bholdus-memo/try-runtime",
 ]
-

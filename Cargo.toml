@@ -4,19 +4,17 @@ members = [
     'node/cli',
     'node/service',
 
-    'primitives/bholdus',
+    'primitives/common',
 
     'runtime/chain-extension',
     'runtime/ulas',
     'runtime/phoenix',
 
     'pallets/currencies',
-    # 'pallets/dex',
     'pallets/support',
     'pallets/support/nft',
     'pallets/tokens',
     'pallets/non-fungible-token',
-    # 'pallets/bridge/bsc',
     'pallets/bridge/native-transfer',
     'pallets/template',
 

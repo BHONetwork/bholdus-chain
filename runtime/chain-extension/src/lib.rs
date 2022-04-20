@@ -1,5 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-use bholdus_primitives::{Balance, TokenId};
+use common_primitives::{Balance, TokenId};
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::dispatch::Output;
 use frame_support::traits::{Get, Randomness};

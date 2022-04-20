@@ -10,7 +10,7 @@ use frame_support::{
     RuntimeDebug,
 };
 
-use bholdus_primitives::{Amount, Balance, BlockNumber, CurrencyId, TokenSymbol};
+use common_primitives::{Amount, Balance, BlockNumber, CurrencyId, TokenSymbol};
 use bholdus_support::parameter_type_with_key;
 use sp_core::{crypto::AccountId32, H256};
 use sp_runtime::{

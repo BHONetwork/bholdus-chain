@@ -1,16 +1,14 @@
 use crate::chain_spec::{authority_keys_from_seed, get_account_id_from_seed, get_from_seed};
 use beefy_primitives::crypto::AuthorityId as BeefyId;
-use bholdus_primitives::{
-    AccountId, Balance, CurrencyId, Signature, TokenInfo, TokenSymbol, TradingPair,
-};
+use common_primitives::{AccountId, Balance, Signature};
 use hex_literal::hex;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use phoenix_runtime::{
-    opaque::SessionKeys, Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
+    Aura, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, BeefyConfig,
     BholdusSupportNFTConfig, BridgeNativeTransferConfig, CouncilConfig, EVMConfig, EthereumConfig,
     GenesisAccount, GenesisConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, MaxNominations,
-    SessionConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig, TokensConfig, BHO,
-    TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
+    SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+    TokensConfig, BHO, TOKEN_DECIMALS, TOKEN_SYMBOL, WASM_BINARY,
 };
 use sc_service::{config::TelemetryEndpoints, ChainType, Properties};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
@@ -28,36 +26,6 @@ const DEFAULT_PROTOCOL_ID: &str = "bho";
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
-struct Constants {
-    pub BHO_CURRENCY: CurrencyId,
-    pub BNB_CURRENCY: CurrencyId,
-    pub DOT_CURRENCY: CurrencyId,
-    pub BHO_BNB_PAIR: TradingPair,
-    pub BNB_DOT_PAIR: TradingPair,
-    pub BHO_BNB_SHARE_CURRENCY: CurrencyId,
-    pub BNB_DOT_SHARE_CURRENCY: CurrencyId,
-}
-
-impl Constants {
-    fn new() -> Constants {
-        let BHO_CURRENCY: CurrencyId = CurrencyId::Token(TokenSymbol::Native);
-        let BNB_CURRENCY: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 1 }));
-        let DOT_CURRENCY: CurrencyId = CurrencyId::Token(TokenSymbol::Token(TokenInfo { id: 2 }));
-        let BHO_BNB_PAIR: TradingPair =
-            TradingPair::from_currency_ids(BNB_CURRENCY, BHO_CURRENCY).unwrap();
-        let BNB_DOT_PAIR: TradingPair =
-            TradingPair::from_currency_ids(BNB_CURRENCY, DOT_CURRENCY).unwrap();
-        Constants {
-            BHO_CURRENCY,
-            BNB_CURRENCY,
-            DOT_CURRENCY,
-            BHO_BNB_PAIR,
-            BNB_DOT_PAIR,
-            BHO_BNB_SHARE_CURRENCY: BHO_BNB_PAIR.dex_share_currency_id(),
-            BNB_DOT_SHARE_CURRENCY: BNB_DOT_PAIR.dex_share_currency_id(),
-        }
-    }
-}
 pub fn get_properties() -> Properties {
     let mut properties = Properties::new();
 
@@ -93,7 +61,6 @@ pub fn config() -> Result<ChainSpec, String> {
 
 pub fn development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
-    let constants = Constants::new();
 
     Ok(ChainSpec::from_genesis(
         // Name
@@ -112,31 +79,22 @@ pub fn development_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     (
-                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice"),
                         1_000_000_000 * BHO,
-                        true,
                     ),
                     (
-                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                         10_000_000_000 * BHO,
-                        true,
                     ),
                     (
-                        constants.BNB_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice"),
                         10_000_000 * BHO,
-                        false,
                     ),
                     (
-                        constants.DOT_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice"),
                         10_000_000_000 * BHO,
-                        false,
                     ),
                 ],
-                vec![],
                 10_000 * BHO,
                 true,
             )
@@ -164,7 +122,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 
 pub fn local_testnet_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
-    let constants = Constants::new();
 
     Ok(ChainSpec::from_genesis(
         // Name
@@ -186,19 +143,14 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     (
-                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                         10_000_000_000 * BHO,
-                        true,
                     ),
                     (
-                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                         10_000_000 * BHO,
-                        true,
                     ),
                 ],
-                vec![],
                 1000 * BHO,
                 true,
             )
@@ -226,7 +178,6 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 
 pub fn production_sample_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
-    let constants = Constants::new();
 
     Ok(ChainSpec::from_genesis(
         // Name
@@ -248,19 +199,14 @@ pub fn production_sample_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     (
-                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                         10_000_000_000 * BHO,
-                        true,
                     ),
                     (
-                        constants.BHO_CURRENCY,
                         get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                         10_000_000 * BHO,
-                        true,
                     ),
                 ],
-                vec![],
                 1000 * BHO,
                 true,
             )
@@ -300,10 +246,9 @@ fn testnet_genesis(
     )>,
     initial_nominators: Vec<AccountId>,
     root_key: AccountId,
-    endowed_accounts: Vec<(CurrencyId, AccountId, Balance, bool)>,
-    initial_dex_liquidity_pairs: Vec<(AccountId, (CurrencyId, CurrencyId), (Balance, Balance))>,
+    endowed_accounts: Vec<(AccountId, Balance)>,
     stash: Balance,
-    enable_println: bool,
+    _enable_println: bool,
 ) -> GenesisConfig {
     // stakers: all validators and nominators.
     let mut rng = rand::thread_rng();
@@ -338,13 +283,7 @@ fn testnet_genesis(
             balances: endowed_accounts
                 .iter()
                 .cloned()
-                .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
-                    if is_native_currency {
-                        Some((account_id, balance))
-                    } else {
-                        None
-                    }
-                })
+                .filter_map(|(account_id, balance)| Some((account_id, balance)))
                 .collect(),
         },
         indices: IndicesConfig { indices: vec![] },
@@ -393,15 +332,7 @@ fn testnet_genesis(
         },
         treasury: Default::default(),
 
-        tokens: TokensConfig {
-            balances: endowed_accounts
-                .iter()
-                .cloned()
-                .filter_map(|(currency_id, account_id, balance, is_native_currency)| {
-                    Some((account_id, balance))
-                })
-                .collect::<Vec<_>>(),
-        },
+        tokens: TokensConfig { balances: vec![] },
         bholdus_support_nft: BholdusSupportNFTConfig { tokens: vec![] },
         bridge_native_transfer: Default::default(),
         evm: EVMConfig {

@@ -1,5 +1,5 @@
 use beefy_primitives::crypto::AuthorityId as BeefyId;
-use bholdus_primitives::{AccountId, Signature};
+use common_primitives::{AccountId, Signature};
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;

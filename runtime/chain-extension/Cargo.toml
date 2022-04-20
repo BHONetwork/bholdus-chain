@@ -75,9 +75,9 @@ default-features = false
 path = "../../pallets/currencies"
 
 
-[dependencies.bholdus-primitives]
+[dependencies.common-primitives]
 default-features = false
-path = "../../primitives/bholdus"
+path = "../../primitives/common"
 
 [features]
 default = ['std']
@@ -93,7 +93,7 @@ std = [
 	'pallet-balances/std',
 	'pallet-randomness-collective-flip/std',
 	'bholdus-currencies/std',
-	'bholdus-primitives/std',
+	'common-primitives/std',
 ]
 runtime-benchmarks = [
 	'frame-benchmarking',

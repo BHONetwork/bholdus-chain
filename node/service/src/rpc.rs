@@ -6,7 +6,7 @@
 #![warn(missing_docs)]
 
 use crate::client::RuntimeApiCollection;
-use crate::{AccountId, Balance, Block, BlockNumber, Hash, Index, TransactionConverters};
+use crate::{AccountId, Balance, Block, BlockNumber, Hash, Nonce, TransactionConverters};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{
     EthBlockDataCache, EthTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,

@@ -111,7 +111,8 @@ sp-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", defau
 sp-io = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 
 # local dependencies
-bholdus-primitives = { path = "../../primitives/bholdus", default-features = false }
+common-primitives = { path = "../../primitives/common", default-features = false }
+runtime-common = { path = "../common", default-features = false }
 bholdus-tokens = { path = "../../pallets/tokens", default-features = false }
 bholdus-memo = { path = "../../pallets/memo", default-features = false }
 bholdus-nft = { path = "../../pallets/non-fungible-token", default-features = false }
@@ -188,14 +189,14 @@ std = [
 	"pallet-preimage/std",
 	"pallet-child-bounties/std",
 
+	"common-primitives/std",
+	"runtime-common/std",
 	"bholdus-tokens/std",
 	"bholdus-memo/std",
 	"bholdus-nft/std",
 	"bholdus-support-nft/std",
 	"bholdus-support/std",
 	"bholdus-currencies/std",
-	"bholdus-primitives/std",
-	"bholdus-bridge-native-transfer/std",
 	"bholdus-bridge-native-transfer/std",
 	"sp-api/std",
 	"sp-block-builder/std",

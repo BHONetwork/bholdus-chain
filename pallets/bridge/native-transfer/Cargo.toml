@@ -26,7 +26,7 @@ frame-system = { default-features = false, git = "https://github.com/BHONetwork/
 sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 
-bholdus-primitives = { default-features = false, path = '../../../primitives/bholdus' }
+common-primitives = { default-features = false, path = '../../../primitives/common' }
 
 [dev-dependencies]
 hex = "0.4.3"
@@ -46,6 +46,6 @@ std = [
 	'frame-benchmarking/std',
 	'sp-std/std',
 	'sp-runtime/std',
-	'bholdus-primitives/std',
+	'common-primitives/std',
 ]
 try-runtime = ['frame-support/try-runtime']

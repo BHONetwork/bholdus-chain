@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use bholdus_primitives::Balance;
+use common_primitives::Balance;
 use codec::{Decode, Encode};
 use frame_support::{
     dispatch::DispatchResult,

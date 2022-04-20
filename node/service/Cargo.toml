@@ -97,7 +97,7 @@ bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
 
 ulas-runtime = { optional = true, path = "../../runtime/ulas" }
 phoenix-runtime = { optional = true, path = "../../runtime/phoenix" }
-bholdus-primitives = { path = "../../primitives/bholdus" }
+common-primitives = { path = "../../primitives/common" }
 
 [features]
 default = ["std"]
