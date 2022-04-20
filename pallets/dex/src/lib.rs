@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use bholdus_primitives::{Balance, CurrencyId, ExchangeRate, Ratio, TradingPair};
+use common_primitives::{Balance, CurrencyId, ExchangeRate, Ratio, TradingPair};
 use bholdus_support::MultiCurrency;
 use frame_support::{
     dispatch::DispatchResult, log, pallet_prelude::*, transactional, weights::DispatchClass,

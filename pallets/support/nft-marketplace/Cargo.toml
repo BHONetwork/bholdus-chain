@@ -10,73 +10,32 @@ repository = 'https://github.com/bholdus/bholdus-chain.git'
 version = "1.0.15"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[dependencies.scale-info]
-default-features = false
-features = ['derive']
-version = '1.0'
 
-[dependencies.serde]
-optional = true
-version = '1.0.124'
+[dependencies]
+codec = { default-features = false, features = [
+	"derive",
+	"max-encoded-len",
+], package = "parity-scale-codec", version = "3.0.0" }
+scale-info = { default-features = false, features = [
+	'derive',
+], version = '2.0.1' }
+serde = { version = "1.0.124", optional = true}
 
-[dependencies.codec]
-default-features = false
-features = ['derive', 'max-encoded-len']
-package = 'parity-scale-codec'
-version = '2.0.0'
+frame-benchmarking = { default-features = false, optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 
-[dependencies.sp-std]
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+common-primitives = { default-features = false, path = "../../../primitives/common" }
+bholdus-support = {  default-features = false, path = "../" }
+bholdus-tokens = { default-features = false, path = "../../tokens" }
+bholdus-support-nft = { package = "support-nft", default-features = false, path = "../nft" }
 
-[dependencies.sp-runtime]
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
-[dependencies.frame-support]
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
-[dependencies.frame-system]
-default-features = false
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
-[dependencies.bholdus-primitives]
-default-features = false
-path = '../../../primitives/bholdus'
-
-[dependencies.bholdus-support-nft]
-default-features = false
-package = 'support-nft'
-path = '../nft'
-
-[dependencies.bholdus-tokens]
-default-features = false
-package = 'bholdus-tokens'
-path = '../../tokens'
-
-[dependencies.bholdus-support]
-default-features = false
-package = 'bholdus-support'
-path = '../../support'
-
-[dev-dependencies.sp-io]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
-
-[dev-dependencies.sp-core]
-git = 'https://github.com/bholdus/substrate.git'
-branch = 'bholdus-monthly-2021-11'
-version = '4.0.0-dev'
+[dev-dependencies]
+sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-core = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 
 [features]
 default = ["std"]
@@ -90,6 +49,7 @@ std = [
 	"frame-system/std",
 	"bholdus-tokens/std",
 	"bholdus-support-nft/std",
-	"bholdus-primitives/std",
+	"bholdus-support/std",
+	"common-primitives/std",
 ]
 try-runtime = ["frame-support/try-runtime"]

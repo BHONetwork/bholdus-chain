@@ -17,8 +17,8 @@ ink_storage = { version = "3.0.0-rc7", default-features = false, git = "https://
 ink_lang = { version = "3.0.0-rc7", default-features = false, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
 ink_prelude = { version = "3.0.0-rc7", default-features = false, git = "https://github.com/paritytech/ink/", tag = "v3.0.0-rc7" }
 
-scale = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = ["derive"] }
-scale-info = { version = "=1.0.0", default-features = false, features = ["derive"], optional = true }
+scale = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
+scale-info = { version = "2.0.1", default-features = false, features = ["derive"], optional = true }
 
 
 # Needed until https://github.com/paritytech/ink/issues/364 is resolved.

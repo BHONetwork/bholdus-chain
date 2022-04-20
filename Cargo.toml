@@ -4,29 +4,22 @@ members = [
     'node/cli',
     'node/service',
 
-    'primitives/bholdus',
-    'primitives/bsc',
+    'primitives/common',
 
     'runtime/chain-extension',
     'runtime/ulas',
-    'runtime/cygnus',
     'runtime/phoenix',
 
     'pallets/currencies',
-    # 'pallets/dex',
     'pallets/support',
     'pallets/support/nft',
     'pallets/tokens',
     'pallets/non-fungible-token',
-    # 'pallets/bridge/bsc',
     'pallets/bridge/native-transfer',
     'pallets/template',
 
     'precompiles/template',
     'precompiles/utils',
-
-    'pallets/pallet-integration',
-    'pallets/pallet-integration/sample-extension',
 ]
 
 exclude = [
