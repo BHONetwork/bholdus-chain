@@ -23,7 +23,7 @@ use common_primitives::NFTBalance;
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::{
-	traits::{Saturating, StaticLookup, Zero},
+	traits::{AccountIdConversion, Saturating, StaticLookup, Zero},
 	DispatchResult, RuntimeDebug,
 };
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};

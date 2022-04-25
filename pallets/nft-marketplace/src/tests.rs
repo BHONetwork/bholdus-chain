@@ -3,11 +3,11 @@ use super::*;
 use frame_support::{assert_noop, assert_ok, traits::Currency};
 use mock::{Event, *};
 
-use bholdus_primitives::Balance;
 use bholdus_support_nft::{Error as SupportNFTError, TokenInfo};
 use bholdus_support_nft_marketplace::{
 	Error as SupportNFTMarketplaceError, ItemListing as SupportNFTMItemListing, NFTState,
 };
+use common_primitives::Balance;
 use sp_runtime::{traits::BlakeTwo256, ArithmeticError};
 
 fn create_nft() {
@@ -446,7 +446,7 @@ fn configure_pallet_management_should_work() {
 			None => assert!(!PalletManagement::<Runtime>::exists()),
 			Some(info) => {
 				assert!(info.controller == controller.clone())
-			},
+			}
 		};
 
 		assert!(PalletManagement::<Runtime>::exists());
@@ -466,7 +466,7 @@ fn configure_pallet_management_should_work() {
 			None => assert!(!PalletManagement::<Runtime>::exists()),
 			Some(info) => {
 				assert!(info.controller == controller.clone())
-			},
+			}
 		};
 	})
 }
@@ -480,7 +480,7 @@ fn configure_pallet_management_should_not_work() {
 			None => assert!(!PalletManagement::<Runtime>::exists()),
 			Some(info) => {
 				assert!(info.controller == ALICE,)
-			},
+			}
 		};
 
 		assert_ok!(NFTMarketplace::configure_pallet_management(Origin::signed(ALICE), ALICE));
@@ -490,7 +490,7 @@ fn configure_pallet_management_should_not_work() {
 			Some(info) => {
 				assert!(info.controller == ALICE);
 				assert_eq!(info.controller == BOB, false)
-			},
+			}
 		};
 		assert_eq!(PalletManagement::<Runtime>::exists(), true);
 

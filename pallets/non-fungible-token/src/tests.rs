@@ -299,12 +299,6 @@ fn transfer_should_work() {
 		System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken(
 			ALICE, DAVE, CLASS_ID, TOKEN_ID,
 		)));
-
-		assert_eq!(
-			bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>(),
-			vec![(DAVE, 0)]
-		);
-
 		// assert_eq!(
 		//     bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
 		//     vec![(DAVE, 0), (ALICE, 0), (BOB, 0)]

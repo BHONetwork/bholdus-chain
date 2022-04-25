@@ -25,9 +25,10 @@ mod tests;
 use common_primitives::Balance;
 
 use bholdus_support_nft_marketplace::{
-	BHC20TokenIdOf, Blacklist as NFTBlacklist, Denominator, MarketMode, MarketplaceFee,
-	MarketplaceFeeInfo, MarketplaceFeeInfoOf, NFTCurrencyId, Numerator, PalletManagement,
-	PalletManagementInfo, PalletManagementInfoOf, Price, RoyaltyRate, UserBlacklist,
+	BHC20TokenIdOf, Blacklist as NFTBlacklist, Denominator, FixedPriceListing,
+	FixedPriceListingInfo, MarketMode, MarketplaceFee, MarketplaceFeeInfo, MarketplaceFeeInfoOf,
+	NFTCurrencyId, Numerator, PalletManagement, PalletManagementInfo, PalletManagementInfoOf,
+	Price, RoyaltyRate, UserBlacklist,
 };
 
 pub use support_module::*;

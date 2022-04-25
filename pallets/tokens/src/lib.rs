@@ -121,8 +121,9 @@ use frame_support::{
 		LockableCurrency as PalletLockableCurrency, ReservableCurrency as PalletReservableCurrency,
 		SignedImbalance, StoredMap, WithdrawReasons,
 	},
-	transactional, BoundedVec,
+	transactional, BoundedVec, PalletId,
 };
+use std::collections::BTreeMap;
 
 // use frame_support::{
 //     dispatch::{DispatchError, DispatchResult},
@@ -1138,7 +1139,7 @@ pub mod pallet {
 					identity.info = info;
 					identity.is_verifiable = false;
 					identity
-				},
+				}
 				None => Registration { info, is_verifiable: false, deposit: Zero::zero() },
 			};
 			let old_deposit = identity.deposit;
@@ -1648,8 +1649,9 @@ impl<T: Config<I>, I: 'static> MultiReservableCurrency<T::AccountId> for Pallet<
 		if slashed == beneficiary {
 			return match status {
 				BalanceStatus::Free => Ok(Self::unreserve(currency_id, slashed, value)),
-				BalanceStatus::Reserved =>
-					Ok(value.saturating_sub(Self::reserved_balance(currency_id, slashed))),
+				BalanceStatus::Reserved => {
+					Ok(value.saturating_sub(Self::reserved_balance(currency_id, slashed)))
+				}
 			};
 		}
 
@@ -1659,10 +1661,10 @@ impl<T: Config<I>, I: 'static> MultiReservableCurrency<T::AccountId> for Pallet<
 		match status {
 			BalanceStatus::Free => {
 				Self::set_free_balance(currency_id, beneficiary, to_account.free + actual);
-			},
+			}
 			BalanceStatus::Reserved => {
 				Self::set_reserved_balance(currency_id, beneficiary, to_account.reserved + actual);
-			},
+			}
 		}
 		Self::set_reserved_balance(currency_id, slashed, from_account.reserved - actual);
 		Ok(value - actual)

@@ -10,14 +10,12 @@ use frame_support::{
 };
 use frame_system::EnsureRoot;
 
-use bholdus_primitives::{
-	Amount, Balance, BlockNumber, CurrencyId, ReserveIdentifier, TokenSymbol,
-};
 use bholdus_support::parameter_type_with_key;
+use common_primitives::{Amount, Balance, BlockNumber, ReserveIdentifier};
 use sp_core::{crypto::AccountId32, H256};
 use sp_runtime::{
 	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup},
+	traits::{AccountIdConversion, BlakeTwo256, IdentityLookup},
 };
 
 use std::cell::RefCell;
@@ -53,6 +51,7 @@ impl frame_system::Config for Runtime {
 	type SystemWeightInfo = ();
 	type SS58Prefix = ();
 	type OnSetCode = ();
+	type MaxConsumers = ConstU32<16>;
 }
 
 parameter_types! {
