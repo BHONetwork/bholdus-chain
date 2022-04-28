@@ -473,7 +473,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-cli",
  "bholdus-service",
@@ -484,7 +484,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-bridge-native-transfer"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "common-primitives",
  "frame-benchmarking",
@@ -503,7 +503,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-cli"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-service",
  "clap 3.1.9",
@@ -524,7 +524,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-client-evm-tracing"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-evm-rpc-primitives-debug",
  "ethereum-types 0.13.1",
@@ -538,7 +538,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-currencies"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -556,7 +556,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-template"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-evm-precompile-utils",
  "bholdus-support",
@@ -584,7 +584,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-utils"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-evm-precompile-utils-macro",
  "fp-evm",
@@ -603,7 +603,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-utils-macro"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "num_enum",
  "proc-macro2",
@@ -614,7 +614,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-primitives-ext"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "ethereum-types 0.12.1",
  "evm-tracing-events",
@@ -626,7 +626,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-core-debug"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-types",
@@ -642,7 +642,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-core-trace"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-types",
@@ -657,7 +657,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-core-types"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "ethereum-types 0.13.1",
  "serde",
@@ -666,7 +666,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-debug"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-debug",
@@ -693,7 +693,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-primitives-debug"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "environmental",
  "ethereum",
@@ -711,7 +711,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-rpc-trace"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-client-evm-tracing",
  "bholdus-evm-rpc-core-trace",
@@ -743,7 +743,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-tracer"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-evm-primitives-ext",
  "ethereum-types 0.13.1",
@@ -762,7 +762,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-memo"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "common-primitives",
  "frame-benchmarking",
@@ -770,6 +770,7 @@ dependencies = [
  "frame-system",
  "pallet-balances",
  "pallet-timestamp",
+ "pallet-transaction-payment",
  "parity-scale-codec 3.1.2",
  "scale-info",
  "serde",
@@ -781,7 +782,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-nft"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-support",
  "common-primitives",
@@ -803,7 +804,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-nft-marketplace"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -827,7 +828,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-service"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "async-trait",
  "beefy-gadget",
@@ -910,7 +911,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-support"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -925,7 +926,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-tokens"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-support",
  "enumflags2",
@@ -1408,7 +1409,7 @@ dependencies = [
 
 [[package]]
 name = "common-primitives"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "parity-scale-codec 3.1.2",
  "scale-info",
@@ -2193,7 +2194,7 @@ dependencies = [
 
 [[package]]
 name = "evm-tracing-events"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "environmental",
  "ethereum",
@@ -5852,7 +5853,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-template"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -6263,7 +6264,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -7011,7 +7012,7 @@ dependencies = [
 
 [[package]]
 name = "runtime-chain-extension"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-currencies",
  "common-primitives",
@@ -7032,7 +7033,7 @@ dependencies = [
 
 [[package]]
 name = "runtime-common"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "common-primitives",
  "frame-support",
@@ -9443,7 +9444,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-nft"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -9458,7 +9459,7 @@ dependencies = [
 
 [[package]]
 name = "support-nft-marketplace"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -9996,7 +9997,7 @@ dependencies = [
 
 [[package]]
 name = "ulas-runtime"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
