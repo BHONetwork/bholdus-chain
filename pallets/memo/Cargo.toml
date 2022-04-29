@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = 'bholdus-memo'
 readme = 'README.md'
 repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
-version = "1.0.15"
+version = "1.0.16"
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -27,6 +27,7 @@ frame-system = { default-features = false, git = "https://github.com/BHONetwork/
 sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 pallet-timestamp = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
+pallet-transaction-payment = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.18" }
 common-primitives = { default-features = false, path = '../../primitives/common' }
 
 [dev-dependencies]
@@ -55,8 +56,10 @@ std = [
 	'sp-runtime/std',
 	'common-primitives/std',
 	'pallet-timestamp/std',
+	'pallet-transaction-payment/std',
 ]
 try-runtime = [
 	'frame-support/try-runtime',
 	'pallet-timestamp/try-runtime',
+	'pallet-transaction-payment/try-runtime',
 ]

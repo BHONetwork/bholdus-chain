@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = 'pallet-template'
 readme = 'README.md'
 repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
-version = "1.0.15"
+version = "1.0.16"
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']

@@ -27,12 +27,18 @@ pub use weights::WeightInfo;
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
-	use frame_support::{dispatch::DispatchResult, pallet_prelude::*, traits::UnixTime};
+	use frame_support::{
+		dispatch::DispatchResult,
+		pallet_prelude::*,
+		traits::{Imbalance, IsSubType, UnixTime},
+	};
 	use frame_system::pallet_prelude::*;
+	use pallet_transaction_payment::OnChargeTransaction;
+	use sp_runtime::traits::{DispatchInfoOf, PostDispatchInfoOf};
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + pallet_transaction_payment::Config {
 		type UnixTime: UnixTime;
 
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
@@ -78,7 +84,8 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn memo_counter)]
-	pub type MemoCounter<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, u128, ValueQuery>;
+	pub type MemoCounter<T: Config> =
+		StorageMap<_, Blake2_128Concat, T::AccountId, u128, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn amount_free_tx)]
@@ -124,24 +131,12 @@ pub mod pallet {
 		}
 	}
 
-	impl<T: Config> Pallet<T> {
-		pub fn calc_actual_weight(sender: &Vec<u8>) -> Pays {
-			let counter = Pallet::<T>::memo_counter(sender);
-			if counter < Pallet::<T>::amount_free_tx() {
-				Pays::No
-			} else {
-				Pays::Yes
-			}
-		}
-	}
-
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
 	// These functions materialize as "extrinsics", which are often compared to transactions.
 	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		#[pallet::weight((T::WeightInfo::create(content.len() as u32, txn_hash.len() as u32),
-                            Pallet::<T>::calc_actual_weight(sender)))]
+		#[pallet::weight(T::WeightInfo::create(content.len() as u32, txn_hash.len() as u32))]
 		#[transactional]
 		pub fn create(
 			origin: OriginFor<T>,
@@ -150,7 +145,7 @@ pub mod pallet {
 			content: Vec<u8>,
 			sender: Vec<u8>,
 			receiver: Vec<u8>,
-		) -> DispatchResult {
+		) -> DispatchResultWithPostInfo {
 			let operator = ensure_signed(origin)?;
 
 			let memo_info = Memo::<T>::get(&chain_id, &txn_hash);
@@ -162,9 +157,9 @@ pub mod pallet {
 			let bounded_content: BoundedVec<u8, T::ContentLimit> =
 				content.clone().try_into().map_err(|_| Error::<T>::BadMemoInfo)?;
 
-			let counter: u128 = MemoCounter::<T>::get(&sender);
+			let counter: u128 = MemoCounter::<T>::get(&operator);
 
-			MemoCounter::<T>::insert(&sender, counter.checked_add(1).unwrap_or_else(Zero::zero));
+			MemoCounter::<T>::insert(&operator, counter.checked_add(1).unwrap_or_else(Zero::zero));
 
 			let memo_info =
 				MemoInfo { content: bounded_content, sender, receiver, operator, time: time_now };
@@ -172,7 +167,12 @@ pub mod pallet {
 			Memo::<T>::insert(&chain_id, &txn_hash, memo_info.clone());
 
 			Self::deposit_event(Event::MemoCreated(chain_id, txn_hash, memo_info));
-			Ok(())
+
+			if counter < Pallet::<T>::amount_free_tx() {
+				return Ok(Pays::No.into());
+			}
+
+			Ok(().into())
 		}
 
 		// #[pallet::weight(T::WeightInfo::update(content.len() as u32))]
@@ -206,6 +206,70 @@ pub mod pallet {
 			<AmountFreeTx<T>>::put(amount_free_tx);
 
 			Ok(())
+		}
+	}
+
+	type NegativeImbalanceOf<C, T> =
+		<C as Currency<<T as frame_system::Config>::AccountId>>::NegativeImbalance;
+
+	pub struct MemoOnChargeTransaction<OCT, C>(sp_std::marker::PhantomData<(OCT, C)>);
+
+	impl<T, OCT, C> OnChargeTransaction<T> for MemoOnChargeTransaction<OCT, C>
+	where
+		T: Config,
+		T::Call: IsSubType<Call<T>>,
+		OCT: OnChargeTransaction<
+			T,
+			LiquidityInfo = Option<NegativeImbalanceOf<C, T>>,
+			Balance = <C as Currency<<T as frame_system::Config>::AccountId>>::Balance,
+		>,
+		C: Currency<<T as frame_system::Config>::AccountId>,
+		C::PositiveImbalance: Imbalance<
+			<C as Currency<<T as frame_system::Config>::AccountId>>::Balance,
+			Opposite = C::NegativeImbalance,
+		>,
+		C::NegativeImbalance: Imbalance<
+			<C as Currency<<T as frame_system::Config>::AccountId>>::Balance,
+			Opposite = C::PositiveImbalance,
+		>,
+	{
+		type LiquidityInfo = OCT::LiquidityInfo;
+		type Balance = OCT::Balance;
+
+		fn withdraw_fee(
+			who: &T::AccountId,
+			call: &T::Call,
+			dispatch_info: &DispatchInfoOf<T::Call>,
+			fee: Self::Balance,
+			tip: Self::Balance,
+		) -> Result<Self::LiquidityInfo, TransactionValidityError> {
+			if let Some(local_call) = call.is_sub_type() {
+				if let Call::create { .. } = local_call {
+					let counter = Pallet::<T>::memo_counter(who);
+					if counter < Pallet::<T>::amount_free_tx() {
+						return Ok(None);
+					}
+				}
+			}
+			return OCT::withdraw_fee(who, call, dispatch_info, fee, tip);
+		}
+
+		fn correct_and_deposit_fee(
+			who: &T::AccountId,
+			dispatch_info: &DispatchInfoOf<T::Call>,
+			post_info: &PostDispatchInfoOf<T::Call>,
+			corrected_fee: Self::Balance,
+			tip: Self::Balance,
+			already_withdrawn: Self::LiquidityInfo,
+		) -> Result<(), TransactionValidityError> {
+			return OCT::correct_and_deposit_fee(
+				who,
+				dispatch_info,
+				post_info,
+				corrected_fee,
+				tip,
+				already_withdrawn,
+			);
 		}
 	}
 }
