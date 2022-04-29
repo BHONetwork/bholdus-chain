@@ -3,7 +3,7 @@ name = "bholdus-evm-precompile-utils"
 authors = ["Bholdus"]
 description = "Utils to write EVM precompiles."
 edition = "2018"
-version = "1.0.16"
+version = "1.0.17"
 
 [dependencies]
 log = "0.4"

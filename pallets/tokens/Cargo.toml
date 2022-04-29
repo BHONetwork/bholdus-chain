@@ -7,7 +7,7 @@ name = 'bholdus-tokens'
 license = "Apache-2.0"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain'
-version = "1.0.16"
+version = "1.0.17"
 
 
 [dependencies]
