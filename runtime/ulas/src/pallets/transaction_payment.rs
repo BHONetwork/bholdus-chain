@@ -45,7 +45,8 @@ parameter_types! {
 }
 
 impl pallet_transaction_payment::Config for Runtime {
-	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
+	type OnChargeTransaction =
+		bholdus_memo::MemoOnChargeTransaction<CurrencyAdapter<Balances, DealWithFees>, Balances>;
 	type TransactionByteFee = TransactionByteFee;
 	type OperationalFeeMultiplier = OperationalFeeMultiplier;
 	type WeightToFee = fee::WeightToFee;
