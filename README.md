@@ -51,14 +51,9 @@ rustup show
 
 ### Prepare a BHO node
 
-To build the BHO node:
+* In early stage, we only support Proof of Staked Authority with private authorities. Hence, users can only run RPC node at the moment.
 
-
-
-
-In early stage, we only support Proof of Staked Authority with private authorities. Hence, users can only run RPC node at the moment.
-
-We have two ways to start a BHO node:
+* We have two ways to start a BHO node:
 
 #### Building from source
 1. Clone the bholdus-chain repository
