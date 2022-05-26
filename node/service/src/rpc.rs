@@ -20,6 +20,8 @@ use sc_client_api::{
 	client::BlockchainEvents,
 	AuxStore, BlockOf,
 };
+#[cfg(feature = "manual-seal")]
+use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
 use sc_finality_grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -289,6 +291,7 @@ where
 		filter_pool,
 		transaction_converter,
 		block_data_cache,
+		command_sink,
 		..
 	} = deps;
 
@@ -381,6 +384,15 @@ where
 		),
 		overrides,
 	)));
+
+	#[cfg(feature = "manual-seal")]
+	if let Some(command_sink) = command_sink {
+		io.extend_with(
+			// We provide the rpc handler with the sending end of the channel to allow the rpc
+			// send EngineCommands to the background block authorship task.
+			ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+		);
+	}
 
 	Ok(io)
 }
