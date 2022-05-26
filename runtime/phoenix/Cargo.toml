@@ -127,6 +127,7 @@ runtime-chain-extension = { path = "../chain-extension", default-features = fals
 
 [features]
 default = ["std"]
+manual-seal = []
 runtime-benchmarks = [
 	"frame-benchmarking",
 	"frame-support/runtime-benchmarks",

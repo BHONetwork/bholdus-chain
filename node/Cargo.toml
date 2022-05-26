@@ -40,3 +40,4 @@ with-phoenix-runtime = [
     "bholdus-service/with-phoenix-runtime",
     "bholdus-cli/with-phoenix-runtime",
 ]
+manual-seal = ["bholdus-service/manual-seal", "bholdus-cli/manual-seal"]

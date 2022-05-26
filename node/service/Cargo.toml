@@ -117,3 +117,4 @@ with-all-runtime = [
     "with-ulas-runtime",
     "with-phoenix-runtime",
 ]
+manual-seal = ["ulas-runtime/manual-seal", "phoenix-runtime/manual-seal"]
