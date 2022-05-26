@@ -96,9 +96,6 @@ You can use the pre-built binary in the Github Releases
 
 To start a node with a pre-built binary, simply use the commands from `1. Building from source`
 
-#### Multi-Node Local Testnet
-If you want to start the multi-node consensus with an authority set of private validators, refer to [our Start a Private Network tutorial](https://substrate.dev/docs/en/tutorials/start-a-private-network/).
-
 
 ### Benchmarking
 
