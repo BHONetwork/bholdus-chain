@@ -87,8 +87,10 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
+	#[cfg(not(feature = "manual-seal"))]
 	pub grandpa: GrandpaDeps<B>,
 	/// BEEFY specific dependencies
+	#[cfg(not(feature = "manual-seal"))]
 	pub beefy: BeefyDeps,
 	/// The Node authority flag
 	pub is_authority: bool,
@@ -110,6 +112,13 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	pub transaction_converter: TransactionConverters,
 	/// Cache for Ethereum block data.
 	pub block_data_cache: Arc<EthBlockDataCache<Block>>,
+	/// Manual seal command sink
+	#[cfg(feature = "manual-seal")]
+	pub command_sink:
+		Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
+	/// Used to bypass type parameter `B` of FullDeps when compiles with `manual-seal` feature.
+	#[cfg(feature = "manual-seal")]
+	pub _phantom: std::marker::PhantomData<B>,
 }
 
 /// Ethereum Api Command
@@ -244,6 +253,8 @@ where
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
+
+	#[cfg(not(feature = "manual-seal"))]
 	let FullDeps {
 		client,
 		pool,
@@ -263,6 +274,25 @@ where
 		..
 	} = deps;
 
+	#[cfg(feature = "manual-seal")]
+	let FullDeps {
+		client,
+		pool,
+		graph,
+		deny_unsafe,
+		is_authority,
+		network,
+		frontier_backend,
+		fee_history_cache,
+		rpc_config,
+		overrides,
+		filter_pool,
+		transaction_converter,
+		block_data_cache,
+		..
+	} = deps;
+
+	#[cfg(not(feature = "manual-seal"))]
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
@@ -284,21 +314,24 @@ where
 	io.extend_with(MmrApi::to_delegate(Mmr::new(client.clone())));
 	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
 
-	io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
-		shared_authority_set.clone(),
-		shared_voter_state,
-		justification_stream,
-		subscription_executor,
-		finality_provider,
-	)));
+	#[cfg(not(feature = "manual-seal"))]
+	{
+		io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
+			shared_authority_set.clone(),
+			shared_voter_state,
+			justification_stream,
+			subscription_executor,
+			finality_provider,
+		)));
 
-	let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
-		beefy_gadget_rpc::BeefyRpcHandler::new(
-			beefy.beefy_commitment_stream,
-			beefy.beefy_best_block_stream,
-			beefy.subscription_executor,
-		)?;
-	io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
+		let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
+			beefy_gadget_rpc::BeefyRpcHandler::new(
+				beefy.beefy_commitment_stream,
+				beefy.beefy_best_block_stream,
+				beefy.subscription_executor,
+			)?;
+		io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
+	}
 
 	io.extend_with(NetApiServer::to_delegate(NetApi::new(
 		client.clone(),
