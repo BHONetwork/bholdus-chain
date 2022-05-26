@@ -116,6 +116,8 @@ pub fn run() -> sc_cli::Result<()> {
 			runner.run_node_until_exit(|config| async move {
 				let chain_spec = &config.chain_spec;
 				let rpc_config = service::rpc::RpcConfig {
+					#[cfg(feature = "manual-seal")]
+					sealing: cli.run.sealing,
 					eth_log_block_cache: cli.run.eth_log_block_cache,
 					eth_statuses_cache: cli.run.eth_statuses_cache,
 					fee_history_limit: cli.run.fee_history_limit,

@@ -16,6 +16,11 @@ pub struct RunCmd {
 	#[clap(flatten)]
 	pub base: sc_cli::RunCmd,
 
+	/// Choose sealing method.
+	#[cfg(feature = "manual-seal")]
+	#[clap(long, ignore_case = true)]
+	pub sealing: service::Sealing,
+
 	/// Enable EVM tracing module on a non-authority node.
 	#[clap(
 		long,

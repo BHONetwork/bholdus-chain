@@ -20,6 +20,8 @@ use sc_client_api::{
 	client::BlockchainEvents,
 	AuxStore, BlockOf,
 };
+#[cfg(feature = "manual-seal")]
+use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
 use sc_finality_grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -87,8 +89,10 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
+	#[cfg(not(feature = "manual-seal"))]
 	pub grandpa: GrandpaDeps<B>,
 	/// BEEFY specific dependencies
+	#[cfg(not(feature = "manual-seal"))]
 	pub beefy: BeefyDeps,
 	/// The Node authority flag
 	pub is_authority: bool,
@@ -110,6 +114,13 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	pub transaction_converter: TransactionConverters,
 	/// Cache for Ethereum block data.
 	pub block_data_cache: Arc<EthBlockDataCache<Block>>,
+	/// Manual seal command sink
+	#[cfg(feature = "manual-seal")]
+	pub command_sink:
+		Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
+	/// Used to bypass type parameter `B` of FullDeps when compiles with `manual-seal` feature.
+	#[cfg(feature = "manual-seal")]
+	pub _phantom: std::marker::PhantomData<B>,
 }
 
 /// Ethereum Api Command
@@ -133,9 +144,34 @@ impl FromStr for EthApiCmd {
 	}
 }
 
+/// Available Sealing methods.
+#[cfg(feature = "manual-seal")]
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Sealing {
+	// Seal using rpc method.
+	Manual,
+	// Seal when transaction is executed.
+	Instant,
+}
+
+#[cfg(feature = "manual-seal")]
+impl FromStr for Sealing {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"manual" => Self::Manual,
+			"instant" => Self::Instant,
+			_ => return Err(format!("`{}` is not recognized as a supported sealing method", s)),
+		})
+	}
+}
+
 /// Configurations of RPC
 #[derive(Clone)]
 pub struct RpcConfig {
+	#[cfg(feature = "manual-seal")]
+	pub sealing: Sealing,
 	pub ethapi: Vec<EthApiCmd>,
 	pub ethapi_max_permits: u32,
 	pub ethapi_trace_max_count: u32,
@@ -219,6 +255,8 @@ where
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
+
+	#[cfg(not(feature = "manual-seal"))]
 	let FullDeps {
 		client,
 		pool,
@@ -238,6 +276,26 @@ where
 		..
 	} = deps;
 
+	#[cfg(feature = "manual-seal")]
+	let FullDeps {
+		client,
+		pool,
+		graph,
+		deny_unsafe,
+		is_authority,
+		network,
+		frontier_backend,
+		fee_history_cache,
+		rpc_config,
+		overrides,
+		filter_pool,
+		transaction_converter,
+		block_data_cache,
+		command_sink,
+		..
+	} = deps;
+
+	#[cfg(not(feature = "manual-seal"))]
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
@@ -259,21 +317,24 @@ where
 	io.extend_with(MmrApi::to_delegate(Mmr::new(client.clone())));
 	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
 
-	io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
-		shared_authority_set.clone(),
-		shared_voter_state,
-		justification_stream,
-		subscription_executor,
-		finality_provider,
-	)));
+	#[cfg(not(feature = "manual-seal"))]
+	{
+		io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
+			shared_authority_set.clone(),
+			shared_voter_state,
+			justification_stream,
+			subscription_executor,
+			finality_provider,
+		)));
 
-	let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
-		beefy_gadget_rpc::BeefyRpcHandler::new(
-			beefy.beefy_commitment_stream,
-			beefy.beefy_best_block_stream,
-			beefy.subscription_executor,
-		)?;
-	io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
+		let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
+			beefy_gadget_rpc::BeefyRpcHandler::new(
+				beefy.beefy_commitment_stream,
+				beefy.beefy_best_block_stream,
+				beefy.subscription_executor,
+			)?;
+		io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
+	}
 
 	io.extend_with(NetApiServer::to_delegate(NetApi::new(
 		client.clone(),
@@ -323,6 +384,15 @@ where
 		),
 		overrides,
 	)));
+
+	#[cfg(feature = "manual-seal")]
+	if let Some(command_sink) = command_sink {
+		io.extend_with(
+			// We provide the rpc handler with the sending end of the channel to allow the rpc
+			// send EngineCommands to the background block authorship task.
+			ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+		);
+	}
 
 	Ok(io)
 }
