@@ -53,44 +53,49 @@ rustup show
 
 To build the BHO node:
 
+
+
+
+In early stage, we only support Proof of Staked Authority with private authorities. Hence, users can only run RPC node at the moment.
+
+We have two ways to start a BHO node:
+
+#### Building from source
 1. Clone the bholdus-chain repository
 
 ```
 git clone https://github.com/Bholdus/bholdus-chain.git
 
 ```
-2. Change to the root directory where you compiled the bholdus node
+2. Build source
 
 ```
-cd bholdus-chain
-```
-3. Start a BHO node
-
-In early stage, we only support Proof of Staked Authority with private authorities. Hence, users can only run RPC node at the moment.
-
-We have two ways to start a BHO node:
-
-1. Building from source
-
-You can clone the repository and try following commands
-
-```
-- Run Testnet Node: Phoenix
+- Build Testnet Node: Phoenix
 
  cargo build --features with-phoenix-runtime,evm-tracing --release
- ./target/release/bholdus --chain=phoenix --name <INSERT_NAME> --rpc-port 9933 --ws-port 9944 --ws-external --rpc-external --prometheus-external --rpc-cors=all --pruning archive -lruntime=debug
+ 
 
-- Run Mainnet Node: Ulas
+- Build Mainnet Node: Ulas
 
  cargo build --features with-ulas-runtime,evm-tracing --release
- ./target/release/bholdus --chain=ulas --name <INSERT_NAME> --rpc-port 9933 --ws-port 9944 --ws-external --rpc-external --prometheus-external --rpc-cors=all --pruning archive -lruntime=debug
 
 ```
 You should always use the --release flag to build optimized artifacts.
 
 Use branch `main` for latest development codebase. However, if you want to build production node, please checkout the tagged release commit. For production build, you can put `SKIP_WASM_BUILD=1` env to disable building wasm version of the runtime.
 
-2. Use pre-built binary
+3. Start BHO node
+```
+- Run Testnet Node: Phoenix
+
+./target/release/bholdus --chain=phoenix --name <INSERT_NAME> --rpc-port 9933 --ws-port 9944 --ws-external --rpc-external --prometheus-external --rpc-cors=all --pruning archive -lruntime=debug
+
+- Run Mainnet Node: Ulas
+
+ ./target/release/bholdus --chain=ulas --name <INSERT_NAME> --rpc-port 9933 --ws-port 9944 --ws-external --rpc-external --prometheus-external --rpc-cors=all --pruning archive -lruntime=debug
+```
+
+#### Use pre-built binary
 
 You can use the pre-built binary in the Github Releases
 
