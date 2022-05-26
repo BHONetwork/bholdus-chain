@@ -58,6 +58,8 @@ pub mod client;
 pub mod rpc;
 
 pub use rpc::EthApiCmd;
+#[cfg(feature = "manual-seal")]
+pub use rpc::Sealing;
 
 pub use client::*;
 

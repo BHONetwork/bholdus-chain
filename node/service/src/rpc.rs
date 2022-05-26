@@ -133,9 +133,34 @@ impl FromStr for EthApiCmd {
 	}
 }
 
+/// Available Sealing methods.
+#[cfg(feature = "manual-seal")]
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Sealing {
+	// Seal using rpc method.
+	Manual,
+	// Seal when transaction is executed.
+	Instant,
+}
+
+#[cfg(feature = "manual-seal")]
+impl FromStr for Sealing {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"manual" => Self::Manual,
+			"instant" => Self::Instant,
+			_ => return Err(format!("`{}` is not recognized as a supported sealing method", s)),
+		})
+	}
+}
+
 /// Configurations of RPC
 #[derive(Clone)]
 pub struct RpcConfig {
+	#[cfg(feature = "manual-seal")]
+	pub sealing: Sealing,
 	pub ethapi: Vec<EthApiCmd>,
 	pub ethapi_max_permits: u32,
 	pub ethapi_trace_max_count: u32,
