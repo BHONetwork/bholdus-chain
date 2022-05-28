@@ -56,4 +56,5 @@ with-all-runtime = [
 	"service/with-all-runtime",
 ]
 
+with-hyper-runtime = ["service/with-hyper-runtime", "manual-seal"]
 manual-seal = ["service/manual-seal"]
