@@ -1038,6 +1038,7 @@ where
 					subscription_executor: subscription_executor.clone(),
 					block_data_cache: block_data_cache.clone(),
 					command_sink: Some(command_sink.clone()),
+					sealing: rpc_config.sealing.clone(),
 					_phantom: PhantomData,
 				};
 

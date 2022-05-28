@@ -118,6 +118,8 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	#[cfg(feature = "manual-seal")]
 	pub command_sink:
 		Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
+	#[cfg(feature = "manual-seal")]
+	pub sealing: Sealing,
 	/// Used to bypass type parameter `B` of FullDeps when compiles with `manual-seal` feature.
 	#[cfg(feature = "manual-seal")]
 	pub _phantom: std::marker::PhantomData<B>,
@@ -292,6 +294,7 @@ where
 		transaction_converter,
 		block_data_cache,
 		command_sink,
+		sealing,
 		..
 	} = deps;
 
@@ -387,11 +390,13 @@ where
 
 	#[cfg(feature = "manual-seal")]
 	if let Some(command_sink) = command_sink {
-		io.extend_with(
-			// We provide the rpc handler with the sending end of the channel to allow the rpc
-			// send EngineCommands to the background block authorship task.
-			ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
-		);
+		if sealing == Sealing::Manual {
+			io.extend_with(
+				// We provide the rpc handler with the sending end of the channel to allow the rpc
+				// send EngineCommands to the background block authorship task.
+				ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+			);
+		}
 	}
 
 	Ok(io)

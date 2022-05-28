@@ -2,8 +2,14 @@
 
 use crate::*;
 
+#[cfg(not(feature = "manual-seal"))]
 parameter_types! {
 	pub const MinimumPeriod: Moment = SLOT_DURATION / 2;
+}
+
+#[cfg(feature = "manual-seal")]
+parameter_types! {
+	pub const MinimumPeriod: Moment = 5;
 }
 
 impl pallet_timestamp::Config for Runtime {
