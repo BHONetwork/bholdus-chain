@@ -59,7 +59,7 @@ pub mod client;
 pub mod rpc;
 
 pub use rpc::EthApiCmd;
-#[cfg(feature = "manual-seal")]
+#[cfg(feature = "with-hyper-runtime")]
 pub use rpc::Sealing;
 
 pub use client::*;
@@ -69,6 +69,9 @@ pub use ulas_runtime;
 
 #[cfg(feature = "with-phoenix-runtime")]
 pub use phoenix_runtime;
+
+#[cfg(feature = "with-hyper-runtime")]
+pub use hyper_runtime;
 
 type FullClient<RuntimeApi, Executor> =
 	TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
@@ -127,9 +130,34 @@ impl sc_executor::NativeExecutionDispatch for PhoenixExecutor {
 	}
 }
 
+#[cfg(feature = "with-hyper-runtime")]
+pub struct HyperExecutor;
+
+#[cfg(feature = "with-hyper-runtime")]
+impl sc_executor::NativeExecutionDispatch for HyperExecutor {
+	/// Only enable the benchmarking host functions when we actually want to benchmark.
+	#[cfg(feature = "runtime-benchmarks")]
+	type ExtendHostFunctions = (
+		frame_benchmarking::benchmarking::HostFunctions,
+		bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+	);
+	/// Otherwise we only use the default Substrate host functions.
+	#[cfg(not(feature = "runtime-benchmarks"))]
+	type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
+
+	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+		hyper_runtime::api::dispatch(method, data)
+	}
+
+	fn native_version() -> sc_executor::NativeVersion {
+		hyper_runtime::native_version()
+	}
+}
+
 pub trait IdentifyVariant {
 	fn is_ulas(&self) -> bool;
 	fn is_phoenix(&self) -> bool;
+	fn is_hyper(&self) -> bool;
 }
 
 impl IdentifyVariant for Box<dyn ChainSpec> {
@@ -140,10 +168,15 @@ impl IdentifyVariant for Box<dyn ChainSpec> {
 	fn is_phoenix(&self) -> bool {
 		self.id().starts_with("phoenix")
 	}
+
+	fn is_hyper(&self) -> bool {
+		self.id().starts_with("hyper")
+	}
 }
 
 pub const ULAS_RUNTIME_NOT_AVAILABLE: &str = "Ulas runtime is not available. Please compile the node with `--features with-ulas-runtime` to enable it.";
 pub const PHOENIX_RUNTIME_NOT_AVAILABLE: &str = "Phoenix runtime is not available. Please compile the node with `--features with-phoenix-runtime` to enable it.";
+pub const HYPER_RUNTIME_NOT_AVAILABLE: &str = "Hyper runtime is not available. Please compile the node with `--features with-hyper-runtime` to enable it.";
 
 pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
 	let config_dir = config
@@ -181,6 +214,9 @@ pub fn new_chain_ops(
 	match &config.chain_spec {
 		#[cfg(feature = "with-ulas-runtime")]
 		spec if spec.is_ulas() => new_chain_ops_inner::<ulas_runtime::RuntimeApi, UlasExecutor>(config),
+		#[cfg(feature = "with-hyper-runtime")]
+		spec if spec.is_hyper() =>
+			new_chain_ops_inner::<hyper_runtime::RuntimeApi, HyperExecutor>(config),
 		#[cfg(feature = "with-phoenix-runtime")]
 		_ => new_chain_ops_inner::<phoenix_runtime::RuntimeApi, PhoenixExecutor>(config),
 		#[cfg(not(feature = "with-phoenix-runtime"))]
@@ -226,6 +262,8 @@ pub enum TransactionConverters {
 	Ulas(ulas_runtime::TransactionConverter),
 	#[cfg(feature = "with-phoenix-runtime")]
 	Phoenix(phoenix_runtime::TransactionConverter),
+	#[cfg(feature = "with-hyper-runtime")]
+	Hyper,
 }
 
 impl TransactionConverters {
@@ -245,6 +283,10 @@ impl TransactionConverters {
 	fn phoenix() -> Self {
 		unimplemented!()
 	}
+	#[cfg(feature = "with-hyper-runtime")]
+	fn hyper() -> Self {
+		TransactionConverters::Hyper
+	}
 }
 
 impl fp_rpc::ConvertTransaction<common_primitives::OpaqueExtrinsic> for TransactionConverters {
@@ -257,11 +299,13 @@ impl fp_rpc::ConvertTransaction<common_primitives::OpaqueExtrinsic> for Transact
 			Self::Ulas(inner) => inner.convert_transaction(transaction),
 			#[cfg(feature = "with-phoenix-runtime")]
 			Self::Phoenix(inner) => inner.convert_transaction(transaction),
+			#[cfg(feature = "with-hyper-runtime")]
+			Self::Hyper => unimplemented!(),
 		}
 	}
 }
 
-#[cfg(not(feature = "manual-seal"))]
+#[cfg(not(feature = "with-hyper-runtime"))]
 pub fn new_partial<RuntimeApi, Executor>(
 	config: &Configuration,
 ) -> Result<
@@ -406,7 +450,7 @@ where
 	})
 }
 
-#[cfg(feature = "manual-seal")]
+#[cfg(feature = "with-hyper-runtime")]
 pub fn new_partial<RuntimeApi, Executor>(
 	config: &Configuration,
 ) -> Result<
@@ -510,7 +554,7 @@ fn remote_keystore(_url: &String) -> Result<Arc<LocalKeystore>, &'static str> {
 }
 
 /// Creates a full service from the configuration.
-#[cfg(not(feature = "manual-seal"))]
+#[cfg(not(feature = "with-hyper-runtime"))]
 pub fn new_full_base<RuntimeApi, Executor>(
 	mut config: Configuration,
 	rpc_config: rpc::RpcConfig,
@@ -892,7 +936,7 @@ where
 	Ok(NewFullBase { task_manager, client: client.clone(), network, transaction_pool })
 }
 
-#[cfg(feature = "manual-seal")]
+#[cfg(feature = "with-hyper-runtime")]
 pub fn new_full_base<RuntimeApi, Executor>(
 	mut config: Configuration,
 	rpc_config: rpc::RpcConfig,
@@ -954,42 +998,8 @@ where
 	let name = config.network.node_name.clone();
 	let prometheus_registry = config.prometheus_registry().cloned();
 
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	let overrides = rpc::overrides_handle(client.clone());
-	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 	// Channel for the rpc handler to communicate with the manual seal authorship task.
 	let (command_sink, commands_stream) = futures::channel::mpsc::channel(1000);
-
-	spawn_frontier_tasks(
-		&task_manager,
-		client.clone(),
-		backend.clone(),
-		frontier_backend.clone(),
-		filter_pool.clone(),
-		overrides.clone(),
-		fee_history_cache.clone(),
-		rpc_config.fee_history_limit,
-	);
-
-	let ethapi_cmd = rpc_config.ethapi.clone();
-	let tracing_requesters =
-		if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace) {
-			rpc::tracing::spawn_tracing_tasks(
-				&rpc_config,
-				rpc::SpawnTasksParams {
-					task_manager: &task_manager,
-					client: client.clone(),
-					substrate_backend: backend.clone(),
-					frontier_backend: frontier_backend.clone(),
-					filter_pool: filter_pool.clone(),
-					overrides: overrides.clone(),
-					fee_history_limit: rpc_config.fee_history_limit,
-					fee_history_cache: fee_history_cache.clone(),
-				},
-			)
-		} else {
-			rpc::tracing::RpcRequesters { debug: None, trace: None }
-		};
 
 	let rpc_extensions_builder = {
 		let client = client.clone();
@@ -999,27 +1009,10 @@ where
 		let chain_spec = config.chain_spec.cloned_box();
 		let frontier_backend = frontier_backend.clone();
 		let network = network.clone();
-		let fee_history_cache = fee_history_cache.clone();
-		let overrides = overrides.clone();
 		let rpc_config = rpc_config.clone();
-		let filter_pool = filter_pool.clone();
-		let block_data_cache = Arc::new(fc_rpc::EthBlockDataCache::new(
-			task_manager.spawn_handle(),
-			overrides.clone(),
-			rpc_config.eth_log_block_cache,
-			rpc_config.eth_statuses_cache,
-		));
-
-		let is_ulas = config.chain_spec.is_ulas();
 
 		let rpc_extensions_builder =
 			move |deny_unsafe, subscription_executor: rpc::SubscriptionTaskExecutor| {
-				let transaction_converter: TransactionConverters = if is_ulas {
-					TransactionConverters::ulas()
-				} else {
-					TransactionConverters::phoenix()
-				};
-
 				let deps = rpc::FullDeps {
 					client: client.clone(),
 					pool: pool.clone(),
@@ -1029,30 +1022,15 @@ where
 					chain_spec: chain_spec.cloned_box(),
 					is_authority,
 					network: network.clone(),
-					transaction_converter,
-					frontier_backend: frontier_backend.clone(),
 					rpc_config: rpc_config.clone(),
-					fee_history_cache: fee_history_cache.clone(),
-					overrides: overrides.clone(),
-					filter_pool: filter_pool.clone(),
 					subscription_executor: subscription_executor.clone(),
-					block_data_cache: block_data_cache.clone(),
 					command_sink: Some(command_sink.clone()),
+					sealing: rpc_config.sealing.clone(),
 					_phantom: PhantomData,
 				};
 
 				let mut io = rpc::create_full(deps)?;
 
-				// Ethereum Tracing RPC
-				if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace)
-				{
-					rpc::tracing::extend_with_tracing(
-						client.clone(),
-						tracing_requesters.clone(),
-						rpc_config.ethapi_trace_max_count,
-						&mut io,
-					);
-				}
 				Ok(io)
 			};
 
@@ -1121,37 +1099,6 @@ where
 		log::info!("Manual Seal Ready");
 	}
 
-	// Spawn authority discovery module.
-	if role.is_authority() {
-		let authority_discovery_role =
-			sc_authority_discovery::Role::PublishAndDiscover(keystore_container.keystore());
-		let dht_event_stream =
-			network.event_stream("authority-discovery").filter_map(|e| async move {
-				match e {
-					Event::Dht(e) => Some(e),
-					_ => None,
-				}
-			});
-		let (authority_discovery_worker, _service) =
-			sc_authority_discovery::new_worker_and_service_with_config(
-				sc_authority_discovery::WorkerConfig {
-					publish_non_global_ips: auth_disc_publish_non_global_ips,
-					..Default::default()
-				},
-				client.clone(),
-				network.clone(),
-				Box::pin(dht_event_stream),
-				authority_discovery_role,
-				prometheus_registry.clone(),
-			);
-
-		task_manager.spawn_handle().spawn(
-			"authority-discovery-worker",
-			Some("networking"),
-			authority_discovery_worker.run(),
-		);
-	}
-
 	// if the node isn't actively participating in consensus then it doesn't
 	// need a keystore, regardless of which protocol we use below.
 	let keystore =
@@ -1177,6 +1124,7 @@ where
 		.map(|NewFullBase { task_manager, .. }| task_manager)
 }
 
+#[cfg(not(feature = "with-hyper-runtime"))]
 fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	task_manager: &TaskManager,
 	client: Arc<FullClient<RuntimeApi, Executor>>,

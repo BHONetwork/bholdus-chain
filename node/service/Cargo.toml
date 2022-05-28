@@ -98,6 +98,7 @@ bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
 
 ulas-runtime = { optional = true, path = "../../runtime/ulas" }
 phoenix-runtime = { optional = true, path = "../../runtime/phoenix" }
+hyper-runtime = { optional = true, path = "../../runtime/hyper" }
 common-primitives = { path = "../../primitives/common" }
 
 [features]
@@ -112,8 +113,8 @@ try-runtime = ["ulas-runtime/try-runtime", "phoenix-runtime/try-runtime"]
 with-ulas-runtime = ["ulas-runtime"]
 with-phoenix-runtime = ["phoenix-runtime"]
 with-all-runtime = ["with-ulas-runtime", "with-phoenix-runtime"]
+
+with-hyper-runtime = ["hyper-runtime", "manual-seal"]
 manual-seal = [
     "sc-consensus-manual-seal",
-    "ulas-runtime/manual-seal",
-    "phoenix-runtime/manual-seal",
 ]

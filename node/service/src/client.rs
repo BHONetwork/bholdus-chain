@@ -31,6 +31,7 @@ use std::sync::Arc;
 ///
 /// This trait has no methods or associated type. It is a concise marker for all the trait bounds
 /// that it contains.
+#[cfg(not(feature = "with-hyper-runtime"))]
 pub trait RuntimeApiCollection:
 	sp_api::ApiExt<Block>
 	+ sp_api::Metadata<Block>
@@ -54,6 +55,7 @@ where
 {
 }
 
+#[cfg(not(feature = "with-hyper-runtime"))]
 impl<Api> RuntimeApiCollection for Api
 where
 	Api: sp_api::ApiExt<Block>
@@ -73,6 +75,38 @@ where
 		+ fp_rpc::EthereumRuntimeRPCApi<Block>
 		+ fp_rpc::ConvertTransactionRuntimeApi<Block>
 		+ bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>,
+	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
+{
+}
+
+#[cfg(feature = "with-hyper-runtime")]
+pub trait RuntimeApiCollection:
+	sp_api::ApiExt<Block>
+	+ sp_api::Metadata<Block>
+	+ sp_block_builder::BlockBuilder<Block>
+	+ sp_offchain::OffchainWorkerApi<Block>
+	+ sp_session::SessionKeys<Block>
+	+ sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
+	+ frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
+	+ pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
+	+ pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
+where
+	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
+{
+}
+
+#[cfg(feature = "with-hyper-runtime")]
+impl<Api> RuntimeApiCollection for Api
+where
+	Api: sp_api::ApiExt<Block>
+		+ sp_api::Metadata<Block>
+		+ sp_block_builder::BlockBuilder<Block>
+		+ sp_offchain::OffchainWorkerApi<Block>
+		+ sp_session::SessionKeys<Block>
+		+ sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
+		+ frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce>
+		+ pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<Block, Balance>
+		+ pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
 	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
 }
@@ -158,6 +192,8 @@ pub enum Client {
 	Ulas(Arc<crate::FullClient<ulas_runtime::RuntimeApi, crate::UlasExecutor>>),
 	#[cfg(feature = "with-phoenix-runtime")]
 	Phoenix(Arc<crate::FullClient<phoenix_runtime::RuntimeApi, crate::PhoenixExecutor>>),
+	#[cfg(feature = "with-hyper-runtime")]
+	Hyper(Arc<crate::FullClient<hyper_runtime::RuntimeApi, crate::HyperExecutor>>),
 }
 
 #[cfg(feature = "with-ulas-runtime")]
@@ -176,6 +212,15 @@ impl From<Arc<crate::FullClient<phoenix_runtime::RuntimeApi, crate::PhoenixExecu
 	}
 }
 
+#[cfg(feature = "with-hyper-runtime")]
+impl From<Arc<crate::FullClient<hyper_runtime::RuntimeApi, crate::HyperExecutor>>> for Client {
+	fn from(
+		client: Arc<crate::FullClient<hyper_runtime::RuntimeApi, crate::HyperExecutor>>,
+	) -> Self {
+		Self::Hyper(client)
+	}
+}
+
 impl ClientHandle for Client {
 	fn execute_with<T: ExecuteWithClient>(&self, t: T) -> T::Output {
 		match self {
@@ -183,6 +228,8 @@ impl ClientHandle for Client {
 			Self::Ulas(client) => T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone()),
 			#[cfg(feature = "with-phoenix-runtime")]
 			Self::Phoenix(client) => T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone()),
+			#[cfg(feature = "with-hyper-runtime")]
+			Self::Hyper(client) => T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone()),
 		}
 	}
 }
@@ -194,6 +241,8 @@ macro_rules! match_client {
 			Self::Ulas(client) => client.$method($($param),*),
 			#[cfg(feature = "with-phoenix-runtime")]
 			Self::Phoenix(client) => client.$method($($param),*),
+			#[cfg(feature = "with-hyper-runtime")]
+			Self::Hyper(client) => client.$method($($param),*),
 		}
 	};
 }

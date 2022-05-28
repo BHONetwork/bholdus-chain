@@ -13,6 +13,9 @@ pub mod ulas;
 #[cfg(feature = "with-phoenix-runtime")]
 pub mod phoenix;
 
+#[cfg(feature = "with-hyper-runtime")]
+pub mod hyper;
+
 pub type DummyChainSpec = sc_service::GenericChainSpec<()>;
 
 type AccountPublic = <Signature as Verify>::Signer;
