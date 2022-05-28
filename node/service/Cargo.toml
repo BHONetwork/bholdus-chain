@@ -9,7 +9,7 @@ version = "1.0.17"
 
 [dependencies]
 structopt = "0.3.8"
-rand = "0.8.4"
+rand = "0.8.5"
 log = "0.4.17"
 async-trait = { version = "0.1.48" }
 futures = { version = "0.3.9", features = ["compat"] }
