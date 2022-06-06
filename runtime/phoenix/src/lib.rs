@@ -169,7 +169,7 @@ construct_runtime!(
 
 		// DeFi
 		Tokens: bholdus_tokens,
-	Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+		Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
 		NFT: bholdus_nft::{Pallet, Call, Event<T>},
 		NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Event<T>},
 		BholdusSupportNFT: bholdus_support_nft,
