@@ -47,9 +47,9 @@ pub struct ClassInfo<TokenId, AccountId, Data> {
 
 /// Token info
 #[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
-pub struct TokenInfo<AccountId, Data, TokenMetadataOf> {
+pub struct TokenInfo<AccountId, Data, Metadata> {
 	/// Token metadata
-	pub metadata: TokenMetadataOf,
+	pub metadata: Metadata,
 	/// Token owner
 	pub owner: AccountId,
 	/// Token creator,
@@ -321,6 +321,7 @@ impl<T: Config> Pallet<T> {
 		NextTokenIdByClass::<T>::mutate(class_id, |id| -> Result<T::TokenId, DispatchError> {
 			let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> =
 				metadata.try_into().map_err(|_| Error::<T>::MaxMetadataExceeded)?;
+
 			let token_id = *id;
 			*id = id.checked_add(&One::one()).ok_or(Error::<T>::NoAvailableTokenId)?;
 			Classes::<T>::try_mutate(class_id, |class_info| -> DispatchResult {
@@ -349,15 +350,12 @@ impl<T: Config> Pallet<T> {
 		owner: &T::AccountId,
 		class_id: T::ClassId,
 		group_id: T::GroupId,
-		metadata: Vec<u8>,
-		data: T::TokenData,
+		info: &TokenInfoOf<T>,
 	) -> Result<T::TokenId, DispatchError> {
 		NextTokenIdByClass::<T>::try_mutate(
 			class_id,
 			|class_token_id| -> Result<T::TokenId, DispatchError> {
 				NextTokenId::<T>::try_mutate(|id| -> Result<T::TokenId, DispatchError> {
-					let bounded_metadata: BoundedVec<u8, T::MaxTokenMetadata> =
-						metadata.try_into().map_err(|_| Error::<T>::MaxMetadataExceeded)?;
 					let token_id = *id;
 					*id = id.checked_add(&One::one()).ok_or(Error::<T>::NoAvailableTokenId)?;
 
@@ -372,19 +370,7 @@ impl<T: Config> Pallet<T> {
 						Ok(())
 					})?;
 
-					let token_info = TokenInfo {
-						metadata: bounded_metadata,
-						owner: owner.clone(),
-						creator: owner.clone(),
-						data,
-					};
-					/*if_std!(println!(
-						"SupportNFT class_id-token_id-class_token_id {:?}:{:?}:{:?}",
-						class_id, token_id, class_token_id
-					));
-					*/
-
-					Tokens::<T>::insert(class_id, token_id, token_info);
+					Tokens::<T>::insert(class_id, token_id, info);
 					TokensByOwner::<T>::insert((owner, class_id, token_id), ());
 					TokensByGroup::<T>::insert((group_id, class_id, token_id), ());
 					Ok(token_id)
@@ -448,5 +434,9 @@ impl<T: Config> Pallet<T> {
 
 	pub fn is_lock(account: &T::AccountId, token: (T::ClassId, T::TokenId)) -> bool {
 		LockableNFT::<T>::contains_key((account, token.0, token.1))
+	}
+
+	pub fn is_existed(token: (T::ClassId, T::TokenId)) -> bool {
+		Tokens::<T>::contains_key(token.0, token.1)
 	}
 }

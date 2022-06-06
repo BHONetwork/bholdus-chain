@@ -64,7 +64,7 @@ pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 #[cfg(any(feature = "std", test))]
 pub use pallet_sudo::Call as SudoCall;
-#[cfg(any(feature = "std", test))]
+#[cfg(any(feature = "std", t))]
 pub use sp_runtime::BuildStorage;
 
 /// BHO deps
@@ -169,10 +169,11 @@ construct_runtime!(
 
 		// DeFi
 		Tokens: bholdus_tokens,
-		NFT: bholdus_nft,
-		NFTMarketplace: bholdus_nft_marketplace,
+	Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+		NFT: bholdus_nft::{Pallet, Call, Event<T>},
+		NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Event<T>},
 		BholdusSupportNFT: bholdus_support_nft,
-		SupportNFTMarketplace: bholdus_support_nft_marketplace,
+		SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage},
 
 		// Others
 		Memo: bholdus_memo,

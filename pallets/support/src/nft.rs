@@ -28,8 +28,8 @@ pub trait NFT<AccountId> {
 	fn owner(token: (Self::ClassId, Self::TokenId)) -> Option<AccountId>;
 	/// Transfer the given token ID from one account to another.
 	fn transfer(
-		from: &AccountId,
-		to: &AccountId,
+		from: AccountId,
+		to: AccountId,
 		token: (Self::ClassId, Self::TokenId),
 	) -> DispatchResult;
 }

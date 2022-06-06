@@ -9,6 +9,7 @@ parameter_types! {
 impl bholdus_support_nft_marketplace::Config for Runtime {
 	type GetRoyaltyValue = RoyaltyValue;
 	type Time = Timestamp;
+	type Currency = Currencies;
 }
 
 impl bholdus_nft_marketplace::Config for Runtime {

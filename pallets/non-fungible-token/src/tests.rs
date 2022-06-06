@@ -24,21 +24,11 @@ fn test_attr(x: u8) -> Attributes {
 fn create_class_should_work() {
 	ExtBuilder::default().build().execute_with(|| {
 		let metadata = vec![1];
-
 		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1)));
-
-		/*System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
-		ALICE, //class_id_account(),
-		CLASS_ID,
-		)));
-		*/
-
 		assert_eq!(
 			bholdus_support_nft::Pallet::<Runtime>::classes(0).unwrap().data,
 			ClassData { attributes: test_attr(1) }
 		)
-		// let class_info = bholdus_support_nft::Classes::<Runtime>::get(CLASS_ID);
-		// println!("create_class_should_work {:?}", class_info);
 	});
 }
 
@@ -46,148 +36,44 @@ fn create_class_should_work() {
 fn mint_should_work() {
 	ExtBuilder::default().build().execute_with(|| {
 		let metadata = vec![1];
-		let metadata_2 = vec![2, 3];
+		let bounded_metadata = metadata.clone().try_into().unwrap();
+		let class_attr = test_attr(2u8);
 
-		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1)));
+		let token_attr = test_attr(1u8);
+		let data = ClassData { attributes: class_attr.clone() };
 
-		System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
-			ALICE, //class_id_account(),
-			CLASS_ID,
-		)));
+		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), class_attr.clone()));
+
+		System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass {
+			owner: ALICE,
+			class_id: CLASS_ID,
+			data,
+		}));
 
 		// ClassID = 0;
-
 		assert_ok!(NFTModule::mint(
-			Origin::signed(
-                        ALICE //class_id_account()
-                    ),
+			Origin::signed(ALICE),
 			BOB,
 			CLASS_ID,
-			metadata_2.clone(),
-			test_attr(2),
+			metadata.clone(),
+			token_attr.clone(),
 			3
 		));
 
-		System::assert_last_event(Event::NFTModule(crate::Event::MintedToken(
-			ALICE, //class_id_account(),
-			BOB, GROUP_ID, CLASS_ID, TOKEN_ID, 3,
-		)));
+		let token_info = TokenInfo {
+			metadata: bounded_metadata,
+			owner: BOB,
+			creator: BOB,
+			data: TokenData { attributes: token_attr },
+		};
 
-		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1)));
-		System::assert_last_event(Event::NFTModule(crate::Event::CreatedClass(
-			ALICE, //class_id_account(),
-			1,
-		)));
-
-		// ClassID = 1;
-
-		let token_id = bholdus_support_nft::NextTokenId::<Runtime>::get();
-		assert_eq!(token_id, 3);
-
-		let group_id = bholdus_support_nft::NextGroupId::<Runtime>::get();
-
-		assert_eq!(group_id, 1);
-
-		assert_ok!(NFTModule::mint(
-			Origin::signed(
-                        ALICE //class_id_account()
-                    ),
-			BOB,
-			1,
-			metadata_2.clone(),
-			test_attr(2),
-			3
-		));
-
-		System::assert_last_event(Event::NFTModule(crate::Event::MintedToken(
-			ALICE, //class_id_account(),
-			BOB, group_id, 1, token_id, 3,
-		)));
-
-		// ClassID = 2;
-		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), test_attr(1)));
-
-		let token_id = bholdus_support_nft::NextTokenId::<Runtime>::get();
-		assert_eq!(token_id, 6);
-
-		let group_id = bholdus_support_nft::NextGroupId::<Runtime>::get();
-		assert_eq!(group_id, 2);
-
-		assert_ok!(NFTModule::mint(
-			Origin::signed(
-                        ALICE //class_id_account()
-                    ),
-			BOB,
-			2,
-			metadata_2.clone(),
-			test_attr(2),
-			2
-		));
-
-		System::assert_last_event(Event::NFTModule(crate::Event::MintedToken(
-			ALICE, //class_id_account(),
-			BOB, 2, 2, token_id, 2,
-		)));
-
-		// Test TokensByOwner
-
-		/* assert_eq!(
-		bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>(),
-		vec![(BOB, 1), (BOB, 0), (BOB, 2)]
-		);
-		*/
-
-		// println!(
-		//     "transfer_should_work: tokens_by_owner {:#?}",
-		//     bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>()
-		// );
-
-		// Test TokensByGroup
-		//
-		// assert_eq!(
-		//     bholdus_support_nft::TokensByGroup::<Runtime>::contains_key((
-		//         GROUP_ID, CLASS_ID, TOKEN_ID
-		//     )),
-		//     true
-		// );
-
-		/* assert_eq!(
-		bholdus_support_nft::TokensByGroup::<Runtime>::contains_key((
-		GROUP_ID, CLASS_ID, TOKEN_ID
-		)),
-		true
-		);
-
-		println!(
-		"mint_should_work: tokens_by_group{:#?}",
-		bholdus_support_nft::TokensByGroup::<Runtime>::iter_values().collect::<Vec<_>>()
-		);
-
-		println!(
-		"mint_should_work: test prefix tokens_by_group{:#?}",
-		bholdus_support_nft::TokensByGroup::<Runtime>::iter_prefix((GROUP_ID, CLASS_ID,))
-		.collect::<Vec<_>>()
-		);
-		*/
-
-		// assert_eq!(
-		//     bholdus_support_nft::TokensByGroup::<Runtime>::iter_prefix((GROUP_ID))
-		//         .collect::<Vec<_>>(),
-		//     vec![(BOB, 1), (BOB, 0), (BOB, 2)]
-		// );
-
-		// Test OwnedTokens
-
-		// assert_eq!(
-		//     bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
-		//     vec![(BOB, 1), (BOB, 0), (BOB, 2)]
-		// )
-
-		// println!(
-		//     "mint_should_work: owned_tokens {:#?}",
-		//     bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>()
-		// );
-		//
+		System::assert_last_event(Event::NFTModule(crate::Event::MintedToken {
+			group_id: GROUP_ID,
+			class_id: CLASS_ID,
+			token_id: TOKEN_ID,
+			token_info,
+			quantity: 3,
+		}));
 	});
 }
 
@@ -278,9 +164,7 @@ fn transfer_should_work() {
 		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), Default::default(),));
 
 		assert_ok!(NFTModule::mint(
-			Origin::signed(
-                        ALICE //class_id_account()
-                    ),
+			Origin::signed(ALICE),
 			BOB,
 			CLASS_ID,
 			metadata.clone(),
@@ -290,19 +174,19 @@ fn transfer_should_work() {
 
 		assert_ok!(NFTModule::transfer(Origin::signed(BOB), ALICE, (CLASS_ID, TOKEN_ID)));
 
-		System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken(
-			BOB, ALICE, CLASS_ID, TOKEN_ID,
-		)));
+		System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken {
+			from: BOB,
+			to: ALICE,
+			token: (CLASS_ID, TOKEN_ID),
+		}));
 
 		assert_ok!(NFTModule::transfer(Origin::signed(ALICE), DAVE, (CLASS_ID, TOKEN_ID)));
 
-		System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken(
-			ALICE, DAVE, CLASS_ID, TOKEN_ID,
-		)));
-		// assert_eq!(
-		//     bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
-		//     vec![(DAVE, 0), (ALICE, 0), (BOB, 0)]
-		// )
+		System::assert_last_event(Event::NFTModule(crate::Event::TransferredToken {
+			from: ALICE,
+			to: DAVE,
+			token: (CLASS_ID, TOKEN_ID),
+		}));
 	});
 }
 
@@ -331,11 +215,6 @@ fn transfer_should_fail() {
 			NFTModule::transfer(Origin::signed(BOB), ALICE, (CLASS_ID, TOKEN_ID_NOT_EXIST)),
 			Error::<Runtime>::TokenIdNotFound
 		);
-
-		// assert_noop!(
-		//     NFTModule::transfer(Origin::signed(ALICE), BOB, (CLASS_ID, TOKEN_ID)),
-		//     bholdus_support_nft::Error::<Runtime>::NoPermission
-		// );
 	});
 
 	ExtBuilder::default().build().execute_with(|| {
@@ -351,9 +230,7 @@ fn burn_should_work() {
 		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), Default::default(),));
 
 		assert_ok!(NFTModule::mint(
-			Origin::signed(
-                        ALICE//class_id_account()
-                    ),
+			Origin::signed(ALICE),
 			BOB,
 			CLASS_ID,
 			metadata.clone(),
@@ -363,20 +240,10 @@ fn burn_should_work() {
 
 		assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
 
-		/*System::assert_last_event(Event::NFTModule(crate::Event::BurnedToken(
-		BOB, CLASS_ID, TOKEN_ID,
-		)));
-		*/
-
-		assert_eq!(
-			bholdus_support_nft::TokensByOwner::<Runtime>::iter_values().collect::<Vec<_>>(),
-			vec![]
-		);
-
-		// assert_eq!(
-		//     bholdus_support_nft::OwnedTokens::<Runtime>::iter_values().collect::<Vec<_>>(),
-		//     vec![(BOB, 0)]
-		// )
+		System::assert_last_event(Event::NFTModule(crate::Event::BurnedToken {
+			owner: BOB,
+			token: (CLASS_ID, TOKEN_ID),
+		}));
 	})
 }
 
@@ -402,11 +269,6 @@ fn burn_should_fail() {
 			Error::<Runtime>::TokenIdNotFound
 		);
 
-		// assert_noop!(
-		//     NFTModule::burn(Origin::signed(ALICE), (CLASS_ID, TOKEN_ID)),
-		//     Error::<Runtime>::NoPermission
-		// );
-
 		bholdus_support_nft::Classes::<Runtime>::mutate(CLASS_ID, |class_info| {
 			class_info.as_mut().unwrap().total_issuance = 0;
 		});
@@ -420,50 +282,23 @@ fn burn_should_fail() {
 #[test]
 fn destroy_class_should_work() {
 	ExtBuilder::default().build().execute_with(|| {
-		let metadata = vec![1];
 		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), Default::default(),));
-		assert_ok!(NFTModule::mint(
-			Origin::signed(
-                        ALICE//class_id_account()
-                    ),
-			BOB,
-			CLASS_ID,
-			metadata,
-			Default::default(),
-			1
-		));
 
-		assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
-		/*assert_ok!(NFTModule::destroy_class(
-		Origin::signed(
-		ALICE//class_id_account()
-		),
-		CLASS_ID,
-		));
-		*/
-
-		/*System::assert_last_event(Event::NFTModule(crate::Event::DestroyedClass(
-		ALICE, //class_id_account(),
-		CLASS_ID,
-		)));
-		*/
+		assert_ok!(NFTModule::destroy_class(Origin::signed(ALICE), CLASS_ID));
+		System::assert_last_event(Event::NFTModule(crate::Event::DestroyedClass {
+			owner: ALICE,
+			class_id: CLASS_ID,
+		}));
 	})
 }
 #[test]
 fn destroy_class_should_fail() {
 	ExtBuilder::default().build().execute_with(|| {
 		let metadata = vec![1];
-		assert_ok!(NFTModule::create_class(
-			Origin::signed(ALICE),
-			// metadata.clone(),
-			Default::default(),
-		));
+		assert_ok!(NFTModule::create_class(Origin::signed(ALICE), Default::default(),));
 
 		assert_ok!(NFTModule::mint(
-			Origin::signed(
-				ALICE,
-				//class_id_account()
-			),
+			Origin::signed(ALICE,),
 			BOB,
 			CLASS_ID,
 			metadata,
@@ -472,39 +307,18 @@ fn destroy_class_should_fail() {
 		));
 
 		assert_noop!(
-			NFTModule::destroy_class(
-				Origin::signed(
-                        ALICE //class_id_account()
-                    ),
-				CLASS_ID_NOT_EXIST
-			),
+			NFTModule::destroy_class(Origin::signed(ALICE), CLASS_ID_NOT_EXIST),
 			Error::<Runtime>::ClassIdNotFound
 		);
 
-		// assert_noop!(
-		//     NFTModule::destroy_class(Origin::signed(BOB), CLASS_ID),
-		//     Error::<Runtime>::NoPermission
-		// );
-
-		/*assert_noop!(
-		NFTModule::destroy_class(
-		Origin::signed(
-		ALICE //class_id_account()
-		),
-		CLASS_ID
-		),
-		Error::<Runtime>::CannotDestroyClass
+		assert_noop!(
+			NFTModule::destroy_class(Origin::signed(BOB), CLASS_ID),
+			Error::<Runtime>::NoPermission
 		);
-		*/
 
-		assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
-
-		/*assert_ok!(NFTModule::destroy_class(
-		  Origin::signed(ALICE
-		//class_id_account()
-		),
-		CLASS_ID,
-		));
-		*/
+		assert_noop!(
+			NFTModule::destroy_class(Origin::signed(ALICE), CLASS_ID),
+			Error::<Runtime>::CannotDestroyClass,
+		);
 	});
 }

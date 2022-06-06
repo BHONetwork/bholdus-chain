@@ -38,6 +38,8 @@ bholdus-support-nft-marketplace = { package = "support-nft-marketplace", default
 [dev-dependencies]
 sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 pallet-utility = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+bholdus-currencies = { default-features = false, path = "../../pallets/currencies" }
+bholdus-nft = { default-features = false, path = "../../pallets/non-fungible-token" }
 
 [features]
 default = ["std"]
