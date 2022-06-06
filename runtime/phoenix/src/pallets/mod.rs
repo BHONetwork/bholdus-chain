@@ -100,6 +100,9 @@ pub use beefy_mmr::*;
 pub mod tokens;
 pub use tokens::*;
 
+pub mod currencies;
+pub use currencies::*;
+
 pub mod memo;
 pub use memo::*;
 

@@ -121,7 +121,7 @@ use frame_support::{
 		LockableCurrency as PalletLockableCurrency, ReservableCurrency as PalletReservableCurrency,
 		SignedImbalance, StoredMap, WithdrawReasons,
 	},
-	transactional, BoundedVec,
+	transactional, BoundedVec, PalletId,
 };
 
 // use frame_support::{

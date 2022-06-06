@@ -43,6 +43,10 @@ test-cygnus-runtime:
 test-phoenix-runtime:
 	SKIP_WASM_BUILD= cargo test --features with-phoenix-runtime -- --nocapture
 
+test:
+	SKIP_WASM_BUILD= cargo test -p bholdus-nft -p support-nft -p bholdus-nft-marketplace -p support-nft-marketplace -- --nocapture
+
+
 # For CI
 .PHONY: test-runtimes
 test-runtimes:

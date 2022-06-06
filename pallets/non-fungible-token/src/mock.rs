@@ -11,11 +11,11 @@ use frame_support::{
 };
 
 use bholdus_support::parameter_type_with_key;
-use common_primitives::{Amount, Balance, BlockNumber, CurrencyId, TokenSymbol};
+use common_primitives::{Amount, Balance, BlockNumber};
 use sp_core::{crypto::AccountId32, H256};
 use sp_runtime::{
 	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup},
+	traits::{AccountIdConversion, BlakeTwo256, IdentityLookup},
 };
 
 parameter_types! {
@@ -48,6 +48,7 @@ impl frame_system::Config for Runtime {
 	type SystemWeightInfo = ();
 	type SS58Prefix = ();
 	type OnSetCode = ();
+	type MaxConsumers = ConstU32<16>;
 }
 
 // parameter_types! {
@@ -69,6 +70,7 @@ impl frame_system::Config for Runtime {
 impl pallet_utility::Config for Runtime {
 	type Event = Event;
 	type Call = Call;
+	type PalletsOrigin = OriginCaller;
 	type WeightInfo = ();
 }
 

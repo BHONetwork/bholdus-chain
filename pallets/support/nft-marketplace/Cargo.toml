@@ -27,6 +27,7 @@ frame-system = { default-features = false, git = "https://github.com/BHONetwork/
 sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+pallet-balances = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 
 common-primitives = { default-features = false, path = "../../../primitives/common" }
 bholdus-support = {  default-features = false, path = "../" }

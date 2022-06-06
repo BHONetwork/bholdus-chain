@@ -812,6 +812,8 @@ dependencies = [
 name = "bholdus-nft-marketplace"
 version = "1.0.17"
 dependencies = [
+ "bholdus-currencies",
+ "bholdus-nft",
  "bholdus-support",
  "bholdus-tokens",
  "common-primitives",
@@ -9592,6 +9594,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "pallet-balances",
  "parity-scale-codec 3.1.2",
  "scale-info",
  "serde",

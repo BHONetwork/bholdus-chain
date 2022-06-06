@@ -57,39 +57,25 @@ fn mint_should_work() {
 #[test]
 fn mint_to_group_should_work() {
 	ExtBuilder::default().build().execute_with(|| {
+		let metadata = vec![1];
+		let bounded_metadata: BoundedVec<u8, MaxTokenMetadata> =
+			metadata.clone().try_into().unwrap();
+		let token_info =
+			TokenInfo { metadata: bounded_metadata, owner: BOB, creator: BOB, data: () };
+
 		assert_eq!(BholdusNFT::next_class_id(), CLASS_ID);
 		assert_ok!(BholdusNFT::create_class(&ALICE, ()));
 
 		assert_eq!(BholdusNFT::next_group_id(), GROUP_ID);
 		assert_ok!(BholdusNFT::create_group());
 
-		assert_ok!(BholdusNFT::mint_to_group(&ALICE, CLASS_ID, GROUP_ID, vec![1], ()));
+		assert_ok!(BholdusNFT::mint_to_group(&ALICE, CLASS_ID, GROUP_ID, &token_info));
+
 		assert_eq!(BholdusNFT::next_class_id(), 1);
 		assert_eq!(BholdusNFT::next_group_id(), 1);
 
-		assert_ok!(BholdusNFT::mint_to_group(&ALICE, CLASS_ID, GROUP_ID, vec![1], ()));
-
-		assert_ok!(BholdusNFT::mint_to_group(&ALICE, CLASS_ID, GROUP_ID, vec![1], ()));
-
-		// assert_eq!(
-		//     TokensByGroup::<Runtime>::contains_key((
-		//         GROUP_ID, CLASS_ID, TOKEN_ID
-		//     )),
-		//     true
-		// );
-
+		assert_ok!(BholdusNFT::mint_to_group(&ALICE, CLASS_ID, GROUP_ID, &token_info));
 		assert_eq!(TokensByGroup::<Runtime>::contains_key((GROUP_ID, CLASS_ID, TOKEN_ID)), true);
-
-		// let tokens_by_group = TokensByGroup::<Runtime>::get((GROUP_ID, CLASS_ID, TOKEN_ID));
-		// println!("tokens-by-group{:#?}", tokens_by_group);
-
-		let tokens_by_group =
-			TokensByGroup::<Runtime>::iter_prefix((GROUP_ID, CLASS_ID)).collect::<Vec<_>>();
-		// println!("tokens-by-group{:#?}", tokens_by_group);
-		// assert_eq!(
-		//     tokens_by_group,
-		//     vec![((0, 2), ()), ((0, 1), ()), ((0, 0), ())]
-		// )
 	});
 }
 
@@ -100,17 +86,6 @@ fn mint_should_fail() {
 		Classes::<Runtime>::mutate(CLASS_ID, |class_info| {
 			class_info.as_mut().unwrap().total_issuance = <Runtime as Config>::TokenId::max_value();
 		});
-		/*assert_noop!(
-			BholdusNFT::mint(&BOB, CLASS_ID, vec![1], ()),
-			ArithmeticError::Overflow,
-		);
-
-		NextTokenId::<Runtime>::mutate(|id| *id = <Runtime as Config>::TokenId::max_value());
-		assert_noop!(
-			BholdusNFT::mint(&BOB, CLASS_ID, vec![1], ()),
-			Error::<Runtime>::NoAvailableTokenId
-		);
-		*/
 	});
 }
 

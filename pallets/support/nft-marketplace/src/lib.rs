@@ -16,12 +16,26 @@ use frame_support::{
 	pallet_prelude::*,
 	traits::{Get, Time},
 };
+use frame_system::pallet_prelude::*;
 
 use scale_info::TypeInfo;
-use sp_runtime::{self, DispatchResult, RuntimeDebug};
+use sp_core::U256;
+use sp_runtime::{self, traits::Zero, DispatchResult, FixedU128, RuntimeDebug};
 
-use common_primitives::Balance;
+use bholdus_support::MultiCurrency;
+use common_primitives::{Balance, TokenId as CurrencyId};
 use sp_std::prelude::*;
+
+pub mod access_control;
+pub mod auction;
+pub mod fixed_price;
+pub mod traits;
+pub use access_control::*;
+pub use auction::*;
+pub use fixed_price::*;
+pub use traits::*;
+
+pub type ExchangeRate = FixedU128;
 
 // #[cfg(test)]
 // mod mock;
@@ -35,62 +49,32 @@ pub type Denominator = u32;
 pub type Numerator = u32;
 pub type RoyaltyRate = (Numerator, Denominator);
 
-#[derive(Encode, Decode, Clone, RuntimeDebug, PartialEq, Eq, TypeInfo)]
-pub struct PalletManagementInfo<AccountId> {
-	pub controller: AccountId,
-}
-
-/// MarketPlace Fee Information
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct MarketplaceFeeInfo<AccountId> {
-	pub service_fee: (Numerator, Denominator),
-	pub beneficiary: AccountId,
-}
-
-/// Listing Info
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct FixedPriceListingInfo<AccountId, CurrencyId, Moment> {
-	pub owner: AccountId,
-	pub price: Price,
-	pub currency_id: CurrencyId,
+/*#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
+pub struct PaymentInfo<AccountId> {
+	pub actual_price: Balance,
+	pub royalty_amount: Balance,
+	pub fee_amount: Balance,
+	pub fee_recipient: AccountId,
+	pub royalty_recipient: AccountId,
 	pub royalty: RoyaltyRate,
-	pub status: NFTState,
-	pub expired_time: Moment,
 	pub service_fee: (Numerator, Denominator),
 }
+*/
 
+/*/// Trading Information
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct ItemListingInfo<AccountId> {
-	pub owner: AccountId,
-	pub mode: MarketMode,
-}
-
-/// Trading Information
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct TradingInfo<AccountId> {
+pub struct FixedPriceOrderInfo<AccountId, CurrencyId, Moment> {
 	pub seller: AccountId,
 	pub buyer: AccountId,
-	pub market_mode: MarketMode,
-	pub price: Price,
-	pub royalty: RoyaltyRate,
+	pub time: Moment,
+	pub currency_id: CurrencyId,
+	pub actual_price: Balance,
+	pub fee_amount: Balance,
+	pub royalty_amount: Balance,
+	pub fee_recipient: AccountId,
+	pub royalty_recipient: AccountId,
 }
-
-#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
-pub enum MarketMode {
-	FixedPrice,
-}
-
-#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
-pub enum NFTCurrencyId<BHC20TokenId> {
-	Native,
-	Token(BHC20TokenId),
-}
-
-#[derive(Encode, Decode, Clone, Eq, PartialEq, MaxEncodedLen, RuntimeDebug, TypeInfo)]
-pub enum NFTState {
-	Pending,
-	Listing,
-}
+*/
 
 #[frame_support::pallet]
 pub mod support_module {
@@ -98,26 +82,45 @@ pub mod support_module {
 
 	#[pallet::config]
 	pub trait Config:
-		frame_system::Config + bholdus_support_nft::Config + bholdus_tokens::Config
+		frame_system::Config
+		+ pallet_balances::Config<Balance = Balance>
+		+ bholdus_support_nft::Config // + bholdus_tokens::Config
 	{
 		type GetRoyaltyValue: Get<RoyaltyRate>;
 		type Time: Time;
+		type Currency: MultiCurrency<Self::AccountId, CurrencyId = CurrencyId, Balance = Balance>;
+		//type NativeCurrency: ReservableCurrency<Self::AccountId>;
 	}
 
 	pub type PalletManagementInfoOf<T> =
 		PalletManagementInfo<<T as frame_system::Config>::AccountId>;
 	pub type MarketplaceFeeInfoOf<T> = MarketplaceFeeInfo<<T as frame_system::Config>::AccountId>;
+	pub type RoyaltyInfoOf<T> = RoyaltyInfo<<T as frame_system::Config>::AccountId>;
 
 	pub type FixedPriceListingInfoOf<T> = FixedPriceListingInfo<
 		<T as frame_system::Config>::AccountId,
-		NFTCurrencyId<<T as bholdus_tokens::Config>::AssetId>,
+		//NFTCurrencyId<<T as bholdus_tokens::Config>::AssetId>,
+		NFTCurrencyId<CurrencyId>,
 		MomentOf<T>,
 	>;
-	pub type TradingInfoOf<T> = TradingInfo<<T as frame_system::Config>::AccountId>;
+
+	pub type TimeAuctionListingInfoOf<T> = TimeAuctionListingInfo<
+		<T as frame_system::Config>::AccountId,
+		NFTCurrencyId<CurrencyId>,
+		MomentOf<T>,
+	>;
+	/*pub type FixedPriceOrderInfoOf<T> = FixedPriceOrderInfo<
+		  <T as frame_system::Config>::AccountId,
+		  NFTCurrencyId<CurrencyId>,
+		  MomentOf<T>,
+	  >;
+	*/
 	pub type ItemListingOf<T> = ItemListingInfo<<T as frame_system::Config>::AccountId>;
 	pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 	pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;
-	pub type BHC20TokenIdOf<T> = <T as bholdus_tokens::Config>::AssetId;
+
+	// pub type BHC20TokenIdOf<T> = <T as bholdus_tokens::Config>::AssetId;
+	pub type BHC20TokenId = CurrencyId;
 	pub type MomentOf<T> = <<T as Config>::Time as Time>::Moment;
 
 	/// Error for NFT Marketplace
@@ -131,11 +134,23 @@ pub mod support_module {
 		NotFound,
 		IsApproved,
 		ExpiredListing,
+		InsufficientBalance,
+		CannotBuyNFT,
+		RoleRedundant,
+		MissingRole,
+		MissingPermission,
+		InvalidRole,
+		AuctionAlreadyConcluded,
 	}
 
 	#[pallet::storage]
 	#[pallet::getter(fn pallet_management)]
 	pub type PalletManagement<T: Config> = StorageValue<_, PalletManagementInfoOf<T>>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn access_control)]
+	pub type AccessControl<T: Config> =
+		StorageDoubleMap<_, Twox64Concat, RoleType, Twox64Concat, T::AccountId, Vec<Permission>>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn marketplace_fee)]
@@ -152,6 +167,19 @@ pub mod support_module {
 			NMapKey<Blake2_128Concat, T::TokenId>,
 		),
 		FixedPriceListingInfoOf<T>,
+	>;
+
+	/// Auction Sale
+	#[pallet::storage]
+	#[pallet::getter(fn time_auction)]
+	pub type TimeAuction<T: Config> = StorageNMap<
+		_,
+		(
+			NMapKey<Blake2_128Concat, T::AccountId>,
+			NMapKey<Blake2_128Concat, T::ClassId>,
+			NMapKey<Blake2_128Concat, T::TokenId>,
+		),
+		TimeAuctionListingInfoOf<T>,
 	>;
 
 	#[pallet::storage]
@@ -182,9 +210,17 @@ pub mod support_module {
 
 	/// History Trading Information
 	#[pallet::storage]
-	#[pallet::getter(fn trading)]
-	pub type Trading<T: Config> =
-		StorageDoubleMap<_, Twox64Concat, T::ClassId, Twox64Concat, T::TokenId, TradingInfoOf<T>>;
+	#[pallet::getter(fn fixed_price_order)]
+	pub type FixedPriceOrder<T: Config> = StorageNMap<
+		_,
+		(
+			NMapKey<Blake2_128Concat, T::AccountId>, // owner
+			NMapKey<Blake2_128Concat, T::ClassId>,
+			NMapKey<Blake2_128Concat, T::TokenId>,
+		),
+		FixedPriceListingInfoOf<T>,
+		//FixedPriceOrderInfoOf<T>,
+	>;
 
 	/// User Blacklist
 	#[pallet::storage]
@@ -202,8 +238,10 @@ pub mod support_module {
 
 	/// Royalty
 	#[pallet::storage]
-	#[pallet::getter(fn set_royalty_value)]
-	pub type RoyaltyValue<T: Config> = StorageValue<_, (u32, u32), ValueQuery>;
+	#[pallet::getter(fn set_royalty)]
+	// pub type Royalty<T: Config> = StorageValue<_, (u32, u32), ValueQuery>;
+	pub type Royalty<T: Config> =
+		StorageDoubleMap<_, Twox64Concat, T::ClassId, Twox64Concat, T::TokenId, RoyaltyInfoOf<T>>;
 
 	#[pallet::pallet]
 	#[pallet::without_storage_info]
@@ -215,34 +253,52 @@ pub mod support_module {
 
 impl<T: Config> Pallet<T> {
 	/// Create fixed price listing
-	pub fn create_fixed_price_listing(
-		owner: &T::AccountId,
+	pub fn new_fixed_price(
 		token: (ClassIdOf<T>, TokenIdOf<T>),
-		price: Price,
-		currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>,
-		royalty: RoyaltyRate,
-		expired_time: MomentOf<T>,
-		service_fee: (Numerator, Denominator),
+		info: &FixedPriceListingInfoOf<T>,
 	) -> DispatchResult {
-		let now = T::Time::now();
-		ensure!(expired_time >= now, Error::<T>::ExpiredListing);
-
-		let listing_info = FixedPriceListingInfo {
-			owner: owner.clone(),
-			price,
-			currency_id,
-			royalty,
-			status: NFTState::Pending,
-			expired_time,
-			service_fee,
-		};
-
-		FixedPriceListing::<T>::insert((owner, token.0, token.1), listing_info);
+		FixedPriceListing::<T>::insert((&info.owner, token.0, token.1), info);
 		ItemListing::<T>::insert(
-			(owner, token.0, token.1),
-			ItemListingInfo { owner: owner.clone(), mode: MarketMode::FixedPrice },
+			(&info.owner, token.0, token.1),
+			ItemListingInfo { owner: info.owner.clone(), mode: MarketMode::FixedPrice },
 		);
-		Self::lock_item(owner, token);
+		Self::lock_item(&info.owner, token);
+		Ok(())
+	}
+
+	/// Auction Create
+	pub fn new_time_auction(
+		token: (ClassIdOf<T>, TokenIdOf<T>),
+		info: &TimeAuctionListingInfoOf<T>,
+	) -> DispatchResult {
+		<TimeAuction<T>>::insert((&info.owner, token.0, token.1), info);
+		ItemListing::<T>::insert(
+			(&info.owner, token.0, token.1),
+			ItemListingInfo {
+				owner: info.owner.clone(),
+				mode: MarketMode::Auction(AuctionType::English),
+			},
+		);
+		Self::lock_item(&info.owner, token);
+		Ok(())
+	}
+
+	/// Buy NFT
+	pub fn buy_now(
+		buyer: T::AccountId,
+		token: (ClassIdOf<T>, TokenIdOf<T>),
+		info: FixedPriceListingInfoOf<T>,
+	) -> DispatchResult {
+		let owner = &info.owner.clone();
+		Self::unlock_item(&owner, token);
+		Self::transfer(&owner, &buyer, token)?;
+
+		<FixedPriceOrder<T>>::insert((&owner, token.0, token.1), info);
+
+		// Clear listing information
+		FixedPriceListing::<T>::remove((&owner, token.0, token.1));
+		ItemListing::<T>::remove((&owner, token.0, token.1));
+
 		Ok(())
 	}
 
@@ -253,7 +309,7 @@ impl<T: Config> Pallet<T> {
 	) -> DispatchResult {
 		Blacklist::<T>::insert(token, reason);
 		let owner = Self::owner(token);
-		Self::remove_item_from_market(&owner, token)?;
+		Self::maybe_do_delist(&owner, token)?;
 		Ok(())
 	}
 
@@ -266,28 +322,13 @@ impl<T: Config> Pallet<T> {
 	}
 
 	/// Approve Listing
-	pub fn approve_item_listing(token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
-		let now = T::Time::now();
+	pub fn approve(token: (ClassIdOf<T>, TokenIdOf<T>)) -> DispatchResult {
 		let owner = Self::owner(token);
 		let item_info =
 			ItemListing::<T>::get((&owner, token.0, token.1)).ok_or(Error::<T>::NotFound)?;
 		match item_info.mode {
-			MarketMode::FixedPrice => FixedPriceListing::<T>::try_mutate_exists(
-				(item_info.owner, token.0, token.1),
-				|listing_info| -> DispatchResult {
-					let info = listing_info.as_mut().ok_or(Error::<T>::NotFound)?;
-					/*if_std!(println!(
-						"expired_time: ExpiredTime: {:?}, Now: {:?}",
-						info.expired_time, now
-					));
-					*/
-					ensure!(info.expired_time > now, Error::<T>::ExpiredListing);
-					ensure!(info.status == NFTState::Pending, Error::<T>::IsApproved);
-					info.status = NFTState::Listing;
-					Ok(())
-				},
-			),
-			_ => return Ok(()),
+			MarketMode::FixedPrice => Self::approve_fixed_price(&owner, token),
+			MarketMode::Auction(_) => Self::approve_time_auction(&owner, token),
 		}
 	}
 
@@ -296,22 +337,15 @@ impl<T: Config> Pallet<T> {
 		let item_info =
 			ItemListing::<T>::take((owner, token.0, token.1)).ok_or(Error::<T>::NotFound)?;
 		match item_info.mode {
-			MarketMode::FixedPrice => {
-				FixedPriceListing::<T>::take((owner, token.0, token.1))
-					.ok_or(Error::<T>::NotFound)?;
-				Self::unlock_item(&owner, token);
-				Ok(())
-			},
-			_ => return Ok(()),
-		}
+			MarketMode::FixedPrice => FixedPriceListing::<T>::remove((owner, token.0, token.1)),
+			MarketMode::Auction(_) => TimeAuction::<T>::remove((owner, token.0, token.1)),
+		};
+		Self::unlock_item(&owner, token);
+		Ok(())
 	}
 }
 
 impl<T: Config> Pallet<T> {
-	pub fn owner(token: (ClassIdOf<T>, TokenIdOf<T>)) -> T::AccountId {
-		bholdus_support_nft::Pallet::<T>::owner(token)
-	}
-
 	pub fn lock_item(owner: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) {
 		bholdus_support_nft::Pallet::<T>::lock(owner, token)
 	}
@@ -320,87 +354,33 @@ impl<T: Config> Pallet<T> {
 		bholdus_support_nft::Pallet::<T>::unlock(owner, token)
 	}
 
-	pub fn get_loyalty_value(value: Option<(Numerator, Denominator)>) -> (Numerator, Denominator) {
-		if RoyaltyValue::<T>::exists() {
-			RoyaltyValue::<T>::get()
-		} else {
-			if let Some(v) = value {
-				v
-			} else {
-				(0, 10_000)
-			}
-		}
-	}
-
 	/// Remove item NFT from market place
-	pub fn remove_item_from_market(
+	pub fn maybe_do_delist(
 		owner: &T::AccountId,
 		token: (ClassIdOf<T>, TokenIdOf<T>),
 	) -> DispatchResult {
-		if ItemListing::<T>::contains_key((owner, token.0, token.1)) {
-			let item_info =
-				ItemListing::<T>::take((owner, token.0, token.1)).ok_or(Error::<T>::UnknownMode)?;
+		if let Some(item_info) = ItemListing::<T>::take((owner, token.0, token.1)) {
 			match item_info.mode {
-				MarketMode::FixedPrice => {
-					FixedPriceListing::<T>::remove((owner, token.0, token.1));
-					Ok(())
-				},
-				_ =>
-				// TODO
-				// AuctionListing::<T>::remove((owner, token.0, token.1));
-					Ok(()),
+				MarketMode::FixedPrice => FixedPriceListing::<T>::remove((owner, token.0, token.1)),
+				MarketMode::Auction(_) => TimeAuction::<T>::remove((owner, token.0, token.1)),
 			}
-		} else {
-			Ok(())
-		}
+		};
+
+		Self::unlock_item(&owner, token);
+		Ok(())
+	}
+
+	pub fn transfer(
+		from: &T::AccountId,
+		to: &T::AccountId,
+		token: (ClassIdOf<T>, TokenIdOf<T>),
+	) -> DispatchResult {
+		bholdus_support_nft::Pallet::<T>::transfer(from, to, token)
 	}
 
 	pub fn remove_by_owner(owner: &T::AccountId) {
 		ItemListing::<T>::remove_prefix((owner,), None);
 		FixedPriceListing::<T>::remove_prefix((owner,), None);
-	}
-}
-
-impl<T: Config> Pallet<T> {
-	pub fn is_lock(account: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> bool {
-		bholdus_support_nft::Pallet::<T>::is_lock(account, token)
-	}
-
-	pub fn is_owner(account: &T::AccountId, token: (ClassIdOf<T>, TokenIdOf<T>)) -> bool {
-		bholdus_support_nft::Pallet::<T>::is_owner(account, token)
-	}
-
-	pub fn is_listing(
-		owner: &T::AccountId,
-		token: (ClassIdOf<T>, TokenIdOf<T>),
-		type_of_listing: MarketMode,
-	) -> bool {
-		match type_of_listing {
-			MarketMode::FixedPrice =>
-				FixedPriceListing::<T>::contains_key((owner, token.0, token.1)),
-			_ => false,
-		}
-	}
-
-	pub fn is_user_blacklist(user: &T::AccountId) -> bool {
-		UserBlacklist::<T>::contains_key(user)
-	}
-
-	pub fn is_item_blacklist(token: (ClassIdOf<T>, TokenIdOf<T>)) -> bool {
-		Blacklist::<T>::contains_key((token.0, token.1))
-	}
-
-	pub fn is_bhc20(currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>) -> bool {
-		match currency_id {
-			NFTCurrencyId::Token(_token_id) => true,
-			_ => false,
-		}
-	}
-
-	pub fn is_native(currency_id: NFTCurrencyId<BHC20TokenIdOf<T>>) -> bool {
-		match currency_id {
-			NFTCurrencyId::Native => true,
-			_ => false,
-		}
+		TimeAuction::<T>::remove_prefix((owner,), None);
 	}
 }

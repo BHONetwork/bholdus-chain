@@ -6,18 +6,17 @@ use codec::{Decode, Encode};
 use frame_support::{
 	construct_runtime, parameter_types,
 	traits::{Everything, Filter, InstanceFilter},
-	RuntimeDebug,
+	PalletId, RuntimeDebug,
 };
 use frame_system::EnsureRoot;
 
-use bholdus_primitives::{
-	Amount, Balance, BlockNumber, CurrencyId, ReserveIdentifier, TokenSymbol,
-};
+use bholdus_nft::{ClassData, TokenData};
 use bholdus_support::parameter_type_with_key;
+use common_primitives::{Amount, Balance, BlockNumber, ReserveIdentifier};
 use sp_core::{crypto::AccountId32, H256};
 use sp_runtime::{
 	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup},
+	traits::{AccountIdConversion, BlakeTwo256, IdentityLookup},
 };
 
 use std::cell::RefCell;
@@ -53,6 +52,7 @@ impl frame_system::Config for Runtime {
 	type SystemWeightInfo = ();
 	type SS58Prefix = ();
 	type OnSetCode = ();
+	type MaxConsumers = ConstU32<16>;
 }
 
 parameter_types! {
@@ -119,17 +119,37 @@ impl bholdus_tokens::Config for Runtime {
 	type MaxDecimals = MaxDecimals;
 }
 
+impl bholdus_currencies::Config for Runtime {
+	type Event = Event;
+	type MultiCurrency = Tokens;
+	type WeightInfo = ();
+}
+
 parameter_types! {
 	pub const MaxClassMetadata: u32 = 1024;
 	pub const MaxTokenMetadata: u32 = 1024;
+}
+
+parameter_types! {
+	pub const NftPalletId: PalletId = PalletId(*b"bho/bNFT");
+	pub MaxAttributesBytes: u32 = 10;
+	pub MaxQuantity: u32 = 100;
+}
+
+impl bholdus_nft::Config for Runtime {
+	type Event = Event;
+	type PalletId = NftPalletId;
+	type MaxAttributesBytes = MaxAttributesBytes;
+	type MaxQuantity = MaxQuantity;
+	type WeightInfo = ();
 }
 
 impl bholdus_support_nft::Config for Runtime {
 	type ClassId = u32;
 	type GroupId = u32;
 	type TokenId = u64;
-	type ClassData = ();
-	type TokenData = ();
+	type ClassData = ClassData;
+	type TokenData = TokenData;
 	type MaxClassMetadata = MaxClassMetadata;
 	type MaxTokenMetadata = MaxTokenMetadata;
 }
@@ -141,6 +161,7 @@ parameter_types! {
 impl bholdus_support_nft_marketplace::Config for Runtime {
 	type GetRoyaltyValue = RoyaltyRate;
 	type Time = Timestamp;
+	type Currency = Currencies;
 }
 
 impl Config for Runtime {
@@ -161,6 +182,8 @@ construct_runtime!(
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 		Tokens: bholdus_tokens::{Pallet, Call, Storage, Config<T>, Event<T>},
+	  	Currencies: bholdus_currencies::{Pallet, Call, Event<T>},
+	  	NFT: bholdus_nft::{Pallet, Call, Event<T>},
 		SupportNFT: bholdus_support_nft::{Pallet, Storage},
 		SupportNFTMarketplace: bholdus_support_nft_marketplace::{Pallet, Storage},
 		NFTMarketplace: bholdus_nft_marketplace::{Pallet, Call, Storage, Event<T>},
@@ -170,14 +193,17 @@ construct_runtime!(
 pub const ALICE: AccountId = AccountId::new([1u8; 32]);
 pub const BOB: AccountId = AccountId::new([2u8; 32]);
 pub const EVE: AccountId = AccountId::new([3u8; 32]);
+pub const DAVE: AccountId = AccountId::new([4u8; 32]);
 pub const CLASS_ID: <Runtime as bholdus_support_nft::Config>::ClassId = 0;
 pub const TOKEN_ID: <Runtime as bholdus_support_nft::Config>::TokenId = 0;
 pub const GROUP_ID: <Runtime as bholdus_support_nft::Config>::GroupId = 0;
+pub const ASSET_ID: <Runtime as bholdus_tokens::Config>::AssetId = 0;
 
 pub const ROYALTY_DENOMINATOR: u32 = 10_000u32;
 pub const EXPIRED_TIME: MomentOf<Runtime> = 12345;
 pub const PRICE: u128 = 10_000u128;
-pub const ROYALTY_VALUE: (u32, u32) = (10_000u32, 10_000u32);
+pub const ROYALTY_VALUE: (u32, u32) = (1000u32, 10_000u32);
+pub const SERVICE_FEE: (u32, u32) = (1000u32, 10_000u32);
 
 thread_local! {
 	static TIME: RefCell<u32> = RefCell::new(0);
