@@ -1,7 +1,7 @@
 use hyper_runtime::{
 	AccountId, BalancesConfig, GenesisConfig, Signature, SudoConfig, SystemConfig, WASM_BINARY,
 };
-use sc_service::ChainType;
+use sc_service::{ChainType, Properties};
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
@@ -26,6 +26,16 @@ where
 	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
+}
+
+pub fn get_properties() -> Properties {
+	let mut properties = Properties::new();
+
+	properties.insert("ss58Format".into(), 42.into());
+	properties.insert("tokenDecimals".into(), 18.into());
+	properties.insert("tokenSymbol".into(), "BHO".into());
+
+	properties
 }
 
 pub fn development_config() -> Result<ChainSpec, String> {
@@ -69,7 +79,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		// Fork ID
 		None,
 		// Properties
-		None,
+		Some(get_properties()),
 		// Extensions
 		None,
 	))
@@ -136,7 +146,11 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
+			balances: endowed_accounts
+				.iter()
+				.cloned()
+				.map(|k| (k, 10_000_000_000_000_000_000_000_000_000))
+				.collect(),
 		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
