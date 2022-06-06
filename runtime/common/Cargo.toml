@@ -1,6 +1,6 @@
 [package]
 name = "runtime-common"
-version = "1.0.15"
+version = "1.0.17"
 description = "Common runtime code for all runtimes"
 authors = ["Daniel Lam"]
 edition = "2021"

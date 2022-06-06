@@ -29,9 +29,10 @@ pub use common_primitives::{
 	AccountId, Balance, BlockNumber, Hash, Header, Nonce, OpaqueBlock as Block,
 };
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
-use fc_rpc::EthTask;
+use fc_rpc::{EthTask, OverrideHandle};
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use futures::prelude::*;
+use rpc::RpcConfig;
 use sc_client_api::{BlockBackend, BlockchainEvents, ExecutorProvider};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
@@ -58,6 +59,8 @@ pub mod client;
 pub mod rpc;
 
 pub use rpc::EthApiCmd;
+#[cfg(feature = "with-hyper-runtime")]
+pub use rpc::Sealing;
 
 pub use client::*;
 
@@ -66,6 +69,9 @@ pub use ulas_runtime;
 
 #[cfg(feature = "with-phoenix-runtime")]
 pub use phoenix_runtime;
+
+#[cfg(feature = "with-hyper-runtime")]
+pub use hyper_runtime;
 
 type FullClient<RuntimeApi, Executor> =
 	TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
@@ -124,9 +130,34 @@ impl sc_executor::NativeExecutionDispatch for PhoenixExecutor {
 	}
 }
 
+#[cfg(feature = "with-hyper-runtime")]
+pub struct HyperExecutor;
+
+#[cfg(feature = "with-hyper-runtime")]
+impl sc_executor::NativeExecutionDispatch for HyperExecutor {
+	/// Only enable the benchmarking host functions when we actually want to benchmark.
+	#[cfg(feature = "runtime-benchmarks")]
+	type ExtendHostFunctions = (
+		frame_benchmarking::benchmarking::HostFunctions,
+		bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+	);
+	/// Otherwise we only use the default Substrate host functions.
+	#[cfg(not(feature = "runtime-benchmarks"))]
+	type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
+
+	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+		hyper_runtime::api::dispatch(method, data)
+	}
+
+	fn native_version() -> sc_executor::NativeVersion {
+		hyper_runtime::native_version()
+	}
+}
+
 pub trait IdentifyVariant {
 	fn is_ulas(&self) -> bool;
 	fn is_phoenix(&self) -> bool;
+	fn is_hyper(&self) -> bool;
 }
 
 impl IdentifyVariant for Box<dyn ChainSpec> {
@@ -137,10 +168,15 @@ impl IdentifyVariant for Box<dyn ChainSpec> {
 	fn is_phoenix(&self) -> bool {
 		self.id().starts_with("phoenix")
 	}
+
+	fn is_hyper(&self) -> bool {
+		self.id().starts_with("hyper")
+	}
 }
 
 pub const ULAS_RUNTIME_NOT_AVAILABLE: &str = "Ulas runtime is not available. Please compile the node with `--features with-ulas-runtime` to enable it.";
 pub const PHOENIX_RUNTIME_NOT_AVAILABLE: &str = "Phoenix runtime is not available. Please compile the node with `--features with-phoenix-runtime` to enable it.";
+pub const HYPER_RUNTIME_NOT_AVAILABLE: &str = "Hyper runtime is not available. Please compile the node with `--features with-hyper-runtime` to enable it.";
 
 pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
 	let config_dir = config
@@ -178,6 +214,9 @@ pub fn new_chain_ops(
 	match &config.chain_spec {
 		#[cfg(feature = "with-ulas-runtime")]
 		spec if spec.is_ulas() => new_chain_ops_inner::<ulas_runtime::RuntimeApi, UlasExecutor>(config),
+		#[cfg(feature = "with-hyper-runtime")]
+		spec if spec.is_hyper() =>
+			new_chain_ops_inner::<hyper_runtime::RuntimeApi, HyperExecutor>(config),
 		#[cfg(feature = "with-phoenix-runtime")]
 		_ => new_chain_ops_inner::<phoenix_runtime::RuntimeApi, PhoenixExecutor>(config),
 		#[cfg(not(feature = "with-phoenix-runtime"))]
@@ -223,6 +262,8 @@ pub enum TransactionConverters {
 	Ulas(ulas_runtime::TransactionConverter),
 	#[cfg(feature = "with-phoenix-runtime")]
 	Phoenix(phoenix_runtime::TransactionConverter),
+	#[cfg(feature = "with-hyper-runtime")]
+	Hyper,
 }
 
 impl TransactionConverters {
@@ -242,6 +283,10 @@ impl TransactionConverters {
 	fn phoenix() -> Self {
 		unimplemented!()
 	}
+	#[cfg(feature = "with-hyper-runtime")]
+	fn hyper() -> Self {
+		TransactionConverters::Hyper
+	}
 }
 
 impl fp_rpc::ConvertTransaction<common_primitives::OpaqueExtrinsic> for TransactionConverters {
@@ -254,10 +299,13 @@ impl fp_rpc::ConvertTransaction<common_primitives::OpaqueExtrinsic> for Transact
 			Self::Ulas(inner) => inner.convert_transaction(transaction),
 			#[cfg(feature = "with-phoenix-runtime")]
 			Self::Phoenix(inner) => inner.convert_transaction(transaction),
+			#[cfg(feature = "with-hyper-runtime")]
+			Self::Hyper => unimplemented!(),
 		}
 	}
 }
 
+#[cfg(not(feature = "with-hyper-runtime"))]
 pub fn new_partial<RuntimeApi, Executor>(
 	config: &Configuration,
 ) -> Result<
@@ -402,6 +450,88 @@ where
 	})
 }
 
+#[cfg(feature = "with-hyper-runtime")]
+pub fn new_partial<RuntimeApi, Executor>(
+	config: &Configuration,
+) -> Result<
+	sc_service::PartialComponents<
+		FullClient<RuntimeApi, Executor>,
+		FullBackend,
+		FullSelectChain,
+		sc_consensus::DefaultImportQueue<Block, FullClient<RuntimeApi, Executor>>,
+		TransactionPool<RuntimeApi, Executor>,
+		(Arc<fc_db::Backend<Block>>, Option<Telemetry>),
+	>,
+	ServiceError,
+>
+where
+	RuntimeApi:
+		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
+	RuntimeApi::RuntimeApi:
+		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	Executor: NativeExecutionDispatch + 'static,
+{
+	let telemetry = config
+		.telemetry_endpoints
+		.clone()
+		.filter(|x| !x.is_empty())
+		.map(|endpoints| -> Result<_, sc_telemetry::Error> {
+			let worker = TelemetryWorker::new(16)?;
+			let telemetry = worker.handle().new_telemetry(endpoints);
+			Ok((worker, telemetry))
+		})
+		.transpose()?;
+
+	let executor = NativeElseWasmExecutor::<Executor>::new(
+		config.wasm_method,
+		config.default_heap_pages,
+		config.max_runtime_instances,
+		config.runtime_cache_size,
+	);
+
+	let (client, backend, keystore_container, task_manager) =
+		sc_service::new_full_parts::<Block, RuntimeApi, _>(
+			&config,
+			telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+			executor,
+		)?;
+	let client = Arc::new(client);
+
+	let telemetry = telemetry.map(|(worker, telemetry)| {
+		task_manager.spawn_handle().spawn("telemetry", None, worker.run());
+		telemetry
+	});
+
+	let select_chain = sc_consensus::LongestChain::new(backend.clone());
+
+	let transaction_pool = sc_transaction_pool::BasicPool::new_full(
+		config.transaction_pool.clone(),
+		config.role.is_authority().into(),
+		config.prometheus_registry(),
+		task_manager.spawn_essential_handle(),
+		client.clone(),
+	);
+
+	let frontier_backend = open_frontier_backend(config)?;
+
+	let import_queue = sc_consensus_manual_seal::import_queue(
+		Box::new(client.clone()),
+		&task_manager.spawn_essential_handle(),
+		config.prometheus_registry(),
+	);
+
+	Ok(sc_service::PartialComponents {
+		client,
+		backend,
+		task_manager,
+		import_queue,
+		keystore_container,
+		select_chain,
+		transaction_pool,
+		other: (frontier_backend, telemetry),
+	})
+}
+
 pub struct NewFullBase<RuntimeApi, Executor>
 where
 	RuntimeApi:
@@ -424,6 +554,7 @@ fn remote_keystore(_url: &String) -> Result<Arc<LocalKeystore>, &'static str> {
 }
 
 /// Creates a full service from the configuration.
+#[cfg(not(feature = "with-hyper-runtime"))]
 pub fn new_full_base<RuntimeApi, Executor>(
 	mut config: Configuration,
 	rpc_config: rpc::RpcConfig,
@@ -523,53 +654,15 @@ where
 	let overrides = rpc::overrides_handle(client.clone());
 	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 
-	// Spawning Ethereum tasks
-	// Frontier offchain DB task. Essential.
-	// Maps emulated ethereum data to substrate native data.
-	task_manager.spawn_essential_handle().spawn(
-		"frontier-mapping-sync-worker",
-		Some("frontier"),
-		MappingSyncWorker::new(
-			client.import_notification_stream(),
-			Duration::new(6, 0),
-			client.clone(),
-			backend.clone(),
-			frontier_backend.clone(),
-			3,
-			0,
-			SyncStrategy::Normal,
-		)
-		.for_each(|()| futures::future::ready(())),
-	);
-
-	// Frontier `EthFilterApi` maintenance.
-	// Manages the pool of user-created Filters.
-	if let Some(filter_pool) = filter_pool.clone() {
-		// Each filter is allowed to stay in the pool for 100 blocks.
-		const FILTER_RETAIN_THRESHOLD: u64 = 100;
-		task_manager.spawn_essential_handle().spawn(
-			"frontier-filter-pool",
-			Some("frontier"),
-			EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
-		);
-	}
-
-	task_manager.spawn_essential_handle().spawn(
-		"frontier-schema-cache-task",
-		Some("frontier"),
-		EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
-	);
-
-	// Spawn Frontier FeeHistory cache maintenance task.
-	task_manager.spawn_essential_handle().spawn(
-		"frontier-fee-history",
-		Some("frontier"),
-		EthTask::fee_history_task(
-			Arc::clone(&client),
-			Arc::clone(&overrides),
-			fee_history_cache.clone(),
-			rpc_config.fee_history_limit,
-		),
+	spawn_frontier_tasks(
+		&task_manager,
+		client.clone(),
+		backend.clone(),
+		frontier_backend.clone(),
+		filter_pool.clone(),
+		overrides.clone(),
+		fee_history_cache.clone(),
+		rpc_config.fee_history_limit,
 	);
 
 	let ethapi_cmd = rpc_config.ethapi.clone();
@@ -843,6 +936,178 @@ where
 	Ok(NewFullBase { task_manager, client: client.clone(), network, transaction_pool })
 }
 
+#[cfg(feature = "with-hyper-runtime")]
+pub fn new_full_base<RuntimeApi, Executor>(
+	mut config: Configuration,
+	rpc_config: rpc::RpcConfig,
+) -> Result<NewFullBase<RuntimeApi, Executor>, ServiceError>
+where
+	RuntimeApi:
+		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
+	RuntimeApi::RuntimeApi:
+		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	Executor: NativeExecutionDispatch + 'static,
+{
+	use std::marker::PhantomData;
+
+	let sc_service::PartialComponents {
+		client,
+		backend,
+		mut task_manager,
+		import_queue,
+		mut keystore_container,
+		select_chain,
+		transaction_pool,
+		other: (frontier_backend, mut telemetry),
+	} = new_partial(&config)?;
+
+	let auth_disc_publish_non_global_ips = config.network.allow_non_globals_in_dht;
+	if let Some(url) = &config.keystore_remote {
+		match remote_keystore(url) {
+			Ok(k) => keystore_container.set_remote_keystore(k),
+			Err(e) =>
+				return Err(ServiceError::Other(format!(
+					"Error hooking up remote keystore for {}: {}",
+					url, e
+				))),
+		};
+	}
+
+	let (network, system_rpc_tx, network_starter) =
+		sc_service::build_network(sc_service::BuildNetworkParams {
+			config: &config,
+			client: client.clone(),
+			transaction_pool: transaction_pool.clone(),
+			spawn_handle: task_manager.spawn_handle(),
+			import_queue,
+			block_announce_validator_builder: None,
+			warp_sync: None,
+		})?;
+
+	if config.offchain_worker.enabled {
+		sc_service::build_offchain_workers(
+			&config,
+			task_manager.spawn_handle(),
+			client.clone(),
+			network.clone(),
+		);
+	}
+
+	let role = config.role.clone();
+	let is_authority = role.is_authority();
+	let name = config.network.node_name.clone();
+	let prometheus_registry = config.prometheus_registry().cloned();
+
+	// Channel for the rpc handler to communicate with the manual seal authorship task.
+	let (command_sink, commands_stream) = futures::channel::mpsc::channel(1000);
+
+	let rpc_extensions_builder = {
+		let client = client.clone();
+		let pool = transaction_pool.clone();
+		let select_chain = select_chain.clone();
+		let _keystore = keystore_container.sync_keystore();
+		let chain_spec = config.chain_spec.cloned_box();
+		let frontier_backend = frontier_backend.clone();
+		let network = network.clone();
+		let rpc_config = rpc_config.clone();
+
+		let rpc_extensions_builder =
+			move |deny_unsafe, subscription_executor: rpc::SubscriptionTaskExecutor| {
+				let deps = rpc::FullDeps {
+					client: client.clone(),
+					pool: pool.clone(),
+					graph: pool.pool().clone(),
+					select_chain: select_chain.clone(),
+					deny_unsafe,
+					chain_spec: chain_spec.cloned_box(),
+					is_authority,
+					network: network.clone(),
+					rpc_config: rpc_config.clone(),
+					subscription_executor: subscription_executor.clone(),
+					command_sink: Some(command_sink.clone()),
+					sealing: rpc_config.sealing.clone(),
+					_phantom: PhantomData,
+				};
+
+				let mut io = rpc::create_full(deps)?;
+
+				Ok(io)
+			};
+
+		rpc_extensions_builder
+	};
+
+	let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
+		network: network.clone(),
+		client: client.clone(),
+		keystore: keystore_container.sync_keystore(),
+		task_manager: &mut task_manager,
+		transaction_pool: transaction_pool.clone(),
+		rpc_extensions_builder: Box::new(rpc_extensions_builder),
+		backend: backend.clone(),
+		system_rpc_tx,
+		config,
+		telemetry: telemetry.as_mut(),
+	})?;
+
+	if let sc_service::config::Role::Authority { .. } = &role {
+		let proposer_factory = sc_basic_authorship::ProposerFactory::new(
+			task_manager.spawn_handle(),
+			client.clone(),
+			transaction_pool.clone(),
+			prometheus_registry.as_ref(),
+			telemetry.as_ref().map(|x| x.handle()),
+		);
+
+		let sealing = rpc_config.sealing;
+
+		let create_inherent_data_providers = move |_, ()| async move {
+			Ok((sp_timestamp::InherentDataProvider::from_system_time(),))
+		};
+
+		let manual_seal = match sealing {
+			Sealing::Manual => future::Either::Left(sc_consensus_manual_seal::run_manual_seal(
+				sc_consensus_manual_seal::ManualSealParams {
+					block_import: client.clone(),
+					env: proposer_factory,
+					client: client.clone(),
+					pool: transaction_pool.clone(),
+					commands_stream,
+					select_chain,
+					consensus_data_provider: None,
+					create_inherent_data_providers,
+				},
+			)),
+			Sealing::Instant => future::Either::Right(sc_consensus_manual_seal::run_instant_seal(
+				sc_consensus_manual_seal::InstantSealParams {
+					block_import: client.clone(),
+					env: proposer_factory,
+					client: client.clone(),
+					pool: transaction_pool.clone(),
+					select_chain,
+					consensus_data_provider: None,
+					create_inherent_data_providers,
+				},
+			)),
+		};
+
+		// we spawn the manual-seal task on a background thread managed by service.
+		task_manager
+			.spawn_essential_handle()
+			.spawn_blocking("manual-seal", None, manual_seal);
+
+		log::info!("Manual Seal Ready");
+	}
+
+	// if the node isn't actively participating in consensus then it doesn't
+	// need a keystore, regardless of which protocol we use below.
+	let keystore =
+		if role.is_authority() { Some(keystore_container.sync_keystore()) } else { None };
+
+	network_starter.start_network();
+	Ok(NewFullBase { task_manager, client: client.clone(), network, transaction_pool })
+}
+
 /// Builds a new service for a full client.
 pub fn new_full<RuntimeApi, Executor>(
 	config: Configuration,
@@ -857,4 +1122,71 @@ where
 {
 	new_full_base::<RuntimeApi, Executor>(config, rpc_config)
 		.map(|NewFullBase { task_manager, .. }| task_manager)
+}
+
+#[cfg(not(feature = "with-hyper-runtime"))]
+fn spawn_frontier_tasks<RuntimeApi, Executor>(
+	task_manager: &TaskManager,
+	client: Arc<FullClient<RuntimeApi, Executor>>,
+	backend: Arc<FullBackend>,
+	frontier_backend: Arc<fc_db::Backend<Block>>,
+	filter_pool: Option<FilterPool>,
+	overrides: Arc<OverrideHandle<Block>>,
+	fee_history_cache: FeeHistoryCache,
+	fee_history_limit: u64,
+) where
+	RuntimeApi:
+		ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>> + Send + Sync + 'static,
+	RuntimeApi::RuntimeApi:
+		RuntimeApiCollection<StateBackend = sc_client_api::StateBackendFor<FullBackend, Block>>,
+	Executor: NativeExecutionDispatch + 'static,
+{
+	// Spawning Ethereum tasks
+	// Frontier offchain DB task. Essential.
+	// Maps emulated ethereum data to substrate native data.
+	task_manager.spawn_essential_handle().spawn(
+		"frontier-mapping-sync-worker",
+		Some("frontier"),
+		MappingSyncWorker::new(
+			client.import_notification_stream(),
+			Duration::new(6, 0),
+			client.clone(),
+			backend.clone(),
+			frontier_backend.clone(),
+			3,
+			0,
+			SyncStrategy::Normal,
+		)
+		.for_each(|()| futures::future::ready(())),
+	);
+
+	// Frontier `EthFilterApi` maintenance.
+	// Manages the pool of user-created Filters.
+	if let Some(filter_pool) = filter_pool.clone() {
+		// Each filter is allowed to stay in the pool for 100 blocks.
+		const FILTER_RETAIN_THRESHOLD: u64 = 100;
+		task_manager.spawn_essential_handle().spawn(
+			"frontier-filter-pool",
+			Some("frontier"),
+			EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
+		);
+	}
+
+	task_manager.spawn_essential_handle().spawn(
+		"frontier-schema-cache-task",
+		Some("frontier"),
+		EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
+	);
+
+	// Spawn Frontier FeeHistory cache maintenance task.
+	task_manager.spawn_essential_handle().spawn(
+		"frontier-fee-history",
+		Some("frontier"),
+		EthTask::fee_history_task(
+			Arc::clone(&client),
+			Arc::clone(&overrides),
+			fee_history_cache.clone(),
+			fee_history_limit,
+		),
+	);
 }

@@ -1,6 +1,6 @@
 [package]
 name = "bholdus-support"
-version = "1.0.15"
+version = "1.0.17"
 edition = "2018"
 
 [dependencies]

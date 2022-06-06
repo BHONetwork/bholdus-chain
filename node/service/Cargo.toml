@@ -5,12 +5,12 @@ edition = "2018"
 homepage = "https://bholdus.com"
 name = "bholdus-service"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.15"
+version = "1.0.17"
 
 [dependencies]
 structopt = "0.3.8"
 rand = "0.8.4"
-
+log = "0.4.17"
 async-trait = { version = "0.1.48" }
 futures = { version = "0.3.9", features = ["compat"] }
 hex-literal = "0.3.1"
@@ -45,6 +45,7 @@ sc-executor = { features = [
     "wasmtime",
 ], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sc-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sc-consensus-manual-seal = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18", optional = true }
 sc-consensus-uncles = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sc-consensus-epochs = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
 sc-consensus-slots = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
@@ -97,6 +98,7 @@ bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
 
 ulas-runtime = { optional = true, path = "../../runtime/ulas" }
 phoenix-runtime = { optional = true, path = "../../runtime/phoenix" }
+hyper-runtime = { optional = true, path = "../../runtime/hyper" }
 common-primitives = { path = "../../primitives/common" }
 
 [features]
@@ -106,14 +108,13 @@ runtime-benchmarks = [
     "ulas-runtime/runtime-benchmarks",
     "phoenix-runtime/runtime-benchmarks",
 ]
-try-runtime = [
-    "ulas-runtime/try-runtime",
-    "phoenix-runtime/try-runtime",
-]
+try-runtime = ["ulas-runtime/try-runtime", "phoenix-runtime/try-runtime"]
 
 with-ulas-runtime = ["ulas-runtime"]
 with-phoenix-runtime = ["phoenix-runtime"]
-with-all-runtime = [
-    "with-ulas-runtime",
-    "with-phoenix-runtime",
+with-all-runtime = ["with-ulas-runtime", "with-phoenix-runtime"]
+
+with-hyper-runtime = ["hyper-runtime", "manual-seal"]
+manual-seal = [
+    "sc-consensus-manual-seal",
 ]

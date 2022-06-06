@@ -1,12 +1,12 @@
-# Bholdus Node
+# BHO Chain Node
 
-[![Bholdus](https://img.shields.io/badge/Bholdus-brightgreen?logo=Parity%20Substrate)](https://apps.bholdus.com/)
+[![BHO Chain](https://img.shields.io/badge/Bholdus-brightgreen?logo=Parity%20Substrate)](https://apps.bholdus.com/)
 
 A fresh FRAME-based [Substrate](https://www.substrate.io/) node
 
 ## Getting Started
 
-Bholdus Blockchain Network is interoperable, cross-chain with various digital asset economies and Defi Networks such as Binance Smart Chain, Ethereum, and Polkadot.
+BHO Blockchain Network is interoperable, cross-chain with various digital asset economies and Defi Networks such as Binance Smart Chain, Ethereum, and Polkadot.
 
 ## Install required packages
 
@@ -49,49 +49,52 @@ rustup show
 
 ```
 
-### Prepare a Bholdus node
+### Prepare a BHO node
 
-To build the Bholdus node:
+* In early stage, we only support Proof of Staked Authority with private authorities. Hence, users can only run RPC node at the moment.
 
+* We have two ways to start a BHO node:
+
+#### Building from source
 1. Clone the bholdus-chain repository
 
 ```
 git clone https://github.com/Bholdus/bholdus-chain.git
 
 ```
-2. Change to the root directory where you compiled the bholdus node
+2. Build source
 
 ```
-cd bholdus-chain
-```
-3. Start a bholdus node
+- Build Testnet Node: Phoenix
 
-```
-- Run Devnet Node: Phoenix
+ cargo build --features with-phoenix-runtime,evm-tracing --release
+ 
 
- cargo build --features with-phoenix-runtime --release
- ./target/release/bholdus --chain=phoenix-dev --name <INSERT_NAME>  --tmp -lruntime=debug
+- Build Mainnet Node: Ulas
 
- Or you can use `cargo run`
-  cargo run --features with-phoenix-runtime --features runtime-benchmarks --release --name <INSERT_NAME> --chain=phoenix-dev --tmp -lruntime=debug
-
-- Run Testnet Node: Cygnus
-
- cargo build --features with-cygnus-runtime --release
- ./target/release/bholdus --chain=cygnus-dev --name <INSERT_NAME>  --tmp -lruntime=debug
-
-- Run Mainnet Node: Ulas
-
- cargo build --features with-ulas-runtime --release
- ./target/release/bholdus --chain=ulas-dev --name <INSERT_NAME>  --tmp -lruntime=debug
+ cargo build --features with-ulas-runtime,evm-tracing --release
 
 ```
 You should always use the --release flag to build optimized artifacts.
 
 Use branch `main` for latest development codebase. However, if you want to build production node, please checkout the tagged release commit. For production build, you can put `SKIP_WASM_BUILD=1` env to disable building wasm version of the runtime.
 
-#### Multi-Node Local Testnet
-If you want to start the multi-node consensus with an authority set of private validators, refer to [our Start a Private Network tutorial](https://substrate.dev/docs/en/tutorials/start-a-private-network/).
+3. Start BHO node
+```
+- Run Testnet Node: Phoenix
+
+./target/release/bholdus --chain=phoenix --name <INSERT_NAME> --rpc-port 9933 --ws-port 9944 --ws-external --rpc-external --prometheus-external --rpc-cors=all --pruning archive -lruntime=debug
+
+- Run Mainnet Node: Ulas
+
+ ./target/release/bholdus --chain=ulas --name <INSERT_NAME> --rpc-port 9933 --ws-port 9944 --ws-external --rpc-external --prometheus-external --rpc-cors=all --pruning archive -lruntime=debug
+```
+
+#### Use pre-built binary
+
+You can use the pre-built binary in the Github Releases
+
+To start a node with a pre-built binary, simply use the commands from `1. Building from source`
 
 
 ### Benchmarking
@@ -121,7 +124,7 @@ Example:
 ```
 
 
-## Connecting the Bholdus node with a User Interface
+## Connecting the BHO node with a User Interface
 
 Now that we have the bholdus node running, let's connect it with a [Bholdus-JS Apps](https://apps.bholdus.com/) to see it working.
 

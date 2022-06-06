@@ -20,6 +20,8 @@ use sc_client_api::{
 	client::BlockchainEvents,
 	AuxStore, BlockOf,
 };
+#[cfg(feature = "with-hyper-runtime")]
+use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
 use sc_finality_grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -87,29 +89,46 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub grandpa: GrandpaDeps<B>,
 	/// BEEFY specific dependencies
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub beefy: BeefyDeps,
 	/// The Node authority flag
 	pub is_authority: bool,
 	/// Network service
 	pub network: Arc<NetworkService<Block, Hash>>,
 	/// Frontier Backend.
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub frontier_backend: Arc<fc_db::Backend<Block>>,
 	/// RPC Config
 	pub rpc_config: RpcConfig,
 	/// Fee History Cache
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub fee_history_cache: FeeHistoryCache,
 	/// Ethereum Schema Overrides
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub overrides: Arc<OverrideHandle<Block>>,
 	/// EthFilterApi pool.
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub filter_pool: Option<FilterPool>,
 	/// Subscription Task Executor
 	pub subscription_executor: SubscriptionTaskExecutor,
 	/// Ethereum transaction to Extrinsic converter.
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub transaction_converter: TransactionConverters,
 	/// Cache for Ethereum block data.
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub block_data_cache: Arc<EthBlockDataCache<Block>>,
+	/// Manual seal command sink
+	#[cfg(feature = "with-hyper-runtime")]
+	pub command_sink:
+		Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
+	#[cfg(feature = "with-hyper-runtime")]
+	pub sealing: Sealing,
+	/// Used to bypass type parameter `B` of FullDeps when compiles with `manual-seal` feature.
+	#[cfg(feature = "with-hyper-runtime")]
+	pub _phantom: std::marker::PhantomData<B>,
 }
 
 /// Ethereum Api Command
@@ -133,9 +152,34 @@ impl FromStr for EthApiCmd {
 	}
 }
 
+/// Available Sealing methods.
+#[cfg(feature = "with-hyper-runtime")]
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Sealing {
+	// Seal using rpc method.
+	Manual,
+	// Seal when transaction is executed.
+	Instant,
+}
+
+#[cfg(feature = "with-hyper-runtime")]
+impl FromStr for Sealing {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"manual" => Self::Manual,
+			"instant" => Self::Instant,
+			_ => return Err(format!("`{}` is not recognized as a supported sealing method", s)),
+		})
+	}
+}
+
 /// Configurations of RPC
 #[derive(Clone)]
 pub struct RpcConfig {
+	#[cfg(feature = "with-hyper-runtime")]
+	pub sealing: Sealing,
 	pub ethapi: Vec<EthApiCmd>,
 	pub ethapi_max_permits: u32,
 	pub ethapi_trace_max_count: u32,
@@ -161,6 +205,7 @@ pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
 }
 
 /// Ethereum Storage Schema overrides
+#[cfg(not(feature = "with-hyper-runtime"))]
 pub fn overrides_handle<C, BE>(client: Arc<C>) -> Arc<OverrideHandle<Block>>
 where
 	BE: Backend<Block> + 'static,
@@ -219,6 +264,8 @@ where
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
+
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	let FullDeps {
 		client,
 		pool,
@@ -238,6 +285,21 @@ where
 		..
 	} = deps;
 
+	#[cfg(feature = "with-hyper-runtime")]
+	let FullDeps {
+		client,
+		pool,
+		graph,
+		deny_unsafe,
+		is_authority,
+		network,
+		rpc_config,
+		command_sink,
+		sealing,
+		..
+	} = deps;
+
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
@@ -256,73 +318,88 @@ where
 	// more context: https://github.com/paritytech/substrate/pull/3480
 	// These RPCs should use an asynchronous caller instead.
 	io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));
+	#[cfg(not(feature = "with-hyper-runtime"))]
 	io.extend_with(MmrApi::to_delegate(Mmr::new(client.clone())));
 	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
 
-	io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
-		shared_authority_set.clone(),
-		shared_voter_state,
-		justification_stream,
-		subscription_executor,
-		finality_provider,
-	)));
+	#[cfg(not(feature = "with-hyper-runtime"))]
+	{
+		io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
+			shared_authority_set.clone(),
+			shared_voter_state,
+			justification_stream,
+			subscription_executor,
+			finality_provider,
+		)));
 
-	let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
-		beefy_gadget_rpc::BeefyRpcHandler::new(
-			beefy.beefy_commitment_stream,
-			beefy.beefy_best_block_stream,
-			beefy.subscription_executor,
-		)?;
-	io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
+		let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
+			beefy_gadget_rpc::BeefyRpcHandler::new(
+				beefy.beefy_commitment_stream,
+				beefy.beefy_best_block_stream,
+				beefy.subscription_executor,
+			)?;
+		io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
 
-	io.extend_with(NetApiServer::to_delegate(NetApi::new(
-		client.clone(),
-		network.clone(),
-		// Whether to format the `peer_count` response as Hex (default) or not.
-		true,
-	)));
-
-	// Nor any signers
-	let signers = Vec::new();
-
-	io.extend_with(EthApiServer::to_delegate(EthApi::new(
-		client.clone(),
-		pool.clone(),
-		graph,
-		Some(transaction_converter),
-		network.clone(),
-		signers,
-		overrides.clone(),
-		frontier_backend.clone(),
-		is_authority,
-		block_data_cache.clone(),
-		rpc_config.fee_history_limit,
-		fee_history_cache,
-	)));
-
-	if let Some(filter_pool) = filter_pool {
-		io.extend_with(EthFilterApiServer::to_delegate(EthFilterApi::new(
+		io.extend_with(NetApiServer::to_delegate(NetApi::new(
 			client.clone(),
+			network.clone(),
+			// Whether to format the `peer_count` response as Hex (default) or not.
+			true,
+		)));
+
+		// Nor any signers
+		let signers = Vec::new();
+
+		io.extend_with(EthApiServer::to_delegate(EthApi::new(
+			client.clone(),
+			pool.clone(),
+			graph,
+			Some(transaction_converter),
+			network.clone(),
+			signers,
+			overrides.clone(),
 			frontier_backend.clone(),
-			filter_pool.clone(),
-			500 as usize, // max stored filters
-			rpc_config.max_past_logs,
+			is_authority,
 			block_data_cache.clone(),
+			rpc_config.fee_history_limit,
+			fee_history_cache,
+		)));
+
+		if let Some(filter_pool) = filter_pool {
+			io.extend_with(EthFilterApiServer::to_delegate(EthFilterApi::new(
+				client.clone(),
+				frontier_backend.clone(),
+				filter_pool.clone(),
+				500 as usize, // max stored filters
+				rpc_config.max_past_logs,
+				block_data_cache.clone(),
+			)));
+		}
+
+		io.extend_with(Web3ApiServer::to_delegate(Web3Api::new(client.clone())));
+
+		io.extend_with(EthPubSubApiServer::to_delegate(EthPubSubApi::new(
+			pool.clone(),
+			client.clone(),
+			network.clone(),
+			SubscriptionManager::<HexEncodedIdProvider>::with_id_provider(
+				HexEncodedIdProvider::default(),
+				Arc::new(deps.subscription_executor.clone()),
+			),
+			overrides,
 		)));
 	}
 
-	io.extend_with(Web3ApiServer::to_delegate(Web3Api::new(client.clone())));
-
-	io.extend_with(EthPubSubApiServer::to_delegate(EthPubSubApi::new(
-		pool.clone(),
-		client.clone(),
-		network.clone(),
-		SubscriptionManager::<HexEncodedIdProvider>::with_id_provider(
-			HexEncodedIdProvider::default(),
-			Arc::new(deps.subscription_executor.clone()),
-		),
-		overrides,
-	)));
+	#[cfg(feature = "with-hyper-runtime")]
+	if let Some(command_sink) = command_sink {
+		if sealing == Sealing::Manual {
+			io.extend_with(
+				// We provide the rpc handler with the sending end of the channel to allow the rpc
+				// send EngineCommands to the background block authorship task.
+				ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+			);
+		}
+	}
 
 	Ok(io)
 }

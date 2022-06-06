@@ -6,7 +6,7 @@ edition = '2018'
 homepage = 'https://bholdus.com'
 name = 'bholdus'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = "1.0.15"
+version = "1.0.17"
 
 [[bin]]
 name = 'bholdus'
@@ -39,4 +39,8 @@ with-ulas-runtime = [
 with-phoenix-runtime = [
     "bholdus-service/with-phoenix-runtime",
     "bholdus-cli/with-phoenix-runtime",
+]
+with-hyper-runtime = [
+    "bholdus-service/with-hyper-runtime",
+    "bholdus-cli/with-hyper-runtime",
 ]

@@ -64,6 +64,9 @@ impl SubstrateCli for Cli {
 			#[cfg(feature = "with-phoenix-runtime")]
 			"phoenix" => Box::new(chain_spec::phoenix::config()?),
 
+			#[cfg(feature = "with-hyper-runtime")]
+			"hyper-dev" => Box::new(chain_spec::hyper::development_config()?),
+
 			path => {
 				let path = std::path::PathBuf::from(path);
 				let chain_spec =
@@ -78,6 +81,14 @@ impl SubstrateCli for Cli {
 
 					#[cfg(not(feature = "with-ulas-runtime"))]
 					return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
+				} else if chain_spec.is_hyper() {
+					#[cfg(feature = "with-hyper-runtime")]
+					{
+						Box::new(chain_spec::hyper::ChainSpec::from_json_file(path)?)
+					}
+
+					#[cfg(not(feature = "with-hyper-runtime"))]
+					return Err(service::HYPER_RUNTIME_NOT_AVAILABLE.into());
 				} else {
 					#[cfg(feature = "with-phoenix-runtime")]
 					{
@@ -97,6 +108,11 @@ impl SubstrateCli for Cli {
 			return &service::ulas_runtime::VERSION;
 			#[cfg(not(feature = "with-ulas-runtime"))]
 			panic!("{}", service::ULAS_RUNTIME_NOT_AVAILABLE);
+		} else if spec.is_hyper() {
+			#[cfg(feature = "with-hyper-runtime")]
+			return &service::hyper_runtime::VERSION;
+			#[cfg(not(feature = "with-hyper-runtime"))]
+			panic!("{}", service::HYPER_RUNTIME_NOT_AVAILABLE);
 		} else {
 			#[cfg(feature = "with-phoenix-runtime")]
 			return &service::phoenix_runtime::VERSION;
@@ -116,6 +132,8 @@ pub fn run() -> sc_cli::Result<()> {
 			runner.run_node_until_exit(|config| async move {
 				let chain_spec = &config.chain_spec;
 				let rpc_config = service::rpc::RpcConfig {
+					#[cfg(feature = "with-hyper-runtime")]
+					sealing: cli.run.sealing,
 					eth_log_block_cache: cli.run.eth_log_block_cache,
 					eth_statuses_cache: cli.run.eth_statuses_cache,
 					fee_history_limit: cli.run.fee_history_limit,
@@ -137,6 +155,17 @@ pub fn run() -> sc_cli::Result<()> {
 					}
 					#[cfg(not(feature = "with-ulas-runtime"))]
 					return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
+				} else if chain_spec.is_hyper() {
+					#[cfg(feature = "with-hyper-runtime")]
+					{
+						return service::new_full::<
+							service::hyper_runtime::RuntimeApi,
+							service::HyperExecutor,
+						>(config, rpc_config)
+						.map_err(sc_cli::Error::Service);
+					}
+					#[cfg(not(feature = "with-hyper-runtime"))]
+					return Err(service::HYPER_RUNTIME_NOT_AVAILABLE.into());
 				} else {
 					#[cfg(feature = "with-phoenix-runtime")]
 					{
@@ -165,7 +194,16 @@ pub fn run() -> sc_cli::Result<()> {
                     }
                     #[cfg(not(feature = "with-ulas-runtime"))]
                     return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
-                }  else {
+                } else if chain_spec.is_hyper() {
+					#[cfg(feature = "with-hyper-runtime")]
+                    {
+                        return cmd.run::<service::hyper_runtime::Block, service::hyper_runtime::RuntimeApi, service::HyperExecutor>(
+                            config,
+                        )
+                    }
+                    #[cfg(not(feature = "with-hyper-runtime"))]
+                    return Err(service::HYPER_RUNTIME_NOT_AVAILABLE.into());
+				} else {
                     #[cfg(feature = "with-phoenix-runtime")]
                     {
                         return cmd.run::<service::phoenix_runtime::Block, service::phoenix_runtime::RuntimeApi, service::PhoenixExecutor>(

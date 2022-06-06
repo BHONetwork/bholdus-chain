@@ -1,6 +1,6 @@
 [package]
 name = "bholdus-currencies"
-version = "1.0.15"
+version = "1.0.17"
 authors = ["Nhi Tran <nhi.tran@hawking.network>"]
 edition = "2018"
 
