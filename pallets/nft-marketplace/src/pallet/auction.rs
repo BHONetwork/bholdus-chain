@@ -23,8 +23,8 @@ impl<T: Config> Pallet<T> {
 			.ok_or(ArithmeticError::Overflow)?;
 
 		ensure!(
-			fee_rate.saturating_add(royalty_rate)
-				< FixedU128::checked_from_rational(10_000, 10_000)
+			fee_rate.saturating_add(royalty_rate) <
+				FixedU128::checked_from_rational(10_000, 10_000)
 					.ok_or(ArithmeticError::Overflow)?,
 			Error::<T>::InvalidRate
 		);

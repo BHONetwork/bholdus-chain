@@ -32,8 +32,7 @@ use bholdus_support_nft_marketplace::{
 };
 
 pub mod pallet;
-pub use pallet::pallet::*;
-pub use pallet::FixedPriceSetting;
+pub use pallet::{pallet::*, FixedPriceSetting};
 
 pub type TokenIdOf<T> = <T as bholdus_support_nft::Config>::TokenId;
 pub type ClassIdOf<T> = <T as bholdus_support_nft::Config>::ClassId;

@@ -24,8 +24,8 @@ impl<T: Config> Pallet<T> {
 			.ok_or(ArithmeticError::Overflow)?;
 
 		ensure!(
-			fee_rate.saturating_add(royalty_rate)
-				< FixedU128::checked_from_rational(10_000, 10_000)
+			fee_rate.saturating_add(royalty_rate) <
+				FixedU128::checked_from_rational(10_000, 10_000)
 					.ok_or(ArithmeticError::Overflow)?,
 			Error::<T>::InvalidRate
 		);
@@ -84,7 +84,7 @@ impl<T: Config> Pallet<T> {
 					royalty_amount,
 				)?;
 				T::Currency::transfer(token_id, &buyer, &listing_info.owner, actual_price)?;
-			}
+			},
 			NFTCurrencyId::Native => {
 				let amount = pallet_balances::Pallet::<T>::free_balance(&buyer);
 				ensure!(amount > listing_info.price, Error::<T>::InsufficientBalance);
@@ -106,7 +106,7 @@ impl<T: Config> Pallet<T> {
 					T::Lookup::unlookup(owner),
 					actual_price,
 				);
-			}
+			},
 		};
 
 		let order = FixedPriceListingInfo {

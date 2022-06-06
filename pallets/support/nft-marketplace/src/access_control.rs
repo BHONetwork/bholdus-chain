@@ -49,12 +49,12 @@ impl<T: Config> Pallet<T> {
 					Permission::RejectListing,
 				];
 				AccessControl::<T>::insert(role, account, access_item);
-			}
+			},
 			RoleType::Member(_) => {
 				let who = ensure_signed(origin)?;
 				Self::check_admin_role(&who)?;
 				AccessControl::<T>::insert(role, account, vec![Permission::None]);
-			}
+			},
 		}
 		Ok(())
 	}
@@ -70,7 +70,7 @@ impl<T: Config> Pallet<T> {
 			RoleType::Member(_) => {
 				let who = ensure_signed(origin)?;
 				Self::check_admin_role(&who)?
-			}
+			},
 		};
 		Self::do_revoke_role(&role, account);
 		Ok(())

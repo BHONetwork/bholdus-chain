@@ -101,9 +101,8 @@ impl<T: Config> Pallet<T> {
 		market_mode: MarketMode,
 	) -> bool {
 		match market_mode {
-			MarketMode::FixedPrice => {
-				FixedPriceListing::<T>::contains_key((owner, token.0, token.1))
-			}
+			MarketMode::FixedPrice =>
+				FixedPriceListing::<T>::contains_key((owner, token.0, token.1)),
 
 			MarketMode::Auction(_) => TimeAuction::<T>::contains_key((owner, token.0, token.1)),
 		}
@@ -121,14 +120,14 @@ impl<T: Config> Pallet<T> {
 				} else {
 					false
 				}
-			}
+			},
 			MarketMode::Auction(_) => {
 				if let Some(listing_info) = TimeAuction::<T>::get((owner, token.0, token.1)) {
 					listing_info.status == NFTState::Listing
 				} else {
 					false
 				}
-			}
+			},
 		}
 	}
 
