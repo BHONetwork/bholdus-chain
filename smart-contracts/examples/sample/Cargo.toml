@@ -1,6 +1,6 @@
 [package]
 name = "sample"
-version = "1.0.17"
+version = "1.0.18"
 authors = ["Vu Hoang <vuhoang2119@gmail.com>"]
 edition = "2018"
 resolver = "2"
