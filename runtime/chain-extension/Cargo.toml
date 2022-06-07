@@ -1,6 +1,6 @@
 [package]
 authors = ["Bholdus <https://github.com/bholdus>"]
-edition = "2018"
+edition = "2021"
 homepage = "https://bholdus.com"
 name = "runtime-chain-extension"
 repository = "https://github.com/bholdus/bholdus-chain/"

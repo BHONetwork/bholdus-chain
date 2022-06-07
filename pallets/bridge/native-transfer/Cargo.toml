@@ -1,7 +1,7 @@
 [package]
 authors = ['Bholdus']
 description = 'Bholdus pallet to crosschain transfer native'
-edition = '2018'
+edition = "2021"
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
 name = 'bholdus-bridge-native-transfer'

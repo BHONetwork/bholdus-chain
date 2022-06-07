@@ -2,7 +2,7 @@
 name = "bholdus-evm-precompile-template"
 authors = ["Bholdus"]
 description = "A Precompile Template"
-edition = "2018"
+edition = "2021"
 version = "1.0.18"
 
 [dependencies]

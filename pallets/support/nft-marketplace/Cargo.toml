@@ -1,7 +1,7 @@
 [package]
 authors = ["Bholdus Technologies"]
 description = "FRAME Support NFT marketplace pallet"
-edition = '2018'
+edition = "2021"
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
 name = "support-nft-marketplace"

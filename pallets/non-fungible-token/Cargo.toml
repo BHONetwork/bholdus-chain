@@ -1,7 +1,7 @@
 [package]
 authors = ["Bholdus Technologies"]
 description = "FRAME non fungible token management pallet"
-edition = '2018'
+edition = "2021"
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
 name = "bholdus-nft"

@@ -2,7 +2,7 @@
 name = "bholdus-currencies"
 version = "1.0.18"
 authors = ["Nhi Tran <nhi.tran@hawking.network>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [package.metadata.docs.rs]
