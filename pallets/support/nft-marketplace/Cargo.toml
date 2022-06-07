@@ -21,13 +21,13 @@ scale-info = { default-features = false, features = [
 ], version = '2.0.1' }
 serde = { version = "1.0.124", optional = true}
 
-frame-benchmarking = { default-features = false, optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-balances = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+frame-benchmarking = { default-features = false, optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-balances = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 
 common-primitives = { default-features = false, path = "../../../primitives/common" }
 bholdus-support = {  default-features = false, path = "../" }
@@ -35,8 +35,8 @@ bholdus-tokens = { default-features = false, path = "../../tokens" }
 bholdus-support-nft = { package = "support-nft", default-features = false, path = "../nft" }
 
 [dev-dependencies]
-sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-core = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-core = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 
 [features]
 default = ["std"]

@@ -19,19 +19,19 @@ bholdus-evm-rpc-core-types = { path = "../../rpc-core/types" }
 bholdus-evm-rpc-primitives-debug = { path = "../../../../primitives/evm/rpc/debug" }
 
 # Substrate
-sc-client-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sc-utils = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sp-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sp-block-builder = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sp-blockchain = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sc-client-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sc-utils = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-block-builder = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-blockchain = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
 
 # Frontier
 ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
 ethereum-types = "0.13.1"
-fc-consensus = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fc-db = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", features = ["rpc_binary_search_estimate"] }
-fp-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fc-consensus = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fc-db = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22", features = ["rpc_binary_search_estimate"] }
+fp-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }

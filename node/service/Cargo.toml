@@ -21,76 +21,76 @@ jsonrpc-core = "18.0.0"
 jsonrpc-pubsub = "18.0.0"
 tokio = { version = "1.13.0", features = ["macros", "sync"] }
 
-beefy-gadget = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-beefy-gadget-rpc = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-beefy-primitives = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+beefy-gadget = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+beefy-gadget-rpc = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+beefy-primitives = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
 
-frame-benchmarking = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-frame-system = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-transaction-payment = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-substrate-frame-rpc-system = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-transaction-payment-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-im-online = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-contracts-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-pallet-mmr-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+frame-benchmarking = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+frame-system = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-transaction-payment = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+substrate-frame-rpc-system = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-transaction-payment-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-im-online = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-contracts-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+pallet-mmr-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 
-sc-basic-authorship = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sc-basic-authorship = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 sc-cli = { features = [
     "wasmtime",
-], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-client-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-consensus = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-client-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-consensus = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 sc-executor = { features = [
     "wasmtime",
-], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-consensus-manual-seal = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18", optional = true }
-sc-consensus-uncles = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-consensus-epochs = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-consensus-slots = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-finality-grandpa-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-keystore = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-rpc-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-consensus-manual-seal = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22", optional = true }
+sc-consensus-uncles = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-consensus-epochs = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-consensus-slots = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-finality-grandpa-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-keystore = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-rpc-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 sc-service = { features = [
     "wasmtime",
-], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-telemetry = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-transaction-pool = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-transaction-pool-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-network = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-authority-discovery = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sc-chain-spec = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+], git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-telemetry = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-transaction-pool = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-transaction-pool-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-network = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-authority-discovery = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-chain-spec = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 
-sp-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-trie = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-block-builder = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-frame-system-rpc-runtime-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-blockchain = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-consensus = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-core = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-inherents = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-runtime = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-timestamp = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-authorship = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-transaction-pool = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-keystore = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-offchain = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-session = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-storage = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
-sp-authority-discovery = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.18" }
+sp-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-trie = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-block-builder = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+frame-system-rpc-runtime-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-blockchain = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-consensus = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-consensus-aura = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-core = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-inherents = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-timestamp = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-authorship = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-transaction-pool = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-keystore = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-offchain = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-session = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-storage = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sp-authority-discovery = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 
-fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fc-db = { version = "2.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fc-rpc-core = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fp-rpc = { version = "3.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-fp-storage = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
-pallet-ethereum = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18" }
+fc-mapping-sync = { version = "2.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fc-db = { version = "2.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fc-rpc-core = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fp-rpc = { version = "3.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+fp-storage = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
+pallet-ethereum = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
 bholdus-evm-rpc-debug = { path = "../../client/evm/rpc/debug" }
 bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug" }
 bholdus-evm-rpc-trace = { path = "../../client/evm/rpc/trace" }
