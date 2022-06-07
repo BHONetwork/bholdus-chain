@@ -23,10 +23,11 @@ use frame_support::{
 };
 use pallet_evm::{AddressMapping, ExitSucceed, PrecompileSet};
 use precompile_utils::{
-	keccak256, EvmDataReader, EvmDataWriter, EvmResult, Gasometer, LogsBuilder, RuntimeHelper,
+	keccak256, revert, succeed, EvmDataReader, EvmDataWriter, EvmResult, FunctionModifier,
+	LogsBuilder, PrecompileHandleExt, RuntimeHelper,
 };
 
-use fp_evm::{Context, PrecompileOutput};
+use fp_evm::{PrecompileHandle, PrecompileOutput};
 
 use sp_core::H160;
 use sp_std::{fmt::Debug, marker::PhantomData};
@@ -61,28 +62,24 @@ where
 	Runtime::Call: From<pallet_template::Call<Runtime>>,
 	<<Runtime as frame_system::Config>::Call as Dispatchable>::Origin: OriginTrait,
 {
-	fn execute(
-		&self,
-		_address: H160,
-		input: &[u8], //Reminder this is big-endian
-		target_gas: Option<u64>,
-		context: &Context,
-		_is_static: bool,
-	) -> Option<EvmResult<PrecompileOutput>> {
+	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<EvmResult<PrecompileOutput>> {
 		let result = {
-			let mut gasometer = Gasometer::new(target_gas);
-			let gasometer = &mut gasometer;
-
-			let (mut input, selector) = match EvmDataReader::new_with_selector(gasometer, input) {
-				Ok((input, selector)) => (input, selector),
+			let selector = match handle.read_selector() {
+				Ok(selector) => selector,
 				Err(e) => return Some(Err(e)),
 			};
-			let input = &mut input;
+
+			if let Err(err) = handle.check_function_modifier(match selector {
+				Action::DoSomething => FunctionModifier::NonPayable,
+				_ => FunctionModifier::View,
+			}) {
+				return Some(Err(err));
+			}
 
 			match selector {
 				// Check for accessor methods first. These return results immediately
-				Action::DoSomething => Self::do_something(input, gasometer, target_gas, context),
-				Action::GetValue => Self::get_value(input, gasometer, target_gas, context),
+				Action::DoSomething => Self::do_something(handle),
+				Action::GetValue => Self::get_value(handle),
 			}
 		};
 
@@ -109,62 +106,41 @@ where
 	Runtime::Call: From<pallet_template::Call<Runtime>>,
 	<<Runtime as frame_system::Config>::Call as Dispatchable>::Origin: OriginTrait,
 {
-	fn do_something(
-		input: &mut EvmDataReader,
-		gasometer: &mut Gasometer,
-		_target_gas: Option<u64>,
-		context: &Context,
-	) -> EvmResult<PrecompileOutput> {
-		gasometer.record_log_costs_manual(1, 32)?;
+	fn do_something(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+		handle.record_cost(RuntimeHelper::<Runtime>::db_read_gas_cost())?;
 
-		// Bound check. We expect a single argument passed in.
-		input.expect_arguments(gasometer, 1)?;
+		// Read input.
+		let mut input = handle.read_input()?;
+		input.expect_arguments(1)?;
 
-		// Parse the u32 value that will be dispatched to the pallet.
-		let value = input.read::<u32>(gasometer)?.into();
+		// // Parse the u32 value that will be dispatched to the pallet.
+		// let value = input.read::<u32>(gasometer)?.into();
 
-		// Use pallet-evm's account mapping to determine what AccountId to dispatch from.
-		let origin = Runtime::AddressMapping::into_account_id(context.caller);
-		let call = pallet_template::Call::<Runtime>::do_something { something: value };
+		// // Use pallet-evm's account mapping to determine what AccountId to dispatch from.
+		// let origin = Runtime::AddressMapping::into_account_id(context.caller);
+		// let call = pallet_template::Call::<Runtime>::do_something { something: value };
 
-		// Dispatch the call into the runtime.
-		// The RuntimeHelper tells how much gas was actually used.
-		RuntimeHelper::<Runtime>::try_dispatch(Some(origin).into(), call, gasometer)?;
+		// // Dispatch the call into the runtime.
+		// // The RuntimeHelper tells how much gas was actually used.
+		// RuntimeHelper::<Runtime>::try_dispatch(Some(origin).into(), call, gasometer)?;
 
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Stopped,
-			cost: gasometer.used_gas(),
-			output: Default::default(),
-			logs: LogsBuilder::new(context.address)
-				.log1(SELECTOR_LOG_SOMETHING, EvmDataWriter::new().write(value).build())
-				.build(),
-		})
+		Ok(succeed(EvmDataWriter::new().write(1_u32).build()))
 	}
 
-	fn get_value(
-		input: &mut EvmDataReader,
-		gasometer: &mut Gasometer,
-		_target_gas: Option<u64>,
-		_context: &Context,
-	) -> EvmResult<PrecompileOutput> {
-		// Bound check
-		input.expect_arguments(gasometer, 0)?;
+	fn get_value(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+		handle.record_cost(RuntimeHelper::<Runtime>::db_read_gas_cost())?;
+
+		// Read input.
+		let mut input = handle.read_input()?;
+		input.expect_arguments(0)?;
 
 		// fetch data from pallet
 		let stored_value = pallet_template::Something::<Runtime>::get().unwrap_or_default();
 
 		// Record one storage red worth of gas.
 		// The utility internally uses pallet_evm's GasWeightMapping.
-		gasometer.record_cost(RuntimeHelper::<Runtime>::db_read_gas_cost())?;
+		handle.record_cost(RuntimeHelper::<Runtime>::db_read_gas_cost())?;
 
-		// Construct to Solidity-formatted output data
-		let output = EvmDataWriter::new().write(stored_value).build();
-
-		Ok(PrecompileOutput {
-			exit_status: ExitSucceed::Returned,
-			cost: gasometer.used_gas(),
-			output,
-			logs: Default::default(),
-		})
+		Ok(succeed(EvmDataWriter::new().write(stored_value).build()))
 	}
 }

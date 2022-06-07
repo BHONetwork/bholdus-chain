@@ -570,10 +570,12 @@ name = "bholdus-evm-precompile-utils"
 version = "1.0.18"
 dependencies = [
  "bholdus-evm-precompile-utils-macro",
+ "evm",
  "fp-evm",
  "frame-support",
  "frame-system",
  "hex-literal",
+ "impl-trait-for-tuples",
  "log",
  "num_enum",
  "pallet-evm",

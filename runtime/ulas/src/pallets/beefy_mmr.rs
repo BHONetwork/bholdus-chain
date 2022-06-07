@@ -35,7 +35,7 @@ parameter_types! {
 	pub LeafVersion: MmrLeafVersion = MmrLeafVersion::new(0, 0);
 }
 
-struct CustomBeefyDataProvider {}
+pub struct CustomBeefyDataProvider {}
 
 impl BeefyDataProvider<()> for CustomBeefyDataProvider {
 	fn extra_data() -> () {}
