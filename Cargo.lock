@@ -5644,6 +5644,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-nomination-pools"
+version = "1.0.0"
+source = "git+https://github.com/BHONetwork/substrate.git?branch=bho-polkadot-v0.9.22#af7d0b1aacd2c679c9ea2675b1312874ef1d8e74"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec 3.1.2",
+ "scale-info",
+ "sp-core",
+ "sp-runtime",
+ "sp-staking",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-offences"
 version = "4.0.0-dev"
 source = "git+https://github.com/BHONetwork/substrate.git?branch=bho-polkadot-v0.9.22#af7d0b1aacd2c679c9ea2675b1312874ef1d8e74"
@@ -6237,6 +6252,7 @@ dependencies = [
  "pallet-indices",
  "pallet-mmr",
  "pallet-multisig",
+ "pallet-nomination-pools",
  "pallet-offences",
  "pallet-preimage",
  "pallet-proxy",
@@ -10148,6 +10164,7 @@ dependencies = [
  "pallet-indices",
  "pallet-mmr",
  "pallet-multisig",
+ "pallet-nomination-pools",
  "pallet-offences",
  "pallet-preimage",
  "pallet-proxy",

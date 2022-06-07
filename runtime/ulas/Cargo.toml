@@ -75,6 +75,7 @@ pallet-beefy = { git = "https://github.com/BHONetwork/substrate.git", default-fe
 pallet-beefy-mmr = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
 pallet-preimage = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
 pallet-child-bounties = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
+pallet-nomination-pools = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
 
 # Frontier
 pallet-evm = { default-features = false, version = "6.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
@@ -189,6 +190,7 @@ std = [
 	"pallet-beefy-mmr/std",
 	"pallet-preimage/std",
 	"pallet-child-bounties/std",
+	"pallet-nomination-pools/std",
 
 	"common-primitives/std",
 	"runtime-common/std",

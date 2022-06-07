@@ -159,7 +159,7 @@ construct_runtime!(
 		Bounties: pallet_bounties,
 		ChildBounties: pallet_child_bounties,
 		BagsList: pallet_bags_list,
-
+		NominationPools: pallet_nomination_pools,
 
 		// Bridge support
 		Mmr: pallet_mmr,
