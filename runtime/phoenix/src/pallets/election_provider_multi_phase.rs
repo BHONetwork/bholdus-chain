@@ -3,7 +3,7 @@
 use codec::Decode;
 use frame_election_provider_support::{onchain, SequentialPhragmen};
 use frame_support::{
-	traits::ConstU32,
+	traits::{ConstU16, ConstU32},
 	weights::{constants::BlockExecutionWeight, DispatchClass},
 };
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
