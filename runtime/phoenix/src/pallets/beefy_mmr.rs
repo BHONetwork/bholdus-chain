@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 pub use beefy_primitives::crypto::AuthorityId as BeefyId;
-use beefy_primitives::mmr::MmrLeafVersion;
+use beefy_primitives::mmr::{BeefyDataProvider, MmrLeafVersion};
 use frame_support::parameter_types;
 
 use crate::*;
@@ -35,8 +35,15 @@ parameter_types! {
 	pub LeafVersion: MmrLeafVersion = MmrLeafVersion::new(0, 0);
 }
 
+struct CustomBeefyDataProvider {}
+
+impl BeefyDataProvider<()> for CustomBeefyDataProvider {
+	fn extra_data() -> () {}
+}
+
 impl pallet_beefy_mmr::Config for Runtime {
 	type LeafVersion = LeafVersion;
 	type BeefyAuthorityToMerkleLeaf = pallet_beefy_mmr::BeefyEcdsaToEthereum;
-	type ParachainHeads = ();
+	type LeafExtra = ();
+	type BeefyDataProvider = CustomBeefyDataProvider;
 }
