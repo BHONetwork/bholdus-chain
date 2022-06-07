@@ -90,9 +90,9 @@ pallet-evm-precompile-dispatch = { git = "https://github.com/BHONetwork/frontier
 pallet-evm-precompile-modexp = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22", default-features = false }
 pallet-evm-precompile-sha3fips = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22", default-features = false }
 pallet-evm-precompile-simple = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22", default-features = false }
-bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug", default-features = false }
-evm-tracing-events = { path = "../../primitives/evm/rpc/evm-tracing-events", optional = true, default-features = false }
-bholdus-evm-tracer = { path = "../evm-tracer", optional = true, default-features = false }
+# bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug", default-features = false }
+# evm-tracing-events = { path = "../../primitives/evm/rpc/evm-tracing-events", optional = true, default-features = false }
+# bholdus-evm-tracer = { path = "../evm-tracer", optional = true, default-features = false }
 
 # Substrate primitives
 sp-api = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
@@ -230,14 +230,15 @@ std = [
 	"fp-self-contained/std",
 	'fp-rpc/std',
 	'fp-evm/std',
-	"bholdus-evm-rpc-primitives-debug/std",
-	"evm-tracing-events/std",
-	"bholdus-evm-tracer/std",
+	# "bholdus-evm-rpc-primitives-debug/std",
+	# "evm-tracing-events/std",
+	# "bholdus-evm-tracer/std",
 
 	"runtime-chain-extension/std",
 ]
 
-evm-tracing = ["evm-tracing-events", "bholdus-evm-tracer", "rlp", "sha3"]
+# evm-tracing = ["evm-tracing-events", "bholdus-evm-tracer", "rlp", "sha3"]
+evm-tracing = []
 
 try-runtime = [
 	"frame-try-runtime",

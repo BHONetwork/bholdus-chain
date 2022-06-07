@@ -49,7 +49,7 @@ pub trait RuntimeApiCollection:
 	+ pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
 	+ fp_rpc::EthereumRuntimeRPCApi<Block>
 	+ fp_rpc::ConvertTransactionRuntimeApi<Block>
-	+ bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>
+// + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>
 where
 	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
@@ -73,8 +73,8 @@ where
 		+ pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>
 		+ pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
 		+ fp_rpc::EthereumRuntimeRPCApi<Block>
-		+ fp_rpc::ConvertTransactionRuntimeApi<Block>
-		+ bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>,
+		+ fp_rpc::ConvertTransactionRuntimeApi<Block>,
+	// + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>,
 	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
 }

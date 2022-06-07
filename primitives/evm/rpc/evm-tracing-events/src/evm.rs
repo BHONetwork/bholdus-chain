@@ -1,18 +1,18 @@
-// Copyright 2019-2021 Bholdus Inc.
-// This file is part of Bholdus.
+// Copyright 2019-2022 PureStake Inc.
+// This file is part of Moonbeam.
 
-// Bholdus is free software: you can redistribute it and/or modify
+// Moonbeam is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-// Bholdus is distributed in the hope that it will be useful,
+// Moonbeam is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Bholdus.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate alloc;
 
@@ -117,6 +117,14 @@ pub enum EvmEvent {
 		gas_limit: u64,
 		address: H160,
 	},
+	PrecompileSubcall {
+		code_address: H160,
+		transfer: Option<Transfer>,
+		input: Vec<u8>,
+		target_gas: Option<u64>,
+		is_static: bool,
+		context: super::Context,
+	},
 }
 
 #[cfg(feature = "evm-tracing")]
@@ -190,6 +198,25 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				salt,
 				gas_limit,
 				address,
+			},
+			evm::tracing::Event::PrecompileSubcall {
+				code_address,
+				transfer,
+				input,
+				target_gas,
+				is_static,
+				context,
+			} => Self::PrecompileSubcall {
+				code_address,
+				transfer: if let Some(transfer) = transfer {
+					Some(transfer.clone().into())
+				} else {
+					None
+				},
+				input: input.to_vec(),
+				target_gas,
+				is_static,
+				context: context.clone().into(),
 			},
 		}
 	}

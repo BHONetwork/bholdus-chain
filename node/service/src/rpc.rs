@@ -47,7 +47,7 @@ pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 pub type RpcResult = Result<RpcExtension, Box<dyn std::error::Error + Send + Sync>>;
 
 /// Ethereum Tracing
-pub mod tracing;
+// pub mod tracing;
 
 /// Extra dependencies for GRANDPA
 pub struct GrandpaDeps<B> {

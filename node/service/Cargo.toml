@@ -91,10 +91,10 @@ fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-pol
 fp-rpc = { version = "3.0.0-dev", git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
 fp-storage = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
 pallet-ethereum = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22" }
-bholdus-evm-rpc-debug = { path = "../../client/evm/rpc/debug" }
-bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug" }
-bholdus-evm-rpc-trace = { path = "../../client/evm/rpc/trace" }
-bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
+# bholdus-evm-rpc-debug = { path = "../../client/evm/rpc/debug" }
+# bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug" }
+# bholdus-evm-rpc-trace = { path = "../../client/evm/rpc/trace" }
+# bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
 
 ulas-runtime = { optional = true, path = "../../runtime/ulas" }
 phoenix-runtime = { optional = true, path = "../../runtime/phoenix" }
