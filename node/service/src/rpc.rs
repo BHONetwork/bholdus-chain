@@ -7,14 +7,14 @@
 
 use crate::{client::RuntimeApiCollection, Block, BlockNumber, Hash, TransactionConverters};
 use fc_rpc::{
-	EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
+	EthBlockDataCacheTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
 	SchemaV2Override, SchemaV3Override, StorageOverride,
 };
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use fp_rpc::EthereumRuntimeRPCApi;
 use fp_storage::EthereumStorageSchema;
 use futures::prelude::*;
-use jsonrpc_pubsub::manager::SubscriptionManager;
+use jsonrpsee::RpcModule;
 use sc_client_api::{
 	backend::{Backend, StateBackend, StorageProvider},
 	client::BlockchainEvents,
@@ -25,7 +25,6 @@ use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
 use sc_finality_grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
-use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
 pub use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
@@ -42,7 +41,7 @@ use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
 use std::{collections::BTreeMap, str::FromStr, sync::Arc, time::Duration};
 
 /// A type representing all RPC extensions.
-pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
+pub type RpcExtension = jsonrpsee::RpcModule<()>;
 /// RPC result.
 pub type RpcResult = Result<RpcExtension, Box<dyn std::error::Error + Send + Sync>>;
 
@@ -119,7 +118,7 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	pub transaction_converter: TransactionConverters,
 	/// Cache for Ethereum block data.
 	#[cfg(not(feature = "with-hyper-runtime"))]
-	pub block_data_cache: Arc<EthBlockDataCache<Block>>,
+	pub block_data_cache: Arc<EthBlockDataCacheTask<Block>>,
 	/// Manual seal command sink
 	#[cfg(feature = "with-hyper-runtime")]
 	pub command_sink:
@@ -145,9 +144,9 @@ impl FromStr for EthApiCmd {
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		Ok(match s {
-			"debug" => Self::Debug,
-			"trace" => Self::Trace,
-			_ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
+			| "debug" => Self::Debug,
+			| "trace" => Self::Trace,
+			| _ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
 		})
 	}
 }
@@ -168,9 +167,9 @@ impl FromStr for Sealing {
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		Ok(match s {
-			"manual" => Self::Manual,
-			"instant" => Self::Instant,
-			_ => return Err(format!("`{}` is not recognized as a supported sealing method", s)),
+			| "manual" => Self::Manual,
+			| "instant" => Self::Instant,
+			| _ => return Err(format!("`{}` is not recognized as a supported sealing method", s)),
 		})
 	}
 }
@@ -254,16 +253,18 @@ where
 	P: TransactionPool<Block = Block> + 'static,
 	A: ChainApi<Block = Block> + 'static,
 {
+	use beefy_gadget_rpc::{BeefyApiServer, BeefyRpcHandler};
 	use fc_rpc::{
-		EthApi, EthApiServer, EthFilterApi, EthFilterApiServer, EthPubSubApi, EthPubSubApiServer,
-		HexEncodedIdProvider, NetApi, NetApiServer, Web3Api, Web3ApiServer,
+		Eth, EthApiServer, EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
+		EthPubSubApiServer, EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
 	};
-	use pallet_contracts_rpc::{Contracts, ContractsApi};
-	use pallet_mmr_rpc::{Mmr, MmrApi};
-	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use substrate_frame_rpc_system::{FullSystem, SystemApi};
+	use pallet_contracts_rpc::{ContractsApiServer, ContractsRpc};
+	use pallet_mmr_rpc::{MmrApiServer, MmrRpc};
+	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPaymentRpc};
+	use sc_finality_grandpa_rpc::{GrandpaApiServer, GrandpaRpc};
+	use substrate_frame_rpc_system::{SystemApiServer, SystemRpc};
 
-	let mut io = jsonrpc_core::IoHandler::default();
+	let mut io = RpcModule::new(());
 
 	#[cfg(not(feature = "with-hyper-runtime"))]
 	let FullDeps {
@@ -308,86 +309,91 @@ where
 		finality_provider,
 	} = grandpa;
 
-	io.extend_with(SystemApi::to_delegate(FullSystem::new(
-		client.clone(),
-		pool.clone(),
-		deny_unsafe,
-	)));
-
-	// Making synchronous calls in light client freezes the browser currently,
-	// more context: https://github.com/paritytech/substrate/pull/3480
-	// These RPCs should use an asynchronous caller instead.
-	io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));
+	io.merge(SystemRpc::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
+	io.merge(ContractsRpc::new(client.clone()).into_rpc())?;
 	#[cfg(not(feature = "with-hyper-runtime"))]
-	io.extend_with(MmrApi::to_delegate(Mmr::new(client.clone())));
-	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
+	io.merge(MmrRpc::new(client.clone()).into_rpc())?;
+	io.merge(TransactionPaymentRpc::new(client.clone()).into_rpc())?;
 
 	#[cfg(not(feature = "with-hyper-runtime"))]
 	{
-		io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
-			shared_authority_set.clone(),
-			shared_voter_state,
-			justification_stream,
-			subscription_executor,
-			finality_provider,
-		)));
+		io.merge(
+			GrandpaRpc::new(
+				subscription_executor,
+				shared_authority_set.clone(),
+				shared_voter_state,
+				justification_stream,
+				finality_provider,
+			)
+			.into_rpc(),
+		)?;
 
-		let beefy_handler: beefy_gadget_rpc::BeefyRpcHandler<Block> =
-			beefy_gadget_rpc::BeefyRpcHandler::new(
+		io.merge(
+			BeefyRpcHandler::<Block>::new(
 				beefy.beefy_commitment_stream,
 				beefy.beefy_best_block_stream,
 				beefy.subscription_executor,
-			)?;
-		io.extend_with(beefy_gadget_rpc::BeefyApi::to_delegate(beefy_handler));
+			)?
+			.into_rpc(),
+		)?;
 
-		io.extend_with(NetApiServer::to_delegate(NetApi::new(
-			client.clone(),
-			network.clone(),
-			// Whether to format the `peer_count` response as Hex (default) or not.
-			true,
-		)));
+		io.merge(
+			Net::new(
+				client.clone(),
+				network.clone(),
+				// Whether to format the `peer_count` response as Hex (default) or not.
+				true,
+			)
+			.into_rpc(),
+		)?;
 
 		// Nor any signers
 		let signers = Vec::new();
 
-		io.extend_with(EthApiServer::to_delegate(EthApi::new(
-			client.clone(),
-			pool.clone(),
-			graph,
-			Some(transaction_converter),
-			network.clone(),
-			signers,
-			overrides.clone(),
-			frontier_backend.clone(),
-			is_authority,
-			block_data_cache.clone(),
-			rpc_config.fee_history_limit,
-			fee_history_cache,
-		)));
+		io.merge(
+			Eth::new(
+				client.clone(),
+				pool.clone(),
+				graph,
+				Some(transaction_converter),
+				network.clone(),
+				signers,
+				overrides.clone(),
+				frontier_backend.clone(),
+				is_authority,
+				block_data_cache.clone(),
+				fee_history_cache,
+				rpc_config.fee_history_limit,
+			)
+			.into_rpc(),
+		)?;
 
 		if let Some(filter_pool) = filter_pool {
-			io.extend_with(EthFilterApiServer::to_delegate(EthFilterApi::new(
-				client.clone(),
-				frontier_backend.clone(),
-				filter_pool.clone(),
-				500 as usize, // max stored filters
-				rpc_config.max_past_logs,
-				block_data_cache.clone(),
-			)));
+			io.merge(
+				EthFilter::new(
+					client.clone(),
+					frontier_backend.clone(),
+					filter_pool.clone(),
+					500_usize, // max stored filters
+					rpc_config.max_past_logs,
+					block_data_cache.clone(),
+				)
+				.into_rpc(),
+			)?;
 		}
 
-		io.extend_with(Web3ApiServer::to_delegate(Web3Api::new(client.clone())));
+		io.merge(Web3::new(client.clone()).into_rpc())?;
 
-		io.extend_with(EthPubSubApiServer::to_delegate(EthPubSubApi::new(
-			pool.clone(),
-			client.clone(),
-			network.clone(),
-			SubscriptionManager::<HexEncodedIdProvider>::with_id_provider(
-				HexEncodedIdProvider::default(),
-				Arc::new(deps.subscription_executor.clone()),
-			),
-			overrides,
-		)));
+		io.merge(
+			EthPubSub::new(
+				pool.clone(),
+				client.clone(),
+				network.clone(),
+				deps.subscription_executor.clone(),
+				overrides,
+			)
+			.into_rpc(),
+		)?;
 	}
 
 	#[cfg(feature = "with-hyper-runtime")]

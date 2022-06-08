@@ -53,6 +53,8 @@ use std::{
 	sync::{Arc, Mutex},
 	time::Duration,
 };
+use fc_db::Backend as FrontierBackend;
+
 
 pub mod chain_spec;
 pub mod client;
@@ -189,16 +191,15 @@ pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
 		.unwrap_or_else(|| {
 			BasePath::from_project("", "", "phoenix").config_dir(config.chain_spec.id())
 		});
-	config_dir.join("frontier").join("db")
+
+	config_dir
 }
 
 pub fn open_frontier_backend(config: &Configuration) -> Result<Arc<fc_db::Backend<Block>>, String> {
-	Ok(Arc::new(fc_db::Backend::<Block>::new(&fc_db::DatabaseSettings {
-		source: fc_db::DatabaseSettingsSrc::RocksDb {
-			path: frontier_database_dir(&config),
-			cache_size: 0,
-		},
-	})?))
+	Ok(Arc::new(FrontierBackend::open(
+		&config.database,
+		&frontier_database_dir(config),
+	)?))
 }
 
 /// Builds a new object suitable for chain operations.
@@ -669,24 +670,24 @@ where
 	);
 
 	let ethapi_cmd = rpc_config.ethapi.clone();
-	let tracing_requesters =
-		if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace) {
-			rpc::tracing::spawn_tracing_tasks(
-				&rpc_config,
-				rpc::SpawnTasksParams {
-					task_manager: &task_manager,
-					client: client.clone(),
-					substrate_backend: backend.clone(),
-					frontier_backend: frontier_backend.clone(),
-					filter_pool: filter_pool.clone(),
-					overrides: overrides.clone(),
-					fee_history_limit: rpc_config.fee_history_limit,
-					fee_history_cache: fee_history_cache.clone(),
-				},
-			)
-		} else {
-			rpc::tracing::RpcRequesters { debug: None, trace: None }
-		};
+	// let tracing_requesters =
+	// 	if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace) {
+	// 		rpc::tracing::spawn_tracing_tasks(
+	// 			&rpc_config,
+	// 			rpc::SpawnTasksParams {
+	// 				task_manager: &task_manager,
+	// 				client: client.clone(),
+	// 				substrate_backend: backend.clone(),
+	// 				frontier_backend: frontier_backend.clone(),
+	// 				filter_pool: filter_pool.clone(),
+	// 				overrides: overrides.clone(),
+	// 				fee_history_limit: rpc_config.fee_history_limit,
+	// 				fee_history_cache: fee_history_cache.clone(),
+	// 			},
+	// 		)
+	// 	} else {
+	// 		rpc::tracing::RpcRequesters { debug: None, trace: None }
+	// 	};
 
 	let (rpc_extensions_builder, rpc_setup) = {
 		let justification_stream = grandpa_link.justification_stream();
@@ -709,11 +710,12 @@ where
 		let overrides = overrides.clone();
 		let rpc_config = rpc_config.clone();
 		let filter_pool = filter_pool.clone();
-		let block_data_cache = Arc::new(fc_rpc::EthBlockDataCache::new(
+		let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
 			task_manager.spawn_handle(),
 			overrides.clone(),
 			rpc_config.eth_log_block_cache,
 			rpc_config.eth_statuses_cache,
+			prometheus_registry.clone(),
 		));
 
 		let is_ulas = config.chain_spec.is_ulas();
@@ -761,15 +763,15 @@ where
 				let mut io = rpc::create_full(deps)?;
 
 				// Ethereum Tracing RPC
-				if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace)
-				{
-					rpc::tracing::extend_with_tracing(
-						client.clone(),
-						tracing_requesters.clone(),
-						rpc_config.ethapi_trace_max_count,
-						&mut io,
-					);
-				}
+				// if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace)
+				// {
+				// 	rpc::tracing::extend_with_tracing(
+				// 		client.clone(),
+				// 		tracing_requesters.clone(),
+				// 		rpc_config.ethapi_trace_max_count,
+				// 		&mut io,
+				// 	);
+				// }
 				Ok(io)
 			};
 
@@ -784,7 +786,7 @@ where
 		keystore: keystore_container.sync_keystore(),
 		task_manager: &mut task_manager,
 		transaction_pool: transaction_pool.clone(),
-		rpc_extensions_builder: Box::new(rpc_extensions_builder),
+		rpc_builder: Box::new(rpc_extensions_builder),
 		backend: backend.clone(),
 		system_rpc_tx,
 		config,
@@ -881,6 +883,7 @@ where
 	let beefy_params = beefy_gadget::BeefyParams {
 		client: client.clone(),
 		backend,
+		runtime: client.clone(),
 		key_store: keystore.clone(),
 		network: network.clone(),
 		signed_commitment_sender: beefy_signed_commitment_sender,
@@ -894,7 +897,7 @@ where
 	task_manager.spawn_essential_handle().spawn_blocking(
 		"beefy-gadget",
 		None,
-		beefy_gadget::start_beefy_gadget::<_, _, _, _>(beefy_params),
+		beefy_gadget::start_beefy_gadget::<_, _, _, _,_>(beefy_params),
 	);
 
 	let config = grandpa::Config {
@@ -1046,7 +1049,7 @@ where
 		keystore: keystore_container.sync_keystore(),
 		task_manager: &mut task_manager,
 		transaction_pool: transaction_pool.clone(),
-		rpc_extensions_builder: Box::new(rpc_extensions_builder),
+		rpc_builder: Box::new(rpc_extensions_builder),
 		backend: backend.clone(),
 		system_rpc_tx,
 		config,

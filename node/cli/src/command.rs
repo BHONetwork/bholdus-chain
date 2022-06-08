@@ -18,6 +18,8 @@
 use crate::cli::{Cli, Subcommand};
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use service::{chain_spec, IdentifyVariant};
+use frame_benchmarking_cli::BenchmarkCmd;
+
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -215,37 +217,113 @@ pub fn run() -> sc_cli::Result<()> {
                 }
             })
 		},
-		Some(Subcommand::Benchmark(cmd)) =>
-			if cfg!(feature = "runtime-benchmarks") {
-				let runner = cli.create_runner(cmd)?;
-				runner.sync_run(|config| {
-					let chain_spec = &config.chain_spec;
-					if chain_spec.is_ulas() {
-						#[cfg(feature = "with-ulas-runtime")]
-						{
-							return cmd.run::<service::ulas_runtime::Block, service::UlasExecutor>(
-								config,
-							);
-						}
-						#[cfg(not(feature = "with-ulas-runtime"))]
-						return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
+		Some(Subcommand::Benchmark(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			
+			// Switch on the concrete benchmark sub-command
+			match cmd {
+				BenchmarkCmd::Pallet(cmd) => {
+					if cfg!(feature = "runtime-benchmarks") {
+						runner.sync_run(|config| {
+							let chain_spec = &config.chain_spec;
+		
+							if chain_spec.is_ulas() {
+								#[cfg(feature = "with-ulas-runtime")]
+								{
+									return cmd.run::<service::ulas_runtime::Block, service::UlasExecutor>(
+										config,
+									);
+								}
+								#[cfg(not(feature = "with-ulas-runtime"))]
+								return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
+							} else {
+								#[cfg(feature = "with-phoenix-runtime")]
+								{
+									return cmd
+										.run::<service::phoenix_runtime::Block, service::PhoenixExecutor>(
+											config,
+										);
+								}
+								#[cfg(not(feature = "with-phoenix-runtime"))]
+								return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
+							}
+						})
 					} else {
-						#[cfg(feature = "with-phoenix-runtime")]
-						{
-							return cmd
-								.run::<service::phoenix_runtime::Block, service::PhoenixExecutor>(
-									config,
-								);
-						}
-						#[cfg(not(feature = "with-phoenix-runtime"))]
-						return Err(service::PHOENIX_RUNTIME_NOT_AVAILABLE.into());
+						Err("Benchmarking wasn't enabled when building the node. \
+						You can enable it with `--features runtime-benchmarks`."
+							.into())
 					}
-				})
-			} else {
-				Err("Benchmarking wasn't enabled when building the node. \
-				You can enable it with `--features runtime-benchmarks`."
-					.into())
-			},
+				}
+				BenchmarkCmd::Block(cmd) => {
+					let chain_spec = &runner.config().chain_spec;
+					match chain_spec {
+						#[cfg(feature = "with-ulas-runtime")]
+						spec if spec.is_ulas() => {
+							return runner.sync_run(|mut config| {
+								let params = service::new_partial::<
+									service::ulas_runtime::RuntimeApi,
+									service::UlasExecutor,
+								>(&mut config)?;
+
+								cmd.run(params.client)
+							})
+						}
+						#[cfg(feature = "with-phoenix-runtime")]
+						spec if spec.is_phoenix() => {
+							return runner.sync_run(|mut config| {
+								let params = service::new_partial::<
+									service::phoenix_runtime::RuntimeApi,
+									service::PhoenixExecutor,
+								>(&mut config)?;
+
+								cmd.run(params.client)
+							})
+						}
+						_ => panic!("invalid chain spec"),
+					}
+				}
+				BenchmarkCmd::Storage(cmd) => {
+					let chain_spec = &runner.config().chain_spec;
+					match chain_spec {
+						#[cfg(feature = "with-ulas-runtime")]
+						spec if spec.is_ulas() => {
+							return runner.sync_run(|mut config| {
+								let params = service::new_partial::<
+									service::ulas_runtime::RuntimeApi,
+									service::UlasExecutor,
+								>(&mut config)?;
+
+								let db = params.backend.expose_db();
+								let storage = params.backend.expose_storage();
+
+								cmd.run(config, params.client, db, storage)
+							})
+						}
+						#[cfg(feature = "with-phoenix-runtime")]
+						spec if spec.is_phoenix() => {
+							return runner.sync_run(|mut config| {
+								let params = service::new_partial::<
+									service::phoenix_runtime::RuntimeApi,
+									service::PhoenixExecutor,
+								>(&mut config)?;
+
+								let db = params.backend.expose_db();
+								let storage = params.backend.expose_storage();
+
+								cmd.run(config, params.client, db, storage)
+							})
+						}
+						_ => panic!("invalid chain spec"),
+					}
+				}
+				BenchmarkCmd::Overhead(_) => Err("Unsupported benchmarking command".into()),
+				BenchmarkCmd::Machine(cmd) => {
+					return runner.sync_run(|config| cmd.run(&config,frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE.clone()));
+				}
+			}
+
+		}
+			,
 		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
 		Some(Subcommand::Sign(cmd)) => cmd.run(),
 		Some(Subcommand::Verify(cmd)) => cmd.run(),
@@ -297,10 +375,42 @@ pub fn run() -> sc_cli::Result<()> {
 		},
 		Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.async_run(|mut config| {
-				let (client, backend, _, task_manager) = service::new_chain_ops(&mut config)?;
-				Ok((cmd.run(client, backend), task_manager))
-			})
+			let chain_spec = &runner.config().chain_spec;
+			match chain_spec {
+				#[cfg(feature = "with-ulas-runtime")]
+				spec if spec.is_ulas() => runner.async_run(|mut config| {
+					let params = service::new_partial::<
+						service::ulas_runtime::RuntimeApi,
+						service::UlasExecutor,
+					>(&mut config)?;
+
+					let aux_revert = Box::new(move |client, _, blocks| {
+						sc_finality_grandpa::revert(client, blocks)?;
+						Ok(())
+					});
+					Ok((
+						cmd.run(params.client, params.backend, Some(aux_revert)),
+						params.task_manager,
+					))
+				}),
+				#[cfg(feature = "with-phoenix-runtime")]
+				spec if spec.is_phoenix() => runner.async_run(|mut config| {
+					let params = service::new_partial::<
+						service::phoenix_runtime::RuntimeApi,
+						service::PhoenixExecutor,
+					>(&mut config)?;
+
+					let aux_revert = Box::new(move |client, _, blocks| {
+						sc_finality_grandpa::revert(client, blocks)?;
+						Ok(())
+					});
+					Ok((
+						cmd.run(params.client, params.backend, Some(aux_revert)),
+						params.task_manager,
+					))
+				}),
+				_ => panic!("invalid chain spec"),
+			}
 		},
 		#[cfg(feature = "try-runtime")]
 		Some(Subcommand::TryRuntime(cmd)) => {

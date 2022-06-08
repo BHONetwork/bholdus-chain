@@ -300,6 +300,7 @@ fn testnet_genesis(
 		},
 		ethereum: EthereumConfig {},
 		base_fee: Default::default(),
+		nomination_pools: Default::default(),
 		/* dex: DexConfig {
 			initial_provisioning_trading_pairs: vec![],
 			initial_enabled_trading_pairs: initial_dex_liquidity_pairs

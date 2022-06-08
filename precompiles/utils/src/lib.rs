@@ -37,11 +37,11 @@ mod data;
 pub use data::{Address, Bytes, EvmData, EvmDataReader, EvmDataWriter};
 pub use precompile_utils_macro::{generate_function_selector, keccak256};
 
-#[cfg(feature = "testing")]
-pub mod testing;
+// #[cfg(feature = "testing")]
+// pub mod testing;
 
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod tests;
 
 /// Alias for Result returning an EVM precompile error.
 pub type EvmResult<T = ()> = Result<T, PrecompileFailure>;

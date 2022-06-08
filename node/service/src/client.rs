@@ -49,7 +49,8 @@ pub trait RuntimeApiCollection:
 	+ pallet_mmr_rpc::MmrRuntimeApi<Block, <Block as sp_runtime::traits::Block>::Hash>
 	+ fp_rpc::EthereumRuntimeRPCApi<Block>
 	+ fp_rpc::ConvertTransactionRuntimeApi<Block>
-// + bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block>
+// + bholdus_evm_rpc_primitives_debug::
+// DebugRuntimeApi<Block>
 where
 	<Self as sp_api::ApiExt<Block>>::StateBackend: sp_api::StateBackend<BlakeTwo256>,
 {
@@ -299,6 +300,10 @@ impl sc_client_api::BlockBackend<Block> for Client {
 		hash: &<Block as BlockT>::Hash,
 	) -> sp_blockchain::Result<bool> {
 		match_client!(self, has_indexed_transaction(hash))
+	}
+
+	fn requires_full_sync(&self) -> bool {
+		match_client!(self, requires_full_sync())
 	}
 }
 

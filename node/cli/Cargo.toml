@@ -30,6 +30,7 @@ sc-telemetry = { git = "https://github.com/BHONetwork/substrate.git", branch = "
 sp-runtime = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 sp-core = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 node-inspect = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
+sc-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
 
 service = { package = "bholdus-service", optional = true, path = "../service" }
 
