@@ -3,7 +3,7 @@ name = "bholdus-evm-precompile-utils"
 authors = ["Bholdus"]
 description = "Utils to write EVM precompiles."
 edition = "2021"
-version = "1.0.18"
+version = "1.0.19"
 
 [dependencies]
 impl-trait-for-tuples = "0.2.2"

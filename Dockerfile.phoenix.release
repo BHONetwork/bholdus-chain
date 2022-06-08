@@ -4,7 +4,7 @@ WORKDIR /bholdus
 
 COPY . .
 
-RUN cargo build --release --features with-{{RELEASE_NETWORK}}-runtime,evm-tracing
+RUN cargo build --release --features with-phoenix-runtime,evm-tracing
 
 RUN mv ./target/release/bholdus /usr/local/bin
 

@@ -4,7 +4,7 @@ edition = "2021"
 homepage = "https://bholdus.com"
 name = "ulas-runtime"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.18"
+version = "1.0.19"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]

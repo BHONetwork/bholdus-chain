@@ -3,7 +3,7 @@ name = "bholdus-evm-precompile-utils-macro"
 authors = ["Bholdus"]
 description = ""
 edition = "2021"
-version = "1.0.18"
+version = "1.0.19"
 
 [lib]
 proc-macro = true

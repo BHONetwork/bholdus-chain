@@ -7,6 +7,6 @@ COPY --from=docker:20.10.12 /usr/local/bin/docker /usr/bin/
 RUN cargo install --locked --git https://github.com/chevdor/srtool-cli --tag v0.8.0
 
 # Subwasm
-RUN cargo install --locked --git https://github.com/chevdor/subwasm --tag v0.16.1
+RUN cargo install --locked --git https://github.com/chevdor/subwasm --tag v0.17.1
 
 WORKDIR /bholdus

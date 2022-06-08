@@ -25,7 +25,7 @@ services:
       - /bholdus:/bholdus
     environment:
       - ARCHIVE_PATH=build-wasm-archive
-      - SRTOOL_TAG=1.57.0
+      - SRTOOL_TAG=1.60.0
     command: scripts/build-wasm.sh
 
   build-binary:

@@ -5,7 +5,7 @@ edition = "2021"
 homepage = "https://bholdus.com"
 name = "bholdus-service"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.18"
+version = "1.0.19"
 
 [dependencies]
 structopt = "0.3.8"
@@ -93,7 +93,7 @@ pallet-ethereum = { git = "https://github.com/BHONetwork/frontier.git", branch =
 # bholdus-evm-rpc-debug = { path = "../../client/evm/rpc/debug" }
 # bholdus-evm-rpc-primitives-debug = { path = "../../primitives/evm/rpc/debug" }
 # bholdus-evm-rpc-trace = { path = "../../client/evm/rpc/trace" }
-# bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
+bholdus-evm-primitives-ext = { path = "../../primitives/evm/ext" }
 
 ulas-runtime = { optional = true, path = "../../runtime/ulas" }
 phoenix-runtime = { optional = true, path = "../../runtime/phoenix" }

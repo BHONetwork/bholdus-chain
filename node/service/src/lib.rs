@@ -93,12 +93,11 @@ impl sc_executor::NativeExecutionDispatch for UlasExecutor {
 	#[cfg(feature = "runtime-benchmarks")]
 	type ExtendHostFunctions = (
 		frame_benchmarking::benchmarking::HostFunctions,
-		// bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+		bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
 	);
 	/// Otherwise we only use the default Substrate host functions.
 	#[cfg(not(feature = "runtime-benchmarks"))]
-	type ExtendHostFunctions = ();
-	// type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
+	type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		ulas_runtime::api::dispatch(method, data)
@@ -118,12 +117,11 @@ impl sc_executor::NativeExecutionDispatch for PhoenixExecutor {
 	#[cfg(feature = "runtime-benchmarks")]
 	type ExtendHostFunctions = (
 		frame_benchmarking::benchmarking::HostFunctions,
-		// bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+		bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
 	);
 	/// Otherwise we only use the default Substrate host functions.
 	#[cfg(not(feature = "runtime-benchmarks"))]
-	type ExtendHostFunctions = ();
-	// type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
+	type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		phoenix_runtime::api::dispatch(method, data)
@@ -143,12 +141,11 @@ impl sc_executor::NativeExecutionDispatch for HyperExecutor {
 	#[cfg(feature = "runtime-benchmarks")]
 	type ExtendHostFunctions = (
 		frame_benchmarking::benchmarking::HostFunctions,
-		// bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
+		bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,
 	);
 	/// Otherwise we only use the default Substrate host functions.
 	#[cfg(not(feature = "runtime-benchmarks"))]
-	type ExtendHostFunctions = ();
-	// type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
+	type ExtendHostFunctions = (bholdus_evm_primitives_ext::bholdus_ext::HostFunctions,);
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
 		hyper_runtime::api::dispatch(method, data)
