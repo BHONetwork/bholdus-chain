@@ -1,7 +1,7 @@
 [package]
 authors = ["Bholdus Technologies"]
 description = "FRAME non fungible token management pallet"
-edition = '2018'
+edition = "2021"
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
 name = "bholdus-nft"
@@ -26,7 +26,7 @@ version = '1.0.124'
 # [dependencies.max-encoded-len]
 # default-features = false
 # git = "https://github.com/BHONetwork/substrate.git"
-# branch = "bho-polkadot-v0.9.18"
+# branch = "bho-polkadot-v0.9.22"
 # version = '4.0.0-dev'
 
 [dependencies.codec]
@@ -39,29 +39,29 @@ version = '3.0.0'
 [dependencies.frame-benchmarking]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 optional = true
 
 [dependencies.frame-support]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.frame-system]
 default-features = false
 # path = '../frame/system'
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-runtime]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 ## Bholdus pallets
 
@@ -83,19 +83,19 @@ path = '../../pallets/support/nft'
 
 [dev-dependencies.sp-core]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dev-dependencies.sp-io]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dev-dependencies.pallet-balances]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dev-dependencies.pallet-utility]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [features]
 default = ["std"]

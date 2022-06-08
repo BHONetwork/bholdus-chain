@@ -2,7 +2,7 @@
 
 use frame_support::{
 	traits::{Currency, Imbalance, OnUnbalanced},
-	weights::IdentityFee,
+	weights::{ConstantMultiplier, IdentityFee},
 };
 use pallet_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 use sp_runtime::{FixedPointNumber, Perquintill};
@@ -47,7 +47,7 @@ parameter_types! {
 impl pallet_transaction_payment::Config for Runtime {
 	type OnChargeTransaction =
 		bholdus_memo::MemoOnChargeTransaction<CurrencyAdapter<Balances, DealWithFees>, Balances>;
-	type TransactionByteFee = TransactionByteFee;
+	type LengthToFee = ConstantMultiplier<Balance, TransactionByteFee>;
 	type OperationalFeeMultiplier = OperationalFeeMultiplier;
 	type WeightToFee = fee::WeightToFee;
 	type FeeMultiplierUpdate =

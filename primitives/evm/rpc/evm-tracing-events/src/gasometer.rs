@@ -1,18 +1,18 @@
-// Copyright 2019-2021 Bholdus Inc.
-// This file is part of Bholdus.
+// Copyright 2019-2022 PureStake Inc.
+// This file is part of Moonbeam.
 
-// Bholdus is free software: you can redistribute it and/or modify
+// Moonbeam is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-// Bholdus is distributed in the hope that it will be useful,
+// Moonbeam is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Bholdus.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 use codec::{Decode, Encode};
 
@@ -30,6 +30,7 @@ impl Snapshot {
 	}
 }
 
+#[cfg(feature = "evm-tracing")]
 impl From<Option<evm_gasometer::Snapshot>> for Snapshot {
 	fn from(i: Option<evm_gasometer::Snapshot>) -> Self {
 		if let Some(i) = i {
@@ -58,12 +59,15 @@ pub enum GasometerEvent {
 impl From<evm_gasometer::tracing::Event> for GasometerEvent {
 	fn from(i: evm_gasometer::tracing::Event) -> Self {
 		match i {
-			evm_gasometer::tracing::Event::RecordCost { cost, snapshot } =>
-				Self::RecordCost { cost, snapshot: snapshot.into() },
-			evm_gasometer::tracing::Event::RecordRefund { refund, snapshot } =>
-				Self::RecordRefund { refund, snapshot: snapshot.into() },
-			evm_gasometer::tracing::Event::RecordStipend { stipend, snapshot } =>
-				Self::RecordStipend { stipend, snapshot: snapshot.into() },
+			evm_gasometer::tracing::Event::RecordCost { cost, snapshot } => {
+				Self::RecordCost { cost, snapshot: snapshot.into() }
+			},
+			evm_gasometer::tracing::Event::RecordRefund { refund, snapshot } => {
+				Self::RecordRefund { refund, snapshot: snapshot.into() }
+			},
+			evm_gasometer::tracing::Event::RecordStipend { stipend, snapshot } => {
+				Self::RecordStipend { stipend, snapshot: snapshot.into() }
+			},
 			evm_gasometer::tracing::Event::RecordDynamicCost {
 				gas_cost,
 				memory_gas,
@@ -75,8 +79,9 @@ impl From<evm_gasometer::tracing::Event> for GasometerEvent {
 				gas_refund,
 				snapshot: snapshot.into(),
 			},
-			evm_gasometer::tracing::Event::RecordTransaction { cost, snapshot } =>
-				Self::RecordTransaction { cost, snapshot: snapshot.into() },
+			evm_gasometer::tracing::Event::RecordTransaction { cost, snapshot } => {
+				Self::RecordTransaction { cost, snapshot: snapshot.into() }
+			},
 		}
 	}
 }

@@ -1,33 +1,39 @@
 [workspace]
 members = [
-    'node',
-    'node/cli',
-    'node/service',
+    "node",
+    "node/cli",
+    "node/service",
 
-    'primitives/common',
+    "primitives/common",
 
-    'runtime/chain-extension',
-    'runtime/ulas',
-    'runtime/phoenix',
+    "runtime/chain-extension",
+    "runtime/ulas",
+    "runtime/phoenix",
 
-    'pallets/currencies',
-    'pallets/support',
-    'pallets/support/nft',
-		'pallets/support/nft-marketplace',
-    'pallets/tokens',
-    'pallets/non-fungible-token',
-    'pallets/bridge/native-transfer',
-    'pallets/template',
+    "pallets/currencies",
+    "pallets/support",
+    "pallets/support/nft",
+		"pallets/support/nft-marketplace",
+    "pallets/tokens",
+    "pallets/non-fungible-token",
+    "pallets/bridge/native-transfer",
+    "pallets/template",
 
-    'precompiles/template',
-    'precompiles/utils',
+    "precompiles/template",
+    "precompiles/utils",
 ]
 
 exclude = [
-    'smart-contracts/tokens',
-	'smart-contracts/lixi',
+    "smart-contracts/tokens",
+	  "smart-contracts/lixi",
+
+    # Temporarily ignore EVM Debug and Tracing feature and wait for Moonbeam to update substrate to polkadot-v0.9.22
+    "client/evm/**/*",
+    "primitives/evm/**/*",
+    "runtime/evm-tracer",
+    "precompiles/**/*",
 ]
 
 [profile.release]
-panic = 'unwind'
+panic = "unwind"
 

@@ -1,6 +1,6 @@
 [package]
 authors = ["Bholdus <https://github.com/bholdus>"]
-edition = "2018"
+edition = "2021"
 homepage = "https://bholdus.com"
 name = "runtime-chain-extension"
 repository = "https://github.com/bholdus/bholdus-chain/"
@@ -28,47 +28,47 @@ version = '2.0.1'
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
 optional = true
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.frame-support]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.frame-system]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-runtime]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-core]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.pallet-contracts]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.pallet-balances]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.pallet-randomness-collective-flip]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.bholdus-currencies]
 default-features = false

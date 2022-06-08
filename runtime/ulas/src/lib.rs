@@ -44,7 +44,7 @@ use sp_core::{
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
-		self, BlakeTwo256, Block as BlockT, Dispatchable, Keccak256, NumberFor, PostDispatchInfoOf,
+		self, BlakeTwo256, Block as BlockT, Dispatchable, Keccak256, NumberFor, PostDispatchInfoOf, DispatchInfoOf,
 		Zero,
 	},
 	transaction_validity::{
@@ -159,7 +159,7 @@ construct_runtime!(
 		Bounties: pallet_bounties,
 		ChildBounties: pallet_child_bounties,
 		BagsList: pallet_bags_list,
-
+		NominationPools: pallet_nomination_pools,
 
 		// Bridge support
 		Mmr: pallet_mmr,
@@ -263,9 +263,14 @@ impl fp_self_contained::SelfContainedCall for Call {
 		}
 	}
 
-	fn validate_self_contained(&self, info: &Self::SignedInfo) -> Option<TransactionValidity> {
+	fn validate_self_contained(
+		&self,
+		info: &Self::SignedInfo,
+		dispatch_info: &DispatchInfoOf<Call>,
+		len: usize,
+	) -> Option<TransactionValidity> {
 		match self {
-			Call::Ethereum(call) => call.validate_self_contained(info),
+			Call::Ethereum(call) => call.validate_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}
@@ -492,11 +497,15 @@ impl_runtime_apis! {
 		Block,
 		mmr::Hash,
 	> for Runtime {
-		fn generate_proof(leaf_index: u64)
+		fn generate_proof(leaf_index: pallet_mmr::primitives::LeafIndex)
 			-> Result<(mmr::EncodableOpaqueLeaf, mmr::Proof<mmr::Hash>), mmr::Error>
 		{
-			Mmr::generate_proof(leaf_index)
-				.map(|(leaf, proof)| (mmr::EncodableOpaqueLeaf::from_leaf(&leaf), proof))
+			Mmr::generate_batch_proof(vec![leaf_index]).and_then(|(leaves, proof)|
+				Ok((
+					mmr::EncodableOpaqueLeaf::from_leaf(&leaves[0]),
+					mmr::BatchProof::into_single_leaf_proof(proof)?
+				))
+			)
 		}
 
 		fn verify_proof(leaf: mmr::EncodableOpaqueLeaf, proof: mmr::Proof<mmr::Hash>)
@@ -506,7 +515,7 @@ impl_runtime_apis! {
 				.into_opaque_leaf()
 				.try_decode()
 				.ok_or(mmr::Error::Verify)?;
-			Mmr::verify_leaf(leaf, proof)
+			Mmr::verify_leaves(vec![leaf], mmr::Proof::into_batch_proof(proof))
 		}
 
 		fn verify_proof_stateless(
@@ -515,7 +524,37 @@ impl_runtime_apis! {
 			proof: mmr::Proof<mmr::Hash>
 		) -> Result<(), mmr::Error> {
 			let node = mmr::DataOrHash::Data(leaf.into_opaque_leaf());
-			pallet_mmr::verify_leaf_proof::<mmr::Hashing, _>(root, node, proof)
+			pallet_mmr::verify_leaves_proof::<mmr::Hashing, _>(root, vec![node], mmr::Proof::into_batch_proof(proof))
+		}
+
+		fn mmr_root() -> Result<mmr::Hash, mmr::Error> {
+			Ok(Mmr::mmr_root())
+		}
+
+		fn generate_batch_proof(leaf_indices: Vec<pallet_mmr::primitives::LeafIndex>)
+			-> Result<(Vec<mmr::EncodableOpaqueLeaf>, mmr::BatchProof<mmr::Hash>), mmr::Error>
+		{
+			Mmr::generate_batch_proof(leaf_indices)
+				.map(|(leaves, proof)| (leaves.into_iter().map(|leaf| mmr::EncodableOpaqueLeaf::from_leaf(&leaf)).collect(), proof))
+		}
+
+		fn verify_batch_proof(leaves: Vec<mmr::EncodableOpaqueLeaf>, proof: mmr::BatchProof<mmr::Hash>)
+			-> Result<(), mmr::Error>
+		{
+			let leaves = leaves.into_iter().map(|leaf|
+				leaf.into_opaque_leaf()
+				.try_decode()
+				.ok_or(mmr::Error::Verify)).collect::<Result<Vec<mmr::Leaf>, mmr::Error>>()?;
+			Mmr::verify_leaves(leaves, proof)
+		}
+
+		fn verify_batch_proof_stateless(
+			root: mmr::Hash,
+			leaves: Vec<mmr::EncodableOpaqueLeaf>,
+			proof: mmr::BatchProof<mmr::Hash>
+		) -> Result<(), mmr::Error> {
+			let nodes = leaves.into_iter().map(|leaf|mmr::DataOrHash::Data(leaf.into_opaque_leaf())).collect();
+			pallet_mmr::verify_leaves_proof::<mmr::Hashing, _>(root, nodes, proof)
 		}
 	}
 
@@ -525,11 +564,13 @@ impl_runtime_apis! {
 		}
 
 		fn account_basic(address: H160) -> EVMAccount {
-			EVM::account_basic(&address)
+			let (account, _) = EVM::account_basic(&address);
+			account
 		}
 
 		fn gas_price() -> U256 {
-			<Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price()
+			let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
+			gas_price
 		}
 
 		fn account_code_at(address: H160) -> Vec<u8> {
@@ -566,6 +607,7 @@ impl_runtime_apis! {
 				None
 			};
 
+			let is_transactional = false;
 			<Runtime as pallet_evm::Config>::Runner::call(
 				from,
 				to,
@@ -576,8 +618,9 @@ impl_runtime_apis! {
 				max_priority_fee_per_gas,
 				nonce,
 				access_list.unwrap_or_default(),
+				is_transactional,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			).map_err(|err| err.into())
+			).map_err(|err| err.error.into())
 		}
 
 		fn create(
@@ -599,6 +642,7 @@ impl_runtime_apis! {
 				None
 			};
 
+			let is_transactional = false;
 			<Runtime as pallet_evm::Config>::Runner::create(
 				from,
 				data,
@@ -608,8 +652,9 @@ impl_runtime_apis! {
 				max_priority_fee_per_gas,
 				nonce,
 				access_list.unwrap_or_default(),
+				is_transactional,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			).map_err(|err| err.into())
+			).map_err(|err| err.error.into())
 		}
 
 		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
@@ -658,86 +703,86 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
-		fn trace_transaction(
-			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			traced_transaction: &EthereumTransaction,
-		) -> Result<
-			(),
-			sp_runtime::DispatchError,
-		> {
-			#[cfg(feature = "evm-tracing")]
-			{
-				use bholdus_evm_tracer::tracer::EvmTracer;
-				// Apply the a subset of extrinsics: all the substrate-specific or ethereum
-				// transactions that preceded the requested transaction.
-				for ext in extrinsics.into_iter() {
-					let _ = match &ext.0.function {
-						Call::Ethereum(transact { transaction }) => {
-							if transaction == traced_transaction {
-								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
-								return Ok(());
-							} else {
-								Executive::apply_extrinsic(ext)
-							}
-						}
-						_ => Executive::apply_extrinsic(ext),
-					};
-				}
+	// impl bholdus_evm_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
+	// 	fn trace_transaction(
+	// 		extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+	// 		traced_transaction: &EthereumTransaction,
+	// 	) -> Result<
+	// 		(),
+	// 		sp_runtime::DispatchError,
+	// 	> {
+	// 		#[cfg(feature = "evm-tracing")]
+	// 		{
+	// 			use bholdus_evm_tracer::tracer::EvmTracer;
+	// 			// Apply the a subset of extrinsics: all the substrate-specific or ethereum
+	// 			// transactions that preceded the requested transaction.
+	// 			for ext in extrinsics.into_iter() {
+	// 				let _ = match &ext.0.function {
+	// 					Call::Ethereum(transact { transaction }) => {
+	// 						if transaction == traced_transaction {
+	// 							EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
+	// 							return Ok(());
+	// 						} else {
+	// 							Executive::apply_extrinsic(ext)
+	// 						}
+	// 					}
+	// 					_ => Executive::apply_extrinsic(ext),
+	// 				};
+	// 			}
 
-				Err(sp_runtime::DispatchError::Other(
-					"Failed to find Ethereum transaction among the extrinsics.",
-				))
-			}
-			#[cfg(not(feature = "evm-tracing"))]
-			Err(sp_runtime::DispatchError::Other(
-				"Missing `evm-tracing` compile time feature flag.",
-			))
-		}
+	// 			Err(sp_runtime::DispatchError::Other(
+	// 				"Failed to find Ethereum transaction among the extrinsics.",
+	// 			))
+	// 		}
+	// 		#[cfg(not(feature = "evm-tracing"))]
+	// 		Err(sp_runtime::DispatchError::Other(
+	// 			"Missing `evm-tracing` compile time feature flag.",
+	// 		))
+	// 	}
 
-		fn trace_block(
-			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			known_transactions: Vec<H256>,
-		) -> Result<
-			(),
-			sp_runtime::DispatchError,
-		> {
-			#[cfg(feature = "evm-tracing")]
-			{
-				use bholdus_evm_tracer::tracer::EvmTracer;
-				use sha3::{Digest, Keccak256};
+	// 	fn trace_block(
+	// 		extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+	// 		known_transactions: Vec<H256>,
+	// 	) -> Result<
+	// 		(),
+	// 		sp_runtime::DispatchError,
+	// 	> {
+	// 		#[cfg(feature = "evm-tracing")]
+	// 		{
+	// 			use bholdus_evm_tracer::tracer::EvmTracer;
+	// 			use sha3::{Digest, Keccak256};
 
-				let mut config = <Runtime as pallet_evm::Config>::config().clone();
-				config.estimate = true;
+	// 			let mut config = <Runtime as pallet_evm::Config>::config().clone();
+	// 			config.estimate = true;
 
-				// Apply all extrinsics. Ethereum extrinsics are traced.
-				for ext in extrinsics.into_iter() {
-					match &ext.0.function {
-						Call::Ethereum(transact { transaction }) => {
-							let eth_extrinsic_hash =
-								H256::from_slice(Keccak256::digest(&rlp::encode(transaction)).as_slice());
-							if known_transactions.contains(&eth_extrinsic_hash) {
-								// Each known extrinsic is a new call stack.
-								EvmTracer::emit_new();
-								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
-							} else {
-								let _ = Executive::apply_extrinsic(ext);
-							}
-						}
-						_ => {
-							let _ = Executive::apply_extrinsic(ext);
-						}
-					};
-				}
+	// 			// Apply all extrinsics. Ethereum extrinsics are traced.
+	// 			for ext in extrinsics.into_iter() {
+	// 				match &ext.0.function {
+	// 					Call::Ethereum(transact { transaction }) => {
+	// 						let eth_extrinsic_hash =
+	// 							H256::from_slice(Keccak256::digest(&rlp::encode(transaction)).as_slice());
+	// 						if known_transactions.contains(&eth_extrinsic_hash) {
+	// 							// Each known extrinsic is a new call stack.
+	// 							EvmTracer::emit_new();
+	// 							EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
+	// 						} else {
+	// 							let _ = Executive::apply_extrinsic(ext);
+	// 						}
+	// 					}
+	// 					_ => {
+	// 						let _ = Executive::apply_extrinsic(ext);
+	// 					}
+	// 				};
+	// 			}
 
-				Ok(())
-			}
-			#[cfg(not(feature = "evm-tracing"))]
-			Err(sp_runtime::DispatchError::Other(
-				"Missing `evm-tracing` compile time feature flag.",
-			))
-		}
-	}
+	// 			Ok(())
+	// 		}
+	// 		#[cfg(not(feature = "evm-tracing"))]
+	// 		Err(sp_runtime::DispatchError::Other(
+	// 			"Missing `evm-tracing` compile time feature flag.",
+	// 		))
+	// 	}
+	// }
 
 	#[cfg(feature = "try-runtime")]
 	impl frame_try_runtime::TryRuntime<Block> for Runtime {

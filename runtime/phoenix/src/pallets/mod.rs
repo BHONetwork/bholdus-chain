@@ -114,3 +114,6 @@ pub use bridge_native_transfer::*;
 
 pub mod nft_marketplace;
 pub use nft_marketplace::*;
+
+pub mod nomination_pools;
+pub use nomination_pools::*;

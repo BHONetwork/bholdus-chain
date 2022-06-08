@@ -2,7 +2,7 @@
 name = "bholdus-evm-precompile-template"
 authors = ["Bholdus"]
 description = "A Precompile Template"
-edition = "2018"
+edition = "2021"
 version = "1.0.18"
 
 [dependencies]
@@ -17,16 +17,16 @@ precompile-utils = { package = 'bholdus-evm-precompile-utils', path = "../utils"
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
     "max-encoded-len",
 ] }
-frame-support = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-frame-system = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
+frame-support = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+frame-system = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
 
 # Frontier
-fp-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
-pallet-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.18", default-features = false }
+fp-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22", default-features = false }
+pallet-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.22", default-features = false }
 
 # Local deps
 pallet-template = { path = "../../pallets/template", default-features = false }
@@ -43,9 +43,9 @@ codec = { package = "parity-scale-codec", version = "3.0.0", features = [
 scale-info = { version = "2.0.1", default-features = false, features = [
     "derive",
 ] }
-sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-pallet-timestamp = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
-pallet-balances = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+pallet-timestamp = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+pallet-balances = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
 bholdus-tokens = { path = "../../pallets/tokens" }
 bholdus-support = { path = "../../pallets/support" }
 

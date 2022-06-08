@@ -1,7 +1,7 @@
 [package]
 name = "bholdus-evm-primitives-ext"
 authors = ["Bholdus"]
-edition = "2018"
+edition = "2021"
 homepage = "https://bholdus.com"
 license = "GPL-3.0-only"
 repository = "https://github.com/bholdus/bholdus-chain/"
@@ -15,9 +15,9 @@ evm-tracing-events = { path = "../rpc/evm-tracing-events", default-features = fa
 
 # Substrate
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-sp-externalities = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-sp-runtime-interface = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
-sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18", default-features = false }
+sp-externalities = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+sp-runtime-interface = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
+sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22", default-features = false }
 
 [features]
 default = ["std"]

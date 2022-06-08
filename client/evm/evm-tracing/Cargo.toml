@@ -1,7 +1,7 @@
 [package]
 name = "bholdus-client-evm-tracing"
 authors = ["Bholdus"]
-edition = "2018"
+edition = "2021"
 homepage = "https://bholdus.com"
 license = "GPL-3.0-only"
 repository = "https://github.com/Bholdus/bholdus-chain/"
@@ -19,4 +19,4 @@ bholdus-evm-rpc-primitives-debug = { path = "../../../primitives/evm/rpc/debug" 
 
 # Substrate
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.18" }
+sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }

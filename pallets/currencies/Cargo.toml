@@ -2,7 +2,7 @@
 name = "bholdus-currencies"
 version = "1.0.18"
 authors = ["Nhi Tran <nhi.tran@hawking.network>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [package.metadata.docs.rs]
@@ -25,27 +25,27 @@ version = '2.0.1'
 [dependencies.sp-runtime]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-io]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.frame-support]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.frame-system]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dependencies.bholdus-support]
 default-features = false
@@ -55,17 +55,17 @@ path = '../support'
 [dev-dependencies.pallet-balances]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dev-dependencies.sp-io]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dev-dependencies.sp-core]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.18"
+branch = "bho-polkadot-v0.9.22"
 
 [dev-dependencies.bholdus-tokens]
 package = "bholdus-tokens"
