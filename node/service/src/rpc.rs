@@ -253,16 +253,16 @@ where
 	P: TransactionPool<Block = Block> + 'static,
 	A: ChainApi<Block = Block> + 'static,
 {
-	use beefy_gadget_rpc::{BeefyApiServer, BeefyRpcHandler};
+	use beefy_gadget_rpc::{BeefyApiServer, Beefy};
 	use fc_rpc::{
 		Eth, EthApiServer, EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
 		EthPubSubApiServer, EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
 	};
-	use pallet_contracts_rpc::{ContractsApiServer, ContractsRpc};
-	use pallet_mmr_rpc::{MmrApiServer, MmrRpc};
-	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPaymentRpc};
-	use sc_finality_grandpa_rpc::{GrandpaApiServer, GrandpaRpc};
-	use substrate_frame_rpc_system::{SystemApiServer, SystemRpc};
+	use pallet_contracts_rpc::{ContractsApiServer, Contracts};
+	use pallet_mmr_rpc::{MmrApiServer, Mmr};
+	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPayment};
+	use sc_finality_grandpa_rpc::{GrandpaApiServer, Grandpa};
+	use substrate_frame_rpc_system::{SystemApiServer, System};
 
 	let mut io = RpcModule::new(());
 
@@ -309,16 +309,16 @@ where
 		finality_provider,
 	} = grandpa;
 
-	io.merge(SystemRpc::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
-	io.merge(ContractsRpc::new(client.clone()).into_rpc())?;
+	io.merge(System::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
+	io.merge(Contracts::new(client.clone()).into_rpc())?;
 	#[cfg(not(feature = "with-hyper-runtime"))]
-	io.merge(MmrRpc::new(client.clone()).into_rpc())?;
-	io.merge(TransactionPaymentRpc::new(client.clone()).into_rpc())?;
+	io.merge(Mmr::new(client.clone()).into_rpc())?;
+	io.merge(TransactionPayment::new(client.clone()).into_rpc())?;
 
 	#[cfg(not(feature = "with-hyper-runtime"))]
 	{
 		io.merge(
-			GrandpaRpc::new(
+			Grandpa::new(
 				subscription_executor,
 				shared_authority_set.clone(),
 				shared_voter_state,
@@ -329,7 +329,7 @@ where
 		)?;
 
 		io.merge(
-			BeefyRpcHandler::<Block>::new(
+			Beefy::<Block>::new(
 				beefy.beefy_commitment_stream,
 				beefy.beefy_best_block_stream,
 				beefy.subscription_executor,
