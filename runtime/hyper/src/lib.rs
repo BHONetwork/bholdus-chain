@@ -324,8 +324,8 @@ impl pallet_contracts::Config for Runtime {
 	// if a too-large contract is uploaded. We noticed that it poses
 	// less friction during development when the requirement here is
 	// just more lax.
-	// type MaxCodeLen = ConstU32<{ 256 * 1024 }>;
-	// type RelaxedMaxCodeLen = ConstU32<{ 512 * 1024 }>;
+	type MaxCodeLen = ConstU32<{ 256 * 1024 }>;
+	type RelaxedMaxCodeLen = ConstU32<{ 512 * 1024 }>;
 }
 
 pub struct Migrations;
