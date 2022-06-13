@@ -9,7 +9,7 @@ version = "1.0.19"
 impl-trait-for-tuples = "0.2.2"
 log = "0.4"
 num_enum = { version = "0.5.3", default-features = false }
-sha3 = { version = "0.9", default-features = false }
+sha3 = { version = "0.10", default-features = false }
 
 # Bholdus
 precompile-utils-macro = { package = "bholdus-evm-precompile-utils-macro", path = "macro" }
