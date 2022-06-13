@@ -21,23 +21,23 @@ codec = { default-features = false, features = [
 scale-info = { default-features = false, features = [
 	'derive',
 ], version = '2.0.1' }
-frame-benchmarking = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", optional = true, branch = "bho-polkadot-v0.9.22" }
-frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-pallet-timestamp = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
-pallet-transaction-payment = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
+frame-benchmarking = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", optional = true, branch = "bho-polkadot-v0.9.23" }
+frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+pallet-timestamp = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.23" }
+pallet-transaction-payment = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.23" }
 common-primitives = { default-features = false, path = '../../primitives/common' }
 
 [dev-dependencies]
 serde = '1.0.119'
-sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-sp-io = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-pallet-balances = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.22" }
-pallet-timestamp = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.22" }
+sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+sp-io = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+pallet-balances = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+pallet-timestamp = { git = "https://github.com/BHONetwork/substrate.git", default-features = false, branch = "bho-polkadot-v0.9.23" }
 
 [features]
 default = ['std']
