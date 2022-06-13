@@ -5,6 +5,7 @@ use crate::*;
 parameter_types! {
 	pub const PostUnbondPoolsWindow: u32 = 4;
 	pub const NominationPoolsPalletId: PalletId = PalletId(*b"py/nopls");
+	pub const MinPointsToBalance: u32 = 10;
 }
 
 use sp_runtime::traits::Convert;
@@ -32,4 +33,5 @@ impl pallet_nomination_pools::Config for Runtime {
 	type MaxMetadataLen = ConstU32<256>;
 	type MaxUnbonding = ConstU32<8>;
 	type PalletId = NominationPoolsPalletId;
+	type MinPointsToBalance = MinPointsToBalance;
 }
