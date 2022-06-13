@@ -19,4 +19,4 @@ bholdus-evm-rpc-primitives-debug = { path = "../../../primitives/evm/rpc/debug" 
 
 # Substrate
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.22" }
+sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }

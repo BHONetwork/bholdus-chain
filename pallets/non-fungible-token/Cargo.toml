@@ -26,7 +26,7 @@ version = '1.0.124'
 # [dependencies.max-encoded-len]
 # default-features = false
 # git = "https://github.com/BHONetwork/substrate.git"
-# branch = "bho-polkadot-v0.9.22"
+# branch = "bho-polkadot-v0.9.23"
 # version = '4.0.0-dev'
 
 [dependencies.codec]
@@ -39,29 +39,29 @@ version = '3.0.0'
 [dependencies.frame-benchmarking]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 optional = true
 
 [dependencies.frame-support]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [dependencies.frame-system]
 default-features = false
 # path = '../frame/system'
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [dependencies.sp-runtime]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 ## Bholdus pallets
 
@@ -83,19 +83,19 @@ path = '../../pallets/support/nft'
 
 [dev-dependencies.sp-core]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [dev-dependencies.sp-io]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [dev-dependencies.pallet-balances]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [dev-dependencies.pallet-utility]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.22"
+branch = "bho-polkadot-v0.9.23"
 
 [features]
 default = ["std"]

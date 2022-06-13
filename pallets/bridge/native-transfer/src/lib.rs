@@ -102,7 +102,7 @@ pub mod pallet {
 			PalletId(*b"xnatrans")
 		}
 		pub fn pallet_account_id() -> T::AccountId {
-			Self::pallet_id().into_account()
+			Self::pallet_id().into_account_truncating()
 		}
 	}
 
