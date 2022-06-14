@@ -58,7 +58,7 @@ substrate-wasm-builder =  { git = "https://github.com/BHONetwork/substrate.git",
 default = [
 	"std",
 	# temporarily enable unstable contracts features by default, remove this before using on a production chain.
-	"contracts-unstable-interface",
+	# "contracts-unstable-interface",
 ]
 std = [
 	"codec/std",
