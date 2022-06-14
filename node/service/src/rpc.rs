@@ -21,7 +21,7 @@ use sc_client_api::{
 	AuxStore, BlockOf,
 };
 #[cfg(feature = "with-hyper-runtime")]
-use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
+use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApiServer};
 use sc_finality_grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -399,10 +399,10 @@ where
 	#[cfg(feature = "with-hyper-runtime")]
 	if let Some(command_sink) = command_sink {
 		if sealing == Sealing::Manual {
-			io.extend_with(
+			io.merge(
 				// We provide the rpc handler with the sending end of the channel to allow the rpc
 				// send EngineCommands to the background block authorship task.
-				ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+				ManualSeal::new(command_sink).into_rpc(),
 			);
 		}
 	}
