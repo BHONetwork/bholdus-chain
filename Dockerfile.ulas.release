@@ -1,0 +1,15 @@
+FROM paritytech/ci-linux:production as builder
+
+WORKDIR /bholdus
+
+COPY . .
+
+RUN cargo build --release --features with-ulas-runtime,evm-tracing
+
+RUN mv ./target/release/bholdus /usr/local/bin
+
+FROM rust:1.60.0 as runner
+
+COPY --from=builder /usr/local/bin/bholdus /usr/local/bin/bholdus
+
+RUN  apt-get update && apt-get install python -y
