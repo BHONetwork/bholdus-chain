@@ -1,0 +1,19 @@
+FROM rust:1.60 as builder
+
+WORKDIR /bholdus
+
+COPY . .
+
+RUN rustup update nightly
+RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+RUN apt update && apt install -y git clang curl libssl-dev llvm libudev-dev make
+
+RUN cargo build --release --features with-phoenix-runtime,evm-tracing
+
+RUN cp target/release/bholdus /usr/local/bin/bholdus
+
+FROM debian as runner
+
+COPY --from=builder /usr/local/bin/bholdus /usr/local/bin/bholdus
+
+CMD bholdus --chain=phoenix-dev --alice --tmp --ws-external --rpc-external --rpc-cors=all
