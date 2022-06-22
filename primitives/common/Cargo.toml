@@ -4,7 +4,7 @@ description = "BHO runtime common primitives"
 edition     = "2021"
 license     = "Unlicense"
 name        = "common-primitives"
-version = "1.0.20"
+version = "1.0.21"
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [

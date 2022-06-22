@@ -4,7 +4,7 @@ edition = "2021"
 homepage = "https://bholdus.com"
 name = "phoenix-runtime"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.20"
+version = "1.0.21"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
