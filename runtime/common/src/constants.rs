@@ -39,8 +39,9 @@ pub mod currency {
 	pub const CENTS: Balance = DOLLARS / 100; // assume this is worth about a cent.
 	pub const DOLLARS: Balance = UNITS;
 	pub const BHO: Balance = DOLLARS;
+	pub const MILLIBHO: Balance = BHO / 1000; // 1_000_000_000_000_000
 
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
-		items as Balance * 15 * CENTS + (bytes as Balance) * 6 * CENTS
+		(items as Balance + bytes as Balance) * MILLIBHO / 1_000_000
 	}
 }

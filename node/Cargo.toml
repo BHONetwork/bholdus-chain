@@ -6,7 +6,7 @@ edition = "2021"
 homepage = 'https://bholdus.com'
 name = 'bholdus'
 repository = 'https://github.com/bholdus/bholdus-chain/'
-version = "1.0.21"
+version = "1.0.22"
 
 [[bin]]
 name = 'bholdus'

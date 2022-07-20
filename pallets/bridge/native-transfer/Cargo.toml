@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = 'bholdus-bridge-native-transfer'
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
-version = "1.0.21"
+version = "1.0.22"
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
