@@ -5,7 +5,7 @@ edition = "2021"
 homepage = "https://bholdus.com"
 name = "bholdus-cli"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.21"
+version = "1.0.22"
 
 
 # [build-dependencies]
@@ -16,7 +16,7 @@ git = "https://github.com/BHONetwork/substrate.git"
 branch = "bho-polkadot-v0.9.23"
 
 [dependencies]
-clap = { version = "3.1", features = ["derive"] }
+clap = { version = "3.2", features = ["derive"] }
 log = "0.4.8"
 
 frame-benchmarking = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
