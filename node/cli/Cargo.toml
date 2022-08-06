@@ -13,24 +13,24 @@ version = "1.0.22"
 
 [build-dependencies.substrate-build-script-utils]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies]
 clap = { version = "3.1", features = ["derive"] }
 log = "0.4.8"
 
-frame-benchmarking = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-try-runtime-cli = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-pallet-transaction-payment-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sc-cli = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sc-client-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sc-service = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sc-telemetry = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sp-runtime = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sp-core = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-node-inspect = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sc-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+frame-benchmarking = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+try-runtime-cli = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+pallet-transaction-payment-rpc = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sc-cli = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sc-client-api = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sc-service = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sc-telemetry = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sp-core = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+node-inspect = { optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sc-finality-grandpa = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
 
 service = { package = "bholdus-service", optional = true, path = "../service" }
 

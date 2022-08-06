@@ -28,32 +28,32 @@ version = '2.0.1'
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
 optional = true
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.frame-support]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.frame-system]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.sp-runtime]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.sp-core]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.bholdus-support]
 default-features = false
@@ -63,17 +63,17 @@ path = '../support'
 [dev-dependencies.sp-io]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dev-dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 
 [dev-dependencies.pallet-balances]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [features]
 default = ['std']

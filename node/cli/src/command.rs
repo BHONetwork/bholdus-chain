@@ -16,10 +16,9 @@
 // limitations under the License.
 
 use crate::cli::{Cli, Subcommand};
+use frame_benchmarking_cli::BenchmarkCmd;
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use service::{chain_spec, IdentifyVariant};
-use frame_benchmarking_cli::BenchmarkCmd;
-
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -219,20 +218,21 @@ pub fn run() -> sc_cli::Result<()> {
 		},
 		Some(Subcommand::Benchmark(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			
+
 			// Switch on the concrete benchmark sub-command
 			match cmd {
-				BenchmarkCmd::Pallet(cmd) => {
+				BenchmarkCmd::Pallet(cmd) =>
 					if cfg!(feature = "runtime-benchmarks") {
 						runner.sync_run(|config| {
 							let chain_spec = &config.chain_spec;
-		
+
 							if chain_spec.is_ulas() {
 								#[cfg(feature = "with-ulas-runtime")]
 								{
-									return cmd.run::<service::ulas_runtime::Block, service::UlasExecutor>(
-										config,
-									);
+									return cmd
+										.run::<service::ulas_runtime::Block, service::UlasExecutor>(
+											config,
+										);
 								}
 								#[cfg(not(feature = "with-ulas-runtime"))]
 								return Err(service::ULAS_RUNTIME_NOT_AVAILABLE.into());
@@ -252,13 +252,12 @@ pub fn run() -> sc_cli::Result<()> {
 						Err("Benchmarking wasn't enabled when building the node. \
 						You can enable it with `--features runtime-benchmarks`."
 							.into())
-					}
-				}
+					},
 				BenchmarkCmd::Block(cmd) => {
 					let chain_spec = &runner.config().chain_spec;
 					match chain_spec {
 						#[cfg(feature = "with-ulas-runtime")]
-						spec if spec.is_ulas() => {
+						spec if spec.is_ulas() =>
 							return runner.sync_run(|mut config| {
 								let params = service::new_partial::<
 									service::ulas_runtime::RuntimeApi,
@@ -266,10 +265,9 @@ pub fn run() -> sc_cli::Result<()> {
 								>(&mut config)?;
 
 								cmd.run(params.client)
-							})
-						}
+							}),
 						#[cfg(feature = "with-phoenix-runtime")]
-						spec if spec.is_phoenix() => {
+						spec if spec.is_phoenix() =>
 							return runner.sync_run(|mut config| {
 								let params = service::new_partial::<
 									service::phoenix_runtime::RuntimeApi,
@@ -277,16 +275,15 @@ pub fn run() -> sc_cli::Result<()> {
 								>(&mut config)?;
 
 								cmd.run(params.client)
-							})
-						}
+							}),
 						_ => panic!("invalid chain spec"),
 					}
-				}
+				},
 				BenchmarkCmd::Storage(cmd) => {
 					let chain_spec = &runner.config().chain_spec;
 					match chain_spec {
 						#[cfg(feature = "with-ulas-runtime")]
-						spec if spec.is_ulas() => {
+						spec if spec.is_ulas() =>
 							return runner.sync_run(|mut config| {
 								let params = service::new_partial::<
 									service::ulas_runtime::RuntimeApi,
@@ -297,10 +294,9 @@ pub fn run() -> sc_cli::Result<()> {
 								let storage = params.backend.expose_storage();
 
 								cmd.run(config, params.client, db, storage)
-							})
-						}
+							}),
 						#[cfg(feature = "with-phoenix-runtime")]
-						spec if spec.is_phoenix() => {
+						spec if spec.is_phoenix() =>
 							return runner.sync_run(|mut config| {
 								let params = service::new_partial::<
 									service::phoenix_runtime::RuntimeApi,
@@ -311,19 +307,21 @@ pub fn run() -> sc_cli::Result<()> {
 								let storage = params.backend.expose_storage();
 
 								cmd.run(config, params.client, db, storage)
-							})
-						}
+							}),
 						_ => panic!("invalid chain spec"),
 					}
-				}
+				},
 				BenchmarkCmd::Overhead(_) => Err("Unsupported benchmarking command".into()),
 				BenchmarkCmd::Machine(cmd) => {
-					return runner.sync_run(|config| cmd.run(&config,frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE.clone()));
-				}
+					return runner.sync_run(|config| {
+						cmd.run(
+							&config,
+							frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE.clone(),
+						)
+					});
+				},
 			}
-
-		}
-			,
+		},
 		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
 		Some(Subcommand::Sign(cmd)) => cmd.run(),
 		Some(Subcommand::Verify(cmd)) => cmd.run(),

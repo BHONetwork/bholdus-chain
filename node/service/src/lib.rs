@@ -28,6 +28,7 @@ use beefy_gadget::notification::{
 pub use common_primitives::{
 	AccountId, Balance, BlockNumber, Hash, Header, Nonce, OpaqueBlock as Block,
 };
+use fc_db::Backend as FrontierBackend;
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{EthTask, OverrideHandle};
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
@@ -53,8 +54,6 @@ use std::{
 	sync::{Arc, Mutex},
 	time::Duration,
 };
-use fc_db::Backend as FrontierBackend;
-
 
 pub mod chain_spec;
 pub mod client;
@@ -193,10 +192,7 @@ pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
 }
 
 pub fn open_frontier_backend(config: &Configuration) -> Result<Arc<fc_db::Backend<Block>>, String> {
-	Ok(Arc::new(FrontierBackend::open(
-		&config.database,
-		&frontier_database_dir(config),
-	)?))
+	Ok(Arc::new(FrontierBackend::open(&config.database, &frontier_database_dir(config))?))
 }
 
 /// Builds a new object suitable for chain operations.
@@ -734,7 +730,6 @@ where
 					chain_spec: chain_spec.cloned_box(),
 					is_authority,
 					network: network.clone(),
-					transaction_converter,
 					// Grandpa
 					grandpa: rpc::GrandpaDeps {
 						shared_voter_state: shared_voter_state.clone(),
@@ -760,8 +755,8 @@ where
 				let mut io = rpc::create_full(deps)?;
 
 				// Ethereum Tracing RPC
-				// if ethapi_cmd.contains(&EthApiCmd::Debug) || ethapi_cmd.contains(&EthApiCmd::Trace)
-				// {
+				// if ethapi_cmd.contains(&EthApiCmd::Debug) ||
+				// ethapi_cmd.contains(&EthApiCmd::Trace) {
 				// 	rpc::tracing::extend_with_tracing(
 				// 		client.clone(),
 				// 		tracing_requesters.clone(),
@@ -894,7 +889,7 @@ where
 	task_manager.spawn_essential_handle().spawn_blocking(
 		"beefy-gadget",
 		None,
-		beefy_gadget::start_beefy_gadget::<_, _, _, _,_>(beefy_params),
+		beefy_gadget::start_beefy_gadget::<_, _, _, _, _>(beefy_params),
 	);
 
 	let config = grandpa::Config {
@@ -1174,12 +1169,6 @@ fn spawn_frontier_tasks<RuntimeApi, Executor>(
 			EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
 		);
 	}
-
-	task_manager.spawn_essential_handle().spawn(
-		"frontier-schema-cache-task",
-		Some("frontier"),
-		EthTask::ethereum_schema_cache_task(Arc::clone(&client), Arc::clone(&frontier_backend)),
-	);
 
 	// Spawn Frontier FeeHistory cache maintenance task.
 	task_manager.spawn_essential_handle().spawn(

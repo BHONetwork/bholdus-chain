@@ -113,9 +113,6 @@ pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	pub filter_pool: Option<FilterPool>,
 	/// Subscription Task Executor
 	pub subscription_executor: SubscriptionTaskExecutor,
-	/// Ethereum transaction to Extrinsic converter.
-	#[cfg(not(feature = "with-hyper-runtime"))]
-	pub transaction_converter: TransactionConverters,
 	/// Cache for Ethereum block data.
 	#[cfg(not(feature = "with-hyper-runtime"))]
 	pub block_data_cache: Arc<EthBlockDataCacheTask<Block>>,
@@ -253,16 +250,16 @@ where
 	P: TransactionPool<Block = Block> + 'static,
 	A: ChainApi<Block = Block> + 'static,
 {
-	use beefy_gadget_rpc::{BeefyApiServer, Beefy};
+	use beefy_gadget_rpc::{Beefy, BeefyApiServer};
 	use fc_rpc::{
 		Eth, EthApiServer, EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
 		EthPubSubApiServer, EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
 	};
-	use pallet_contracts_rpc::{ContractsApiServer, Contracts};
-	use pallet_mmr_rpc::{MmrApiServer, Mmr};
-	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPayment};
-	use sc_finality_grandpa_rpc::{GrandpaApiServer, Grandpa};
-	use substrate_frame_rpc_system::{SystemApiServer, System};
+	use pallet_contracts_rpc::{Contracts, ContractsApiServer};
+	use pallet_mmr_rpc::{Mmr, MmrApiServer};
+	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
+	use sc_finality_grandpa_rpc::{Grandpa, GrandpaApiServer};
+	use substrate_frame_rpc_system::{System, SystemApiServer};
 
 	let mut io = RpcModule::new(());
 
@@ -281,7 +278,6 @@ where
 		rpc_config,
 		overrides,
 		filter_pool,
-		transaction_converter,
 		block_data_cache,
 		..
 	} = deps;
@@ -337,25 +333,17 @@ where
 			.into_rpc(),
 		)?;
 
-		io.merge(
-			Net::new(
-				client.clone(),
-				network.clone(),
-				// Whether to format the `peer_count` response as Hex (default) or not.
-				true,
-			)
-			.into_rpc(),
-		)?;
-
 		// Nor any signers
 		let signers = Vec::new();
+
+		let no_tx_converter: Option<fp_rpc::NoTransactionConverter> = None;
 
 		io.merge(
 			Eth::new(
 				client.clone(),
 				pool.clone(),
 				graph,
-				Some(transaction_converter),
+				no_tx_converter,
 				network.clone(),
 				signers,
 				overrides.clone(),
@@ -391,6 +379,16 @@ where
 				network.clone(),
 				deps.subscription_executor.clone(),
 				overrides,
+			)
+			.into_rpc(),
+		)?;
+
+		io.merge(
+			Net::new(
+				client.clone(),
+				network.clone(),
+				// Whether to format the `peer_count` response as Hex (default) or not.
+				true,
 			)
 			.into_rpc(),
 		)?;

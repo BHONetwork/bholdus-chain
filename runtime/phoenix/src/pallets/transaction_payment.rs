@@ -45,6 +45,7 @@ parameter_types! {
 }
 
 impl pallet_transaction_payment::Config for Runtime {
+	type Event = Event;
 	type OnChargeTransaction =
 		bholdus_memo::MemoOnChargeTransaction<CurrencyAdapter<Balances, DealWithFees>, Balances>;
 	type LengthToFee = ConstantMultiplier<Balance, TransactionByteFee>;
