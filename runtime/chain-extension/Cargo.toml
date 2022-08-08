@@ -10,7 +10,7 @@ version = "1.0.23"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-enumflags2 = { version = "0.6.2" }
+enumflags2 = { version = "0.7.5" }
 smallvec = "1.8.0"
 
 [dependencies.codec]
