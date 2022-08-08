@@ -5,7 +5,7 @@ edition = "2021"
 homepage = "https://bholdus.com"
 license = "GPL-3.0-only"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.22"
+version = "1.0.23"
 
 [dependencies]
 futures = { version = "0.3", features = ["compat"] }
@@ -19,19 +19,19 @@ bholdus-evm-rpc-core-types = { path = "../../rpc-core/types" }
 bholdus-evm-rpc-primitives-debug = { path = "../../../../primitives/evm/rpc/debug" }
 
 # Substrate
-sc-client-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sc-utils = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sp-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sp-block-builder = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sp-blockchain = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
-sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23" }
+sc-client-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sc-utils = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sp-api = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sp-block-builder = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sp-blockchain = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
+sp-runtime = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26" }
 
 # Frontier
 ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
 ethereum-types = "0.13.1"
-fc-consensus = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.23" }
-fc-db = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.23" }
-fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.23", features = ["rpc_binary_search_estimate"] }
-fp-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.23" }
+fc-consensus = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.26" }
+fc-db = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.26" }
+fc-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.26", features = ["rpc_binary_search_estimate"] }
+fp-rpc = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.26" }

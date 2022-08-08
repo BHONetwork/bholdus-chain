@@ -1,6 +1,6 @@
 [package]
 name = "runtime-common"
-version = "1.0.22"
+version = "1.0.23"
 description = "Common runtime code for all runtimes"
 authors = ["Daniel Lam"]
 edition = "2021"
@@ -13,9 +13,9 @@ targets = ["x86_64-unknown-linux-gnu"]
 [dependencies]
 smallvec = "1.8.0"
 
-frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
 
 common-primitives = { default-features = false, path = "../../primitives/common" }
 

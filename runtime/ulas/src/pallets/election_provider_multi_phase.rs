@@ -1,9 +1,11 @@
 #![allow(unused_imports)]
 
 use codec::Decode;
-use frame_election_provider_support::{onchain, SequentialPhragmen, ElectionDataProvider};
+use frame_election_provider_support::{
+	onchain, BalancingConfig, ElectionDataProvider, SequentialPhragmen,
+};
 use frame_support::{
-	traits::{ConstU16, ConstU32},
+	traits::{ConstU16, ConstU32, Get},
 	weights::{constants::BlockExecutionWeight, DispatchClass},
 };
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
@@ -71,23 +73,22 @@ pub const MINER_MAX_ITERATIONS: u32 = 10;
 
 /// A source of random balance for NposSolver, which is meant to be run by the OCW election miner.
 pub struct OffchainRandomBalancing;
-impl frame_support::pallet_prelude::Get<Option<(usize, sp_npos_elections::ExtendedBalance)>>
-	for OffchainRandomBalancing
-{
-	fn get() -> Option<(usize, sp_npos_elections::ExtendedBalance)> {
+impl Get<Option<BalancingConfig>> for OffchainRandomBalancing {
+	fn get() -> Option<BalancingConfig> {
 		use sp_runtime::traits::TrailingZeroInput;
-		let iters = match MINER_MAX_ITERATIONS {
+		let iterations = match MINER_MAX_ITERATIONS {
 			0 => 0,
-			max @ _ => {
+			max => {
 				let seed = sp_io::offchain::random_seed();
 				let random = <u32>::decode(&mut TrailingZeroInput::new(&seed))
-					.expect("input is padded with zeroes; qed")
-					% max.saturating_add(1);
+					.expect("input is padded with zeroes; qed") %
+					max.saturating_add(1);
 				random as usize
 			},
 		};
 
-		Some((iters, 0))
+		let config = BalancingConfig { iterations, tolerance: 0 };
+		Some(config)
 	}
 }
 

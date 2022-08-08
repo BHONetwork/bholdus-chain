@@ -7,7 +7,7 @@ license = 'Unlicense'
 name = "bholdus-nft-marketplace"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain.git'
-version = "1.0.22"
+version = "1.0.23"
 
 [dependencies]
 codec = { default-features = false, features = [
@@ -20,13 +20,13 @@ scale-info = { default-features = false, features = [
 enumflags2 = "0.6.3"
 serde = { version = "1.0.124", optional = true}
 
-frame-benchmarking = { default-features = false, optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-pallet-balances = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+frame-benchmarking = { default-features = false, optional = true, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+frame-support = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+frame-system = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sp-runtime = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sp-std = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+sp-core = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+pallet-balances = { default-features = false, git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
 
 ## Bholdus deps
 common-primitives = { default-features = false, path = "../../primitives/common" }
@@ -36,8 +36,8 @@ bholdus-support-nft = { package = "support-nft", default-features = false, path 
 bholdus-support-nft-marketplace = { package = "support-nft-marketplace", default-features = false, path = "../../pallets/support/nft-marketplace" }
 
 [dev-dependencies]
-sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
-pallet-utility = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.23" }
+sp-io = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
+pallet-utility = { git = "https://github.com/BHONetwork/substrate.git", branch = "bho-polkadot-v0.9.26" }
 bholdus-currencies = { default-features = false, path = "../../pallets/currencies" }
 bholdus-nft = { default-features = false, path = "../../pallets/non-fungible-token" }
 

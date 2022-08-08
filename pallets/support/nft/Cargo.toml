@@ -7,7 +7,7 @@ name = 'support-nft'
 license = "Apache-2.0"
 readme = 'README.md'
 repository = 'https://github.com/bholdus/bholdus-chain'
-version = "1.0.22"
+version = "1.0.23"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -23,7 +23,7 @@ version = '1.0.124'
 # [dependencies.max-encoded-len]
 # default-features = false
 # git = "https://github.com/BHONetwork/substrate.git"
-# branch = "bho-polkadot-v0.9.23"
+# branch = "bho-polkadot-v0.9.26"
 # version = '4.0.0-dev'
 
 [dependencies.codec]
@@ -35,30 +35,30 @@ version = '3.0.0'
 [dependencies.sp-std]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.sp-runtime]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.frame-support]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dependencies.frame-system]
 default-features = false
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dev-dependencies.sp-io]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [dev-dependencies.sp-core]
 git = "https://github.com/BHONetwork/substrate.git"
-branch = "bho-polkadot-v0.9.23"
+branch = "bho-polkadot-v0.9.26"
 
 [features]
 default = ["std"]

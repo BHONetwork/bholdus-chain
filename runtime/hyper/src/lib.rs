@@ -28,7 +28,7 @@ pub use frame_support::{
 	traits::{ConstU32, KeyOwnerProofSystem, Randomness, StorageInfo},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
-		IdentityFee, Weight, ConstantMultiplier,
+		ConstantMultiplier, IdentityFee, Weight,
 	},
 	StorageValue,
 };
@@ -262,6 +262,7 @@ parameter_types! {
 }
 
 impl pallet_transaction_payment::Config for Runtime {
+	type Event = Event;
 	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
 	type OperationalFeeMultiplier = OperationalFeeMultiplier;
 	type WeightToFee = IdentityFee<Balance>;
@@ -326,6 +327,7 @@ impl pallet_contracts::Config for Runtime {
 	// just more lax.
 	type MaxCodeLen = ConstU32<{ 256 * 1024 }>;
 	type RelaxedMaxCodeLen = ConstU32<{ 512 * 1024 }>;
+	type MaxStorageKeyLen = ConstU32<128>;
 }
 
 pub struct Migrations;
@@ -572,7 +574,7 @@ impl_runtime_apis! {
 
 		fn get_storage(
 			address: AccountId,
-			key: [u8; 32],
+			key: Vec<u8>,
 		) -> pallet_contracts_primitives::GetStorageResult {
 			Contracts::get_storage(address, key)
 		}

@@ -5,21 +5,21 @@ edition = "2021"
 homepage = "https://bholdus.com"
 license = "GPL-3.0-only"
 repository = "https://github.com/Bholdus/bholdus-chain/"
-version = "1.0.22"
+version = "1.0.23"
 
 [dependencies]
 environmental = { version = "1.1.2", default-features = false }
 
 # Substrate
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-sp-runtime-interface = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23", default-features = false }
+sp-runtime-interface = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26", default-features = false }
 
 # Ethereum
 ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
 ethereum-types = { version = "0.13.1", default-features = false }
-evm = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false, features = ["with-codec"] }
-evm-gasometer = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false }
-evm-runtime = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false }
+evm = { git = "https://github.com/rust-blockchain/evm", rev = "01bcbd2205a212c34451d3b4fabc962793b057d3", default-features = false, features = ["with-codec"] }
+evm-gasometer = { git = "https://github.com/rust-blockchain/evm", rev = "01bcbd2205a212c34451d3b4fabc962793b057d3", default-features = false }
+evm-runtime = { git = "https://github.com/rust-blockchain/evm", rev = "01bcbd2205a212c34451d3b4fabc962793b057d3", default-features = false }
 
 [features]
 default = ["std"]
