@@ -3,29 +3,29 @@ name = "bholdus-evm-precompile-utils"
 authors = ["Bholdus"]
 description = "Utils to write EVM precompiles."
 edition = "2021"
-version = "1.0.22"
+version = "1.0.23"
 
 [dependencies]
 impl-trait-for-tuples = "0.2.2"
 log = "0.4"
 num_enum = { version = "0.5.3", default-features = false }
-sha3 = { version = "0.9", default-features = false }
+sha3 = { version = "0.10", default-features = false }
 
 # Bholdus
 precompile-utils-macro = { package = "bholdus-evm-precompile-utils-macro", path = "macro" }
 
 # Substrate
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
-frame-support = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23", default-features = false }
-frame-system = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23", default-features = false }
-sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23", default-features = false }
-sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23", default-features = false }
-sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.23", default-features = false }
+frame-support = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26", default-features = false }
+frame-system = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26", default-features = false }
+sp-core = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26", default-features = false }
+sp-io = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26", default-features = false }
+sp-std = { git = "https://github.com/BHONetwork/substrate", branch = "bho-polkadot-v0.9.26", default-features = false }
 
 # Frontier
-evm = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false, features = [ "with-codec" ] }
-fp-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.23", default-features = false }
-pallet-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.23", default-features = false }
+evm = { git = "https://github.com/rust-blockchain/evm", rev = "01bcbd2205a212c34451d3b4fabc962793b057d3", default-features = false, features = [ "with-codec" ] }
+fp-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.26", default-features = false }
+pallet-evm = { git = "https://github.com/BHONetwork/frontier.git", branch = "bho-polkadot-v0.9.26", default-features = false }
 
 [dev-dependencies]
 hex-literal = "0.3.1"
