@@ -465,7 +465,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-cli",
  "bholdus-service",
@@ -476,7 +476,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-bridge-native-transfer"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "common-primitives",
  "frame-benchmarking",
@@ -495,7 +495,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-cli"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-service",
  "clap 3.2.16",
@@ -517,7 +517,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-currencies"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -535,7 +535,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-template"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-evm-precompile-utils",
  "bholdus-support",
@@ -563,7 +563,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-utils"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-evm-precompile-utils-macro",
  "evm",
@@ -584,7 +584,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-precompile-utils-macro"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "num_enum",
  "proc-macro2",
@@ -595,7 +595,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-evm-primitives-ext"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "ethereum-types 0.12.1",
  "evm-tracing-events",
@@ -607,7 +607,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-memo"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "common-primitives",
  "frame-benchmarking",
@@ -627,7 +627,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-nft"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-support",
  "common-primitives",
@@ -649,7 +649,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-nft-marketplace"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-currencies",
  "bholdus-nft",
@@ -675,7 +675,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-service"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "async-trait",
  "beefy-gadget",
@@ -757,7 +757,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-support"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -772,7 +772,7 @@ dependencies = [
 
 [[package]]
 name = "bholdus-tokens"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-support",
  "enumflags2 0.6.4",
@@ -1255,7 +1255,7 @@ dependencies = [
 
 [[package]]
 name = "common-primitives"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "parity-scale-codec 3.1.5",
  "scale-info",
@@ -2056,7 +2056,7 @@ dependencies = [
 
 [[package]]
 name = "evm-tracing-events"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "environmental",
  "ethereum",
@@ -3133,7 +3133,7 @@ dependencies = [
 
 [[package]]
 name = "hyper-runtime"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "frame-benchmarking",
  "frame-executive",
@@ -5601,7 +5601,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-template"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5972,7 +5972,7 @@ dependencies = [
 
 [[package]]
 name = "phoenix-runtime"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",
@@ -6737,7 +6737,7 @@ dependencies = [
 
 [[package]]
 name = "runtime-chain-extension"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-currencies",
  "common-primitives",
@@ -6758,7 +6758,7 @@ dependencies = [
 
 [[package]]
 name = "runtime-common"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "common-primitives",
  "frame-support",
@@ -9269,7 +9269,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "support-nft"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -9284,7 +9284,7 @@ dependencies = [
 
 [[package]]
 name = "support-nft-marketplace"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "bholdus-support",
  "bholdus-tokens",
@@ -9829,7 +9829,7 @@ dependencies = [
 
 [[package]]
 name = "ulas-runtime"
-version = "1.0.22"
+version = "1.0.23"
 dependencies = [
  "beefy-primitives",
  "bholdus-bridge-native-transfer",

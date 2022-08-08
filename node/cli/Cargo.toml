@@ -5,7 +5,7 @@ edition = "2021"
 homepage = "https://bholdus.com"
 name = "bholdus-cli"
 repository = "https://github.com/bholdus/bholdus-chain/"
-version = "1.0.22"
+version = "1.0.23"
 
 
 # [build-dependencies]

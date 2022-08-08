@@ -1,6 +1,6 @@
 [package]
 name = "hyper-runtime"
-version = "1.0.22"
+version = "1.0.23"
 authors = ["BHO Network <daniel.lam@bho.network>"]
 edition = "2021"
 license = "Unlicense"
