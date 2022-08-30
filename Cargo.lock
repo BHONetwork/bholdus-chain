@@ -498,7 +498,7 @@ name = "bholdus-cli"
 version = "1.0.23"
 dependencies = [
  "bholdus-service",
- "clap 3.2.16",
+ "clap 3.2.18",
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "log",
@@ -1196,9 +1196,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.2.16"
+version = "3.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3dbbb6653e7c55cc8595ad3e1f7be8f32aba4eb7ff7f0fd1163d4f3d137c0a9"
+checksum = "b15f2ea93df33549dbe2e8eecd1ca55269d63ae0b3ba1f55db030817d1c2867f"
 dependencies = [
  "atty",
  "bitflags",
@@ -1213,9 +1213,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "3.2.15"
+version = "3.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ba52acd3b0a5c33aeada5cdaa3267cdc7c594a98731d4268cdc1532f4264cb4"
+checksum = "ea0c8bce528c4be4da13ea6fead8965e95b6073585a2f05204bd8f4119f82a65"
 dependencies = [
  "heck 0.4.0",
  "proc-macro-error",
@@ -2408,7 +2408,7 @@ source = "git+https://github.com/BHONetwork/substrate.git?branch=bho-polkadot-v0
 dependencies = [
  "Inflector",
  "chrono",
- "clap 3.2.16",
+ "clap 3.2.18",
  "comfy-table",
  "frame-benchmarking",
  "frame-support",
@@ -4651,7 +4651,7 @@ name = "node-inspect"
 version = "0.9.0-dev"
 source = "git+https://github.com/BHONetwork/substrate.git?branch=bho-polkadot-v0.9.26#e5808fc283c05dbeaaddff2cfd2639f68cfc6f31"
 dependencies = [
- "clap 3.2.16",
+ "clap 3.2.18",
  "parity-scale-codec 3.1.5",
  "sc-cli",
  "sc-client-api",
@@ -7025,7 +7025,7 @@ version = "0.10.0-dev"
 source = "git+https://github.com/BHONetwork/substrate.git?branch=bho-polkadot-v0.9.26#e5808fc283c05dbeaaddff2cfd2639f68cfc6f31"
 dependencies = [
  "chrono",
- "clap 3.2.16",
+ "clap 3.2.18",
  "fdlimit",
  "futures 0.3.21",
  "hex",
@@ -9765,7 +9765,7 @@ name = "try-runtime-cli"
 version = "0.10.0-dev"
 source = "git+https://github.com/BHONetwork/substrate.git?branch=bho-polkadot-v0.9.26#e5808fc283c05dbeaaddff2cfd2639f68cfc6f31"
 dependencies = [
- "clap 3.2.16",
+ "clap 3.2.18",
  "jsonrpsee",
  "log",
  "parity-scale-codec 3.1.5",
