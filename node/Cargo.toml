@@ -20,7 +20,7 @@ git = "https://github.com/BHONetwork/substrate.git"
 branch = "bho-polkadot-v0.9.26"
 
 [dependencies]
-futures = { version = "0.3.9", features = ["compat"] }
+futures = { version = "0.3.26", features = ["compat"] }
 hex = '0.4.3'
 
 bholdus-cli = { path = 'cli' }
